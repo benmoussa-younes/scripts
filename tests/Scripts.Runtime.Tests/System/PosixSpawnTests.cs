@@ -134,10 +134,18 @@ public sealed class PosixSpawnTests
     }
 
     [Fact]
-    public void A_descriptor_open_in_bcs_is_not_inherited_by_the_child()
+    public void A_descriptor_open_in_scripts_is_not_inherited_by_the_child()
     {
-        var fileDescriptor = Libc.Open(NativeText.ToNullTerminated("/dev/null"), Libc.OpenReadOnly, 0);
-        Assert.True(fileDescriptor >= 3, "the probe needs a descriptor above stdio");
+        var opened = Libc.Open(NativeText.ToNullTerminated("/dev/null"), Libc.OpenReadOnly, 0);
+        Assert.True(opened >= 0, "cannot open the probe");
+        var fileDescriptor = opened;
+        if (fileDescriptor < 3)
+        {
+            fileDescriptor = Libc.FileControl(opened, Libc.DuplicateAboveCloseOnExec, 4);
+            Assert.True(fileDescriptor >= 4, "the probe needs a descriptor above stdio and above ls's directory descriptor");
+            _ = Libc.Close(opened);
+        }
+
         try
         {
             var child = Launch("/bin/ls", ["/proc/self/fd"]);

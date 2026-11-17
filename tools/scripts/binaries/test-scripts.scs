@@ -48,14 +48,14 @@ function expect_exit(label: string, outcome: process_result, expected: integer, 
 
 let root = filesystem.make_temporary_directory("scripts-script-tests-")?
 
-# 1. git available: the computed version starts with the 0.1.1 line.
+# 1. git available: the computed version starts with the 0.1.2 line.
 let computed = run_version(repo, "/usr/local/bin:/usr/bin:/bin")
 if computed.exit_code != 0 {
     fail(root, "version git", "exit {computed.exit_code}: {computed.standard_error.trim_whitespace()}")
 }
 let computed_text = computed.standard_output.trim_whitespace()
-if not computed_text.starts_with("0.1.1") {
-    fail(root, "version git", "expected a 0.1.1 version, got '{computed_text}'")
+if not computed_text.starts_with("0.1.2") {
+    fail(root, "version git", "expected a 0.1.2 version, got '{computed_text}'")
 }
 io.write_standard_output_line("ok   version git is {computed_text}")
 

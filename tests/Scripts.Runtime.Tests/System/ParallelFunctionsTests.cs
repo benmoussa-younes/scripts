@@ -266,9 +266,13 @@ public sealed class ParallelFunctionsTests
 
         Assert.Equal("spawn_failed\n", lastOutput);
 
-        // 15 items of 5 s at the I/O ceiling (logical cores ≥ 8 here) fit in at most two waves; three waves
-        // (~15 s) would mean a worker owned a whole block, the regression this guards. The bound is generous.
-        Assert.True(lastStopwatch.Elapsed < TimeSpan.FromSeconds(11), $"the last-item failure took {lastStopwatch.Elapsed}");
+        // The ceiling is the runner's logical CPU count: 15 items of 5 s take ceil(15 / workers) waves. A worker
+        // that owned the whole block would take 15 waves (75 s); the bound below follows the runner and stays
+        // well under that, so the regression is caught on 2-core CI runners as well as on a large host.
+        var workers = Math.Max(1, Math.Min(15, Environment.ProcessorCount));
+        var waves = (15 + workers - 1) / workers;
+        var bound = TimeSpan.FromSeconds((5 * waves) + 10);
+        Assert.True(lastStopwatch.Elapsed < bound, $"the last-item failure took {lastStopwatch.Elapsed} (bound {bound}, workers {workers})");
     }
 
     /// <summary>

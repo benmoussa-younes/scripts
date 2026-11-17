@@ -1,3 +1,10 @@
+scripts (0.1.2) unstable; urgency=medium
+
+  * Make the release gate portable on GitHub Actions: CPU-count-aware parallel
+    bound and a descriptor probe above stdio. No language change.
+
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Tue, 17 Nov 2026 20:06:46 +0000
+
 scripts (0.1.1) unstable; urgency=medium
 
   * Fix a closed standard input when the .NET runtime owns descriptor 0: treat

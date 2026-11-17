@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-17
+
+### Changed
+
+- Make the release gate portable on GitHub Actions: the parallel promptness
+  bound follows the runner's CPU count, and the spawn descriptor probe
+  duplicates a low descriptor above stdio. No language or binary behaviour
+  change.
+
 ## [0.1.1] - 2026-11-17
 
 ### Fixed
@@ -44,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; the JSON codecs
   are local GPL-3.0-or-later adaptations.
 
-[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.2
 [0.1.1]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.1
 [0.1.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.0

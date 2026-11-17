@@ -10,7 +10,7 @@ designed for humans and agents.
 
 ## Status
 
-Scripts 0.1.1 is the initial public release. The language is usable; as a
+Scripts 0.1.2 is the initial public release. The language is usable; as a
 `0.y.z` release its API may still change. Supported platform: Linux x86-64,
 glibc 2.34 or newer.
 
@@ -22,15 +22,15 @@ and libm; no .NET runtime is needed at run time.
 Debian/Ubuntu package:
 
 ```sh
-sudo apt install ./scripts_0.1.1_amd64.deb
+sudo apt install ./scripts_0.1.2_amd64.deb
 scripts --version
 ```
 
 Binary tarball:
 
 ```sh
-tar -xzf scripts_0.1.1_linux-x64.tar.gz
-sudo install -m 755 scripts-0.1.1/scripts /usr/local/bin/scripts
+tar -xzf scripts_0.1.2_linux-x64.tar.gz
+sudo install -m 755 scripts-0.1.2/scripts /usr/local/bin/scripts
 ```
 
 From source (build requirements: .NET 10 SDK, clang, zlib1g-dev):
