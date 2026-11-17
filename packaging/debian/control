@@ -8,8 +8,7 @@ Maintainer: Younes BENMOUSSA <younes.benmoussa@pm.me>
 Homepage: https://github.com/benmoussa-younes/scripts
 Description: typed scripting language with a native interpreter
  scripts is a statically typed scripting language. Its interpreter is shipped
- in a single native binary (Native AOT, .NET 10) with no dependency on a
- .NET runtime.
+ in a single native binary (Native AOT, .NET 10); it needs no .NET runtime.
  .
  It provides a static checker, a frozen standard library
  (filesystem, processes, environment), typed errors
