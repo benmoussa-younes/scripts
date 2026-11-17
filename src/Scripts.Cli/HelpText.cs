@@ -14,7 +14,7 @@ public static class HelpText
     {
         var lines = new List<string>();
         lines.Add($"{VersionLine} ({LanguageReference.ProductName})");
-        lines.Add("Statically typed system scripting language for Linux, single native binary.");
+        lines.Add("Statically typed system scripting language for Linux, interpreted by one native binary.");
         lines.Add(string.Empty);
         lines.Add("USAGE");
         lines.Add("  scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]");

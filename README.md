@@ -1,10 +1,11 @@
-# scripts — a typed scripting language for Linux
+# scripts — a statically typed programming language for Linux
 
-`scripts` is a statically typed language for Linux system automation, compiled
-with .NET 10 Native AOT into one native executable: no runtime to install. It
-keeps one file, no build step, direct access to files and processes, and removes
-the cause of most shell bugs: data silently re-parsed as code. It is designed for
-humans and agents.
+`scripts` is a statically typed scripting language for Linux system automation.
+Its reference implementation is an interpreter shipped as one native executable
+(Native AOT, .NET 10): no runtime to install. A `.scs` file is loaded, statically
+checked and interpreted; there is no build step for the script. It keeps one
+file, direct access to files and processes, and removes the cause of most shell
+bugs: data silently re-parsed as code. It is designed for humans and agents.
 
 ## 10-second demo
 
@@ -45,12 +46,13 @@ filesystem corpus is generated at test time, not tracked.
 
 ## Layout
 
-- `src/`: the compiler, checker, runtime, CLI and the vendored Core subset.
+- `src/`: the parser and static checker, the interpreter/runtime, the CLI and
+  the vendored Core subset.
 - `tests/`: the xUnit projects (published and run as Native AOT executables),
   `Scripts.Corpus.Tests`, and the `Corpus/` data (base, stdlib, errors,
   explain, stdin, migration, differential, json, describe). The four black-box
   axes (fuzz, semantics, JSON, system) run in `Scripts.Corpus.Tests`; no shell
-  corpus remains.
+  test runner remains (the migration fixtures keep their `.sh` scripts).
 - `tools/scripts/`: the gate and verifiers.
 - `packaging/`: the Debian package and the source and binary tarballs.
 - `docs/`: product documentation; the agent plan and kanban live in

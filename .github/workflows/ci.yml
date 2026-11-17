@@ -24,5 +24,5 @@ jobs:
         run: |
           pipx install reuse==5.0.2
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Gate (build, Native AOT tests, self-test, licences)
+      - name: Gate (build, AOT app, helpers, AOT tests, licences)
         run: bash tools/scripts/binaries/check-all.sh

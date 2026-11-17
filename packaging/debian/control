@@ -6,10 +6,10 @@ Architecture: amd64
 Depends: libc6 (>= 2.34)
 Maintainer: Younes BENMOUSSA <younes.benmoussa@pm.me>
 Homepage: https://github.com/benmoussa-younes/scripts
-Description: typed scripting language in one native binary
- scripts is a statically typed scripting language, compiled
- into a single native binary (Native AOT, .NET 10) with no dependency
- on a .NET runtime.
+Description: typed scripting language with a native interpreter
+ scripts is a statically typed scripting language. Its interpreter is shipped
+ in a single native binary (Native AOT, .NET 10) with no dependency on a
+ .NET runtime.
  .
  It provides a static checker, a frozen standard library
  (filesystem, processes, environment), typed errors

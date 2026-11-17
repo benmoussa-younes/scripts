@@ -5,8 +5,10 @@ scripts (0.1.0) unstable; urgency=medium
     - static checker, `run`, `check`, `explain`, `fmt --check` and
       `describe --format json`, with `--errors-json` and `--json-out`;
     - frozen standard library (filesystem, processes, environment) with typed
-      errors and bounded-concurrency helpers;
-    - Native AOT single binary, no .NET runtime dependency;
+      errors and bounded-concurrency helpers, including process.set_umask,
+      filesystem.make_hard_link, filesystem.get_file_system_status,
+      integer.absolute and float.absolute;
+    - Native AOT interpreter binary, no .NET runtime dependency;
     - vendored Core subset (Results, Serialization.Values, Concurrency) under
       LGPL-3.0-or-later; the language itself is GPL-3.0-or-later.
 

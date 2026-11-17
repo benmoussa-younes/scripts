@@ -18,7 +18,7 @@ ARCHITECTURE="amd64"
 BINAIRE="scripts"
 
 # Single project version: computed from git (tools/scripts/binaries/version.sh), the same as
-# the one compiled into the binary (LanguageReference.Version). The Version
+# the one built into the binary (LanguageReference.Version). The Version
 # field of DEBIAN/control is rewritten below with this value. A tag build names the
 # package X.Y.Z; a clean post-tag build names it X.Y.Z+N.<hash>, the version the
 # binary also reports, so a development package never overwrites a release one.

@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (for example v0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: ga
+
+      - name: Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev lintian
+
+      - name: Install reuse
+        run: |
+          pipx install reuse==5.0.2
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Gate (build, AOT app, helpers, AOT tests, licences)
+        run: bash tools/scripts/binaries/check-all.sh
+
+      - name: Verify tag matches the version
+        run: |
+          version="$(sh tools/scripts/binaries/version.sh)"
+          test "$version" = "${TAG#v}"
+
+      - name: Build Debian package and tarballs
+        run: |
+          bash packaging/build-deb.sh
+          bash packaging/build-tarballs.sh --skip-deb
+
+      - name: Verify release evidence
+        run: |
+          bash packaging/verify-release.sh --write
+          bash packaging/verify-release.sh
+
+      - name: Smoke-test the package
+        run: bash packaging/smoke-test.sh
+
+      - name: Generate SPDX SBOM and collect assets
+        run: |
+          mkdir -p artifacts
+          cp packaging/*.deb packaging/*.tar.gz packaging/SHA256SUMS \
+            packaging/tarballs.sha256 packaging/RELEASE-EVIDENCE artifacts/
+          pipx run reuse==5.0.2 spdx > artifacts/scripts.spdx
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          if-no-files-found: error
+          path: artifacts/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: artifacts
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" artifacts/* --clobber
+          else
+            gh release create "$TAG" \
+              --verify-tag \
+              --title "Scripts ${TAG}" \
+              --generate-notes \
+              artifacts/*
+          fi

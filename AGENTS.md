@@ -38,8 +38,9 @@ filesystem corpus is generated at test time, not tracked.
   (product documentation); no samples.
 - `tests/Scripts.Corpus.Tests` runs the corpus in xUnit; its data lives under
   `tests/Corpus`. The four black-box axes (fuzz, semantics, JSON, system) run
-  in the same project; no shell corpus remains. Every test project is published
-  as a Native AOT executable and run directly.
+  in the same project; no shell test runner remains (the migration fixtures keep
+  their `.sh` scripts). Every test project is published as a Native AOT
+  executable and run directly.
 - Scripts is consumed as source; no NuGet package is produced.
 
 ## Maintenance
