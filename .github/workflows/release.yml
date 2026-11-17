@@ -34,6 +34,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Verify the signed tag
+        run: |
+          gpg --import .github/release-key.asc
+          git verify-tag "$TAG"
+
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:

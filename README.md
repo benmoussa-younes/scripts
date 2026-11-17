@@ -3,9 +3,9 @@
 `scripts` is a statically typed scripting language for Linux system automation.
 Its reference implementation is an interpreter shipped as one native executable
 (Native AOT, .NET 10): no runtime to install. A `.scs` file is loaded, statically
-checked and interpreted; there is no build step for the script. It keeps one
-file, direct access to files and processes, and removes the cause of most shell
-bugs: data silently re-parsed as code. It is designed for humans and agents.
+checked and interpreted; there is no build step for the script. It keeps the
+source as plain `.scs` files, direct access to files and processes, and removes
+the cause of most shell bugs: data silently re-parsed as code. It is designed for humans and agents.
 
 ## 10-second demo
 
@@ -37,8 +37,8 @@ is `tools/scripts/binaries/gate`; it runs `check-all` with the build
 (5 steps: build, AOT app, helpers, AOT tests, licences).
 `check-all --no-build` runs the 4 remaining steps (the AOT publishes still
 compile). The gate prints one `VERDICT` line and does not change tracked
-files. The gate is a bash script and runs everywhere; `gate-static` is the
-lighter worker gate. The product is `scripts`.
+files. The gate is a bash script; no `bcs` bootstrap is required. `gate-static`
+is the lighter worker gate. The product is `scripts`.
 `reuse` 5.0.2 is needed for the licence step.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the
@@ -55,8 +55,6 @@ filesystem corpus is generated at test time, not tracked.
   test runner remains (the migration fixtures keep their `.sh` scripts).
 - `tools/scripts/`: the gate and verifiers.
 - `packaging/`: the Debian package and the source and binary tarballs.
-- `docs/`: product documentation; the agent plan and kanban live in
-  `~/agents/projects/scripts/`.
 
 ## Licence
 

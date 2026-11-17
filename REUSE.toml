@@ -6,7 +6,7 @@ SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 
 [[annotations]]
-path = ["README.md", "AGENTS.md", "CHANGELOG.md", "NOTICE", "THIRD-PARTY", "docs/**"]
+path = ["README.md", "AGENTS.md", "CHANGELOG.md", "NOTICE", "THIRD-PARTY"]
 SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 

@@ -17,5 +17,4 @@
   `invalid_syntax` instead of an ambiguous last-wins map.
 - Vendored the Core subset (`Results`, `Serialization.Values`, `Concurrency`)
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; local JSON codecs.
-- The tree is `src/`, `tests/`, `tools/scripts/`, `packaging/` and `docs/`
-  (product documentation); no samples.
+- The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.

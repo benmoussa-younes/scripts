@@ -15,7 +15,7 @@ six projects); there is no `dotnet test`/VSTest path. The gate is
 `tools/scripts/binaries/gate`; it runs `check-all` with the build (5 steps:
 build, AOT app, helpers, AOT tests, licences) and prints one `VERDICT` line;
 `check-all --no-build` runs 4 (the AOT publishes still compile). The gate is a
-bash script and runs everywhere; `tools/scripts/binaries/gate-static` is the
+bash script; no `bcs` bootstrap is required. `tools/scripts/binaries/gate-static` is the
 lighter worker gate (build, fast AOT tests, tree hygiene). None changes tracked
 files. The product is `scripts`.
 
@@ -24,9 +24,9 @@ filesystem corpus is generated at test time, not tracked.
 
 ## Repository facts
 
-- Root markdown is limited to `README.md`, `AGENTS.md` and `CHANGELOG.md`;
-  `docs/` is product documentation; the agent plan and kanban live in
-  `~/agents/projects/scripts/`; one root `AGENTS.md`.
+- Root markdown is limited to `README.md`, `AGENTS.md` and `CHANGELOG.md`; the
+  agent plan and kanban live in `~/agents/projects/scripts/`; one root
+  `AGENTS.md`.
 - Scripts is GPL-3.0-or-later; the vendored Core subset (`Results`,
   `Serialization.Values`, `Concurrency`) under `src/Scripts.Core/Compatibility/Core/`
   is LGPL-3.0-or-later, and the local JSON codecs are GPL-3.0-or-later. The
@@ -34,8 +34,7 @@ filesystem corpus is generated at test time, not tracked.
   CC-BY-SA-4.0; see `NOTICE`,
   `THIRD-PARTY` and `LICENSES/`.
 - The command is `scripts`; sources are `.scs`; error codes are `SCRIPTS-*`.
-- The tree is `src/`, `tests/`, `tools/scripts/`, `packaging/` and `docs/`
-  (product documentation); no samples.
+- The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.
 - `tests/Scripts.Corpus.Tests` runs the corpus in xUnit; its data lives under
   `tests/Corpus`. The four black-box axes (fuzz, semantics, JSON, system) run
   in the same project; no shell test runner remains (the migration fixtures keep
