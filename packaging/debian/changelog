@@ -3,7 +3,7 @@ scripts (0.1.1) unstable; urgency=medium
   * Fix a closed standard input when the .NET runtime owns descriptor 0: treat
     it as an absent stream, not as a script (GitHub Actions, 251 regression).
 
- -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Tue, 17 Nov 2026 00:00:00 +0000
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Tue, 17 Nov 2026 19:57:27 +0000
 
 scripts (0.1.0) unstable; urgency=medium
 
