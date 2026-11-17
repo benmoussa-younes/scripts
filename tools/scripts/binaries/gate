@@ -1,32 +1,22 @@
-#!/usr/bin/env bcs run
-import "../modules/verdict.bcs" as verdict
-import "../modules/repo.bcs" as repo
+#!/usr/bin/env bash
 # gate — read-only full verification of this repository.
 #
-#   tools/scripts/binaries/gate
-# It runs tools/scripts/binaries/check-all.sh (5 steps with the build, 4 with
-# --no-build; tests run only as Native AOT executables), streams its output,
-# and ends with exactly one VERDICT line.
-# It does not change tracked files.
+#   tools/scripts/binaries/gate [--no-build]
+# It runs check-all.sh (5 steps with the build, 4 with --no-build; tests run
+# only as Native AOT executables), streams its output, and ends with exactly
+# one VERDICT line. It does not change tracked files.
+set -u
+export LC_ALL=C
 
-let root: path = repo.root_path_from(process.script_path())
-let mutable success = false
+script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repository_root="$(cd "${script_directory}/../../.." && pwd)"
 
-let request = process.request("tools/scripts/binaries/check-all.sh", [])
-    .with_working_directory(root)
+bash "${script_directory}/check-all.sh" "$@"
+status=$?
+if [ "${status}" -eq 0 ]; then
+    echo "VERDICT: PASS"
+    exit 0
+fi
 
-match process.run_inherit(request) {
-    ok(code) => {
-        if code == 0 {
-            success = true
-        } else {
-            io.write_standard_error_line("FAIL check-all: exit {code}")
-        }
-    }
-    error(failure) => {
-        io.write_standard_error_line("FAIL check-all: {failure.kind}: {failure.message}")
-    }
-}
-
-io.write_standard_output_line(verdict.line(success))
-process.exit_with_code(verdict.code(success))
+echo "VERDICT: FAIL"
+exit 1

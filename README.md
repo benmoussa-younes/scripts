@@ -36,9 +36,8 @@ is `tools/scripts/binaries/gate`; it runs `check-all` with the build
 (5 steps: build, AOT app, helpers, AOT tests, licences).
 `check-all --no-build` runs the 4 remaining steps (the AOT publishes still
 compile). The gate prints one `VERDICT` line and does not change tracked
-files. The agent gate is a script for the `bcs` 0.5.0 interpreter used as
-bootstrap; without bcs, `tools/scripts/binaries/gate.sh` runs the same
-`check-all` and prints the same single `VERDICT`. The product is `scripts`.
+files. The gate is a bash script and runs everywhere; `gate-static` is the
+lighter worker gate. The product is `scripts`.
 `reuse` 5.0.2 is needed for the licence step.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the

@@ -14,10 +14,10 @@ Tests run only as Native AOT executables (`tools/scripts/binaries/aot-tests.sh`,
 six projects); there is no `dotnet test`/VSTest path. The gate is
 `tools/scripts/binaries/gate`; it runs `check-all` with the build (5 steps:
 build, AOT app, helpers, AOT tests, licences) and prints one `VERDICT` line;
-`check-all --no-build` runs 4 (the AOT publishes still compile). `tools/scripts/binaries/gate.sh` is the same gate for contributors
-without `bcs`. The agent gate is a `bcs` 0.5.0 script used as bootstrap; the
-product is `scripts`. `tools/scripts/binaries/gate-static` is the lighter
-worker gate (build, fast AOT tests, tree hygiene). None changes tracked files.
+`check-all --no-build` runs 4 (the AOT publishes still compile). The gate is a
+bash script and runs everywhere; `tools/scripts/binaries/gate-static` is the
+lighter worker gate (build, fast AOT tests, tree hygiene). None changes tracked
+files. The product is `scripts`.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the
 filesystem corpus is generated at test time, not tracked.
