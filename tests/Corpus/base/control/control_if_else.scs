@@ -1,0 +1,15 @@
+function classify(n: integer) -> string {
+    if n < 0 {
+        return "negative"
+    } else if n == 0 {
+        return "zero"
+    } else if n < 10 {
+        return "small"
+    } else {
+        return "large"
+    }
+}
+io.write_standard_output_line(classify(-5))
+io.write_standard_output_line(classify(0))
+io.write_standard_output_line(classify(7))
+io.write_standard_output_line(classify(100))

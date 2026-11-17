@@ -1,0 +1,4 @@
+#!/usr/bin/scripts run
+io.write_standard_output_line("debut")
+let _ = process.run(process.request("sleep", ["10"]))?
+io.write_standard_output_line("fin")

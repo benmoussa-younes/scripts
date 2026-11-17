@@ -1,0 +1,16 @@
+exit: 251
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 251
+check: doc["success"] is False
+check: doc["termination"] == "static_error"
+check: doc["stdout"] == ""
+check: doc["stderr"] == ""
+check: doc["result"] is None
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-TYPE-0012"
+check: doc["errors"][0]["severity"] == "error"
+check: doc["errors"][0]["file"] == "run-json-out-static-error.scs"
+check: doc["errors"][0]["line"] == 2
+check: doc["errors"][0]["column"] == 20
+check: doc["warnings"] == []

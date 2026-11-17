@@ -1,0 +1,11 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let deep_directory = work_directory / "a" / "b" / "c"
+filesystem.make_directory_tree(deep_directory)?
+filesystem.make_directory_tree(deep_directory)?
+io.write_standard_output_line("{filesystem.path_exists(deep_directory)}")
+filesystem.write_file_overwrite("x", work_directory / "f.txt")?
+match filesystem.make_directory_tree(work_directory / "f.txt") {
+    ok(_) => io.write_standard_output_line("créé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

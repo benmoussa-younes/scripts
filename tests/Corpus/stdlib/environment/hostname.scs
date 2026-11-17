@@ -1,0 +1,4 @@
+let host = system.get_information()?.host_name
+let known = host.length() > 0
+io.write_standard_output_line("{known}")
+io.write_standard_output_line("{host == system.get_information()?.host_name}")

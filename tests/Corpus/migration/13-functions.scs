@@ -1,0 +1,44 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 13: functions (arguments, return, recursion)
+let greeting_word = "Bonjour"
+
+function greet(person_name: string, punctuation: string) -> string {
+    return "{greeting_word} {person_name}{punctuation}"
+}
+
+function add_numbers(first_number: integer, second_number: integer) -> integer {
+    return first_number + second_number
+}
+
+function is_even(candidate: integer) -> boolean {
+    return candidate % 2 == 0
+}
+
+function factorial(value: integer) -> integer {
+    if value <= 1 {
+        return 1
+    }
+    return value * factorial(value - 1)
+}
+
+function safe_divide(numerator: integer, denominator: integer) -> result<integer, string> {
+    if denominator == 0 {
+        return error("division par zero")
+    }
+    return ok(numerator / denominator)
+}
+
+io.write_standard_output_line(greet("ana", "!"))
+io.write_standard_output_line(greet("bob", "?"))
+io.write_standard_output_line("somme: {add_numbers(3, 4)}")
+io.write_standard_output_line("pair(4): {is_even(4)}")
+io.write_standard_output_line("pair(7): {is_even(7)}")
+io.write_standard_output_line("factorielle(5): {factorial(5)}")
+match safe_divide(10, 2) {
+    ok(quotient) => io.write_standard_output_line("quotient: {quotient}")
+    error(reason) => io.write_standard_output_line("erreur: {reason}")
+}
+match safe_divide(10, 0) {
+    ok(other_quotient) => io.write_standard_output_line("quotient: {other_quotient}")
+    error(other_reason) => io.write_standard_output_line("erreur: {other_reason}")
+}

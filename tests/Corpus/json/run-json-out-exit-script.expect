@@ -1,0 +1,10 @@
+exit: 3
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 3
+check: doc["success"] is False
+check: doc["termination"] == "exit_script"
+check: doc["stdout"] == "bye\n"
+check: doc["result"] is None
+check: doc["errors"] == []
+check: doc["warnings"] == []

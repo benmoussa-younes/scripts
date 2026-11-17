@@ -1,0 +1,4 @@
+import "util/strings.scs" as strings
+public function shout(text: string) -> string {
+    return strings.upper(text) + "!"
+}

@@ -1,0 +1,7 @@
+io.write_standard_output_line("{to_integer(3.7).value_or_fail()}")
+io.write_standard_output_line("{to_integer(-3.7).value_or_fail()}")
+io.write_standard_output_line("{to_integer(-0.0).value_or_fail()}")
+match to_integer(1e19) {
+    ok(converted) => io.write_standard_output_line("{converted}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

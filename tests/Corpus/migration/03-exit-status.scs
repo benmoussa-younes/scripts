@@ -1,0 +1,31 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 03: exit status ($?), || and set -e
+
+function run_step(program: string, step_arguments: list<string>) -> result<unit, string> {
+    let outcome = process.run(process.request(program, step_arguments)).transform_error(failure => failure.message)?
+    if outcome.exit_code != 0 {
+        return error("echec de {program}, code {outcome.exit_code}")
+    }
+    return ok()
+}
+
+function run_all() -> result<unit, string> {
+    run_step("true", [])?
+    io.write_standard_output_line("etape A faite")
+    run_step("false", [])?
+    io.write_standard_output_line("etape B faite")
+    return ok()
+}
+
+match run_step("true", []) {
+    ok(_) => io.write_standard_output_line("etape 1 ok")
+    error(first_message) => io.write_standard_output_line("etape 1: {first_message}")
+}
+match run_step("false", []) {
+    ok(_) => io.write_standard_output_line("etape 2 ok")
+    error(second_message) => io.write_standard_output_line("etape 2: {second_message}")
+}
+match run_all() {
+    ok(_) => io.write_standard_output_line("tout est ok")
+    error(final_message) => io.write_standard_output_line("arret: {final_message}")
+}

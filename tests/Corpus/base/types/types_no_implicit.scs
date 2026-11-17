@@ -1,0 +1,8 @@
+let n: integer = 5
+let f = to_float(n)
+let back = to_integer(f).value_or(-1)
+let s = "{n}"
+io.write_standard_output_line("f={f}")
+io.write_standard_output_line("back={back}")
+io.write_standard_output_line("s={s}")
+io.write_standard_output_line("len={s.length()}")

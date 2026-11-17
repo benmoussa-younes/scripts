@@ -1,0 +1,4 @@
+let names = ["Charlie", "alice", "Bob"]
+io.write_standard_output_line(names.sorted_by(name => name.lowercased()).join(","))
+let words = ["bb", "a", "ccc", "dd"]
+io.write_standard_output_line(words.sorted_by(word => word.length()).join(","))

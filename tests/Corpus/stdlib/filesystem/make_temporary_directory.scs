@@ -1,0 +1,11 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let directory_name = (work_directory).base_name()
+io.write_standard_output_line("{directory_name.starts_with("scripts-stdlib-")}")
+let prefixed = filesystem.make_temporary_directory("")?
+io.write_standard_output_line("{(prefixed).base_name().length() >= 8}")
+filesystem.remove_directory_tree(prefixed)?
+match filesystem.make_temporary_directory("bad/prefix") {
+    ok(made) => io.write_standard_output_line("créé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

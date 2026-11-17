@@ -1,0 +1,4 @@
+# file: lib.scs
+function hidden() -> integer {
+    return 1
+}

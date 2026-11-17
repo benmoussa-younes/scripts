@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0008 2:15
+let n = "abc".size()

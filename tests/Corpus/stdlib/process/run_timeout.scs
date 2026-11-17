@@ -1,0 +1,10 @@
+let fast = process.run(process.request("printf", ["vite"]).with_timeout(10000))?
+io.write_standard_output_line(fast.standard_output)
+match process.run(process.request("sleep", ["5"]).with_timeout(100)) {
+    ok(outcome) => io.write_standard_output_line("{outcome.exit_code}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match process.run(process.request("printf", []).with_timeout(-1)) {
+    ok(outcome) => io.write_standard_output_line(outcome.standard_output)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

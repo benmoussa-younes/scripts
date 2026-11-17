@@ -1,0 +1,3 @@
+# multiline_raw_crlf.scs is a deliberate CRLF fixture: the r""" literal must keep
+# its CRLF bytes in the checkout so the corpus pins normalization.
+multiline_raw_crlf.scs -text -eol

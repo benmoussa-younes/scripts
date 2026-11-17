@@ -1,0 +1,11 @@
+stdout:
+d800: invalid_syntax
+dc00: invalid_syntax
+d800x: invalid_syntax
+low: invalid_syntax
+nested: invalid_syntax
+pair: 😀
+1000: list
+1001: depth_exceeded
+encode1000: 2000
+exit: 0

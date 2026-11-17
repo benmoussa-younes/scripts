@@ -1,0 +1,2 @@
+# expect: SCRIPTS-RUNTIME-0007 2:1 exit=253
+let n = "x".parse_integer().value_or_fail()

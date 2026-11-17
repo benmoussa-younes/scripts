@@ -1,0 +1,5 @@
+# expect-warning: SCRIPTS-LINT-0007 2:10
+function main() -> result<unit, error> {
+    io.write_standard_output_line("never printed")
+    return ok()
+}

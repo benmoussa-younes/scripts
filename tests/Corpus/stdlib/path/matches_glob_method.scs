@@ -1,0 +1,8 @@
+io.write_standard_output_line("{p"a/b.txt".matches_glob("**/*.txt")?}")
+io.write_standard_output_line("{p"a/b.txt".matches_glob("*.txt")?}")
+io.write_standard_output_line("{p"a/b.txt".matches_glob("a/[!x]*.txt")?}")
+io.write_standard_output_line("{p"/a/b.txt".matches_glob("**/*.txt")?}")
+match p"a/b.txt".matches_glob("a[") {
+    ok(_) => io.write_standard_output_line("matched")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

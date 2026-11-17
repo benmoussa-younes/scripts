@@ -1,0 +1,30 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 05: for f in *.txt and find (file enumeration)
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-05")?
+filesystem.make_directory_tree(temporary_directory / "sub" / "deep")?
+filesystem.write_file_overwrite("a\n", temporary_directory / "a.txt")?
+filesystem.write_file_overwrite("b\n", temporary_directory / "b.txt")?
+filesystem.write_file_overwrite("", temporary_directory / "c.log")?
+filesystem.write_file_overwrite("", temporary_directory / ".hidden.txt")?
+filesystem.write_file_overwrite("d", temporary_directory / "sub" / "d.txt")?
+filesystem.write_file_overwrite("", temporary_directory / "sub" / "deep" / "e.txt")?
+
+io.write_standard_output_line("--glob--")
+let entries = filesystem.list_directory(temporary_directory)?.transform(entry => entry.path)
+for entry in entries {
+    let entry_name = (entry).base_name()
+    if entry_name.ends_with(".txt") and not entry_name.starts_with(".") {
+        io.write_standard_output_line("txt: {entry_name}")
+    }
+}
+
+io.write_standard_output_line("--find--")
+let all_entries = filesystem.walk_directory(temporary_directory)?.entries.transform(entry => entry.path)
+for found in all_entries {
+    let found_name = (found).base_name()
+    if found_name.ends_with(".txt") and filesystem.get_path_status(found)?.kind == "file" {
+        io.write_standard_output_line("trouve: {found_name}")
+    }
+}
+
+filesystem.remove_directory_tree(temporary_directory)?

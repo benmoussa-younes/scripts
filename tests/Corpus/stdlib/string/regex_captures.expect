@@ -1,0 +1,8 @@
+stdout:
+a1,a,1
+ab,a,b
+ab,b,
+aaa,a
+not_found
+invalid_regex
+exit: 0

@@ -1,0 +1,5 @@
+stdout:
+encode not_encodable
+pretty not_encodable
+list not_encodable
+exit: 0

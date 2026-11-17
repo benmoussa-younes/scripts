@@ -1,0 +1,5 @@
+# expect: SCRIPTS-TYPE-0047 5:15
+function make() -> result<integer, integer> {
+    return error(1)
+}
+let n = make()?

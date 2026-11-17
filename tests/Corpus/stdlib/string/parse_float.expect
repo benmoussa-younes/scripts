@@ -1,0 +1,6 @@
+stdout:
+2.5
+invalid_float
+out_of_range
+-0.0
+exit: 0

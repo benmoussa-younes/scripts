@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0003 2:35
+io.write_standard_output_line("a")<CR>io.write_standard_output_line("b")

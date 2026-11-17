@@ -1,0 +1,7 @@
+let root_directory = filesystem.make_temporary_directory("scripts-directory-trailing-")?
+let private_directory = root_directory / "private"
+let trailing_path = (private_directory.to_string() + "/").to_path()
+filesystem.make_directory_with_permissions(trailing_path, 0o750)?
+let status = filesystem.get_path_status(private_directory)?
+io.write_standard_output_line("{status.permissions == 0o750}")
+filesystem.remove_directory_tree(root_directory)?

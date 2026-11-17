@@ -1,0 +1,5 @@
+io.write_standard_output_line(json.encode_pretty({"a": [1, 2]})?)
+let empty: list<integer> = []
+io.write_standard_output_line(json.encode_pretty(empty)?)
+let blank: map<string, list<integer>> = {"a": []}
+io.write_standard_output_line(json.encode_pretty(blank)?)

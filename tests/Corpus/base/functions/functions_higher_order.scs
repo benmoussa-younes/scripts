@@ -1,0 +1,9 @@
+function apply_twice(f: function(integer) -> integer, v: integer) -> integer {
+    return f(f(v))
+}
+let inc = (x: integer) => x + 1
+io.write_standard_output_line("twice={apply_twice(inc, 5)}")
+let double = (x: integer) => x * 2
+io.write_standard_output_line("double_twice={apply_twice(double, 3)}")
+let noop = (_: integer) => 0
+io.write_standard_output_line("noop={apply_twice(noop, 99)}")

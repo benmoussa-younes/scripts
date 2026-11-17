@@ -1,0 +1,6 @@
+stdout:
+sum=100
+v=10
+v=20
+odds=40
+exit: 0

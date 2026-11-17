@@ -1,0 +1,2 @@
+let trimmed = "  a  ".trim_start()
+io.write_standard_output_line("[{trimmed}]")

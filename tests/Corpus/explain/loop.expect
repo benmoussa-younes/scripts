@@ -1,0 +1,9 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  declares the mutable variable `i` = 0
+  repeats while `i` < 3:
+    displays the string "{`i`}" on the standard output
+    adds 1 to `i`
+  for each `item` of the list [1, 2]:
+    displays the string "{`item`}" on the standard output

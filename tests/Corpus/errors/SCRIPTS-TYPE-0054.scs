@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0054 4:8
+function g() {
+}
+return g

@@ -1,0 +1,5 @@
+stdout:
+unknown user not_found
+unknown group not_found
+nul invalid_argument
+exit: 0

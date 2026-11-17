@@ -1,0 +1,26 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 18: regular expressions ([[ s =~ re ]])
+let digits_pattern = r"^[0-9]+$"
+let candidates = ["12345", "12a45", "", "007"]
+for candidate in candidates {
+    let all_digits = candidate.matches(digits_pattern)?
+    io.write_standard_output_line("[{candidate}]: {all_digits}")
+}
+
+let email_pattern = r"^[a-z]+@[a-z]+\.com$"
+let emails = ["ana@example.com", "ana@example.org", "Ana@example.com"]
+for email_text in emails {
+    let is_email = email_text.matches(email_pattern)?
+    io.write_standard_output_line("{email_text}: {is_email}")
+}
+
+let word_pattern = r"^[a-z]{2,}$"
+let short_word_ok = "ab".matches(word_pattern)?
+let single_letter_ok = "a".matches(word_pattern)?
+io.write_standard_output_line("ab: {short_word_ok}")
+io.write_standard_output_line("a: {single_letter_ok}")
+
+match "x".matches("(") {
+    ok(_) => io.write_standard_output_line("motif valide")
+    error(regex_failure) => io.write_standard_output_line("motif invalide: {regex_failure.kind}")
+}

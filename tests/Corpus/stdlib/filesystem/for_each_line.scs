@@ -1,0 +1,12 @@
+function display(line: string) -> string {
+    return line.replace("\r", "<CR>")
+}
+function visit_line(line: string) -> result<unit, error> {
+    io.write_standard_output_line("{display(line)} ({line.length()})")
+    return ok()
+}
+let work_directory = filesystem.make_temporary_directory("scripts-for-each-line-")?
+let file_path = work_directory / "lines.txt"
+filesystem.write_file_overwrite("alpha\nbeta\r\ngamma\rlast-no-newline", file_path)?
+filesystem.for_each_line(file_path, visit_line)?
+filesystem.remove_directory_tree(work_directory)?

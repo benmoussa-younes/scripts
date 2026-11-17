@@ -1,0 +1,10 @@
+stdout:
+a=14
+b=20
+c=26
+d=5
+e=5
+f=true
+g=true
+h=true
+exit: 0

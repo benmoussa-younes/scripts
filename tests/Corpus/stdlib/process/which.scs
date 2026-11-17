@@ -1,0 +1,12 @@
+let located = process.find_program_path("sh")?
+io.write_standard_output_line((located).base_name())
+match process.find_program_path("scripts-spec-inexistant") {
+    ok(found) => io.write_standard_output_line((found).to_string())
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match process.find_program_path("") {
+    ok(found) => io.write_standard_output_line((found).to_string())
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let created = process.find_program_path("printf")?
+io.write_standard_output_line("{(created).is_absolute()}")

@@ -1,0 +1,8 @@
+let information = system.get_information()?
+io.write_standard_output_line(information.kernel_name)
+let has_host = information.host_name.length() > 0
+io.write_standard_output_line("{has_host}")
+let has_release = information.kernel_release.length() > 0
+io.write_standard_output_line("{has_release}")
+let has_machine = information.machine_architecture.length() > 0
+io.write_standard_output_line("{has_machine}")

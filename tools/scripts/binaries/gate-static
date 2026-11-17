@@ -1,0 +1,102 @@
+#!/usr/bin/env bcs run
+import "../modules/verdict.bcs" as verdict
+import "../modules/repo.bcs" as repo
+# gate-static — the compile-and-test gate used by a worker job.
+#
+#   tools/scripts/binaries/gate-static
+# It builds, runs the fast Native AOT suites (Syntax, Checker, Cli), and checks
+# the tree hygiene that a full gate also checks: no legacy name, no tracked
+# docs/samples/editor directory, no whitespace error. No corpus, no E2E, no
+# licence copy. Tests run only as Native AOT executables, never through
+# `dotnet test`/VSTest. It does not change tracked files.
+
+let root: path = repo.root_path_from(process.script_path())
+let mutable success = true
+
+function expect(root: path, label: string, request: run_request, expected: integer) -> boolean {
+    let located = request.with_working_directory(root)
+    match process.run_inherit(located) {
+        ok(code) => {
+            if code == expected {
+                io.write_standard_output_line("PASS {label}")
+                return true
+            }
+            io.write_standard_error_line("FAIL {label}: exit {code}, expected {expected}")
+            return false
+        }
+        error(failure) => {
+            io.write_standard_error_line("FAIL {label}: {failure.kind}: {failure.message}")
+            return false
+        }
+    }
+}
+
+function no_match(root: path, label: string, request: run_request) -> boolean {
+    let located = request.with_working_directory(root)
+    match process.run_inherit(located) {
+        ok(code) => {
+            if code == 1 {
+                io.write_standard_output_line("PASS {label}")
+                return true
+            }
+            if code == 0 {
+                io.write_standard_error_line("FAIL {label}: matches found")
+                return false
+            }
+            io.write_standard_error_line("FAIL {label}: exit {code}")
+            return false
+        }
+        error(failure) => {
+            io.write_standard_error_line("FAIL {label}: {failure.kind}: {failure.message}")
+            return false
+        }
+    }
+}
+
+function no_entries(root: path, label: string, request: run_request) -> boolean {
+    let located = request.with_working_directory(root)
+    match process.run(located) {
+        ok(outcome) => {
+            if outcome.exit_code != 0 {
+                io.write_standard_error_line("FAIL {label}: exit {outcome.exit_code}")
+                return false
+            }
+            if outcome.standard_output.trim_whitespace() == "" {
+                io.write_standard_output_line("PASS {label}")
+                return true
+            }
+            io.write_standard_error_line("FAIL {label}: {outcome.standard_output.trim_whitespace()}")
+            return false
+        }
+        error(failure) => {
+            io.write_standard_error_line("FAIL {label}: {failure.kind}: {failure.message}")
+            return false
+        }
+    }
+}
+
+if not expect(root, "build", process.request("dotnet", ["build", "Scripts.slnx", "-c", "Release"]), 0) {
+    success = false
+}
+if success and not expect(root, "tests (Native AOT)", process.request("tools/scripts/binaries/aot-tests.sh", ["--fast"]), 0) {
+    success = false
+}
+if success and not no_match(
+    root,
+    "no legacy name",
+    process.request("git", ["grep", "-n", "-E", "BCS-[0-9]|BitCrafts|\\.bcs\\b|\\bbcs\\b|Shell\\.", "--",
+        "src", "tests", "packaging"])) {
+    success = false
+}
+if success and not no_entries(
+    root,
+    "no tracked docs/samples/editor directory",
+    process.request("git", ["ls-files", "--", "docs", "samples", ".opencode", ".vscode"])) {
+    success = false
+}
+if success and not expect(root, "no whitespace error", process.request("git", ["diff", "--check"]), 0) {
+    success = false
+}
+
+io.write_standard_output_line(verdict.line(success))
+process.exit_with_code(verdict.code(success))

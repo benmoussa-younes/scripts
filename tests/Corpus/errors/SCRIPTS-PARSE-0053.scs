@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0053 2:21
+let report = p"/tmp/{name}.txt"

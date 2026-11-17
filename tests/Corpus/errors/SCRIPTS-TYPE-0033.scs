@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0033 3:12
+function f() -> result<integer, string> {
+    return ok()
+}

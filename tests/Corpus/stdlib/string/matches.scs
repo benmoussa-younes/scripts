@@ -1,0 +1,16 @@
+match "abc".matches("b+") {
+    ok(found) => io.write_standard_output_line("{found}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".matches("(") {
+    ok(found) => io.write_standard_output_line("{found}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".matches("z") {
+    ok(found) => io.write_standard_output_line("{found}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".matches("") {
+    ok(found) => io.write_standard_output_line("{found}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

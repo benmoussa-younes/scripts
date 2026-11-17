@@ -1,0 +1,6 @@
+#!/usr/bin/scripts run
+# scripts → "; rm -rf /" is data: it is passed VERBATIM to printf,
+# no shell is interposed (never an implicit /bin/sh).
+let payload = "; rm -rf / ; echo INJECTE"
+let shown = process.run(process.request("printf", ["[%s]\n", payload]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

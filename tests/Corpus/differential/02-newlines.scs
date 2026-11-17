@@ -1,0 +1,5 @@
+#!/usr/bin/scripts run
+# scripts → an argument containing a newline stays ONE argument.
+let multi_line = "ligne un\nligne deux"
+let shown = process.run(process.request("printf", ["[%s]\n", multi_line]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

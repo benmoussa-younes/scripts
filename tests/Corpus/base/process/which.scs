@@ -1,0 +1,7 @@
+let found = process.find_program_path("echo")?
+io.write_standard_output_line("{(found).is_absolute()}")
+io.write_standard_output_line((found).base_name())
+match process.find_program_path("scripts-spec-inexistant-program") {
+    ok(location) => io.write_standard_output_line((location).to_string())
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,4 @@
+# expect: SCRIPTS-PARSE-0046 3:11
+match "1".parse_integer() {
+    ok(n) | error(n) => io.write_standard_output_line("x")
+}

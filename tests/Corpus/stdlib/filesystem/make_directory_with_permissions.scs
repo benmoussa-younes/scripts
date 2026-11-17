@@ -1,0 +1,16 @@
+let root_directory = filesystem.make_temporary_directory("scripts-directory-mode-")?
+let private_directory = root_directory / "private"
+filesystem.make_directory_with_permissions(private_directory, 0o750)?
+let status = filesystem.get_path_status(private_directory)?
+io.write_standard_output_line("{status.permissions == 0o750}")
+match filesystem.make_directory_with_permissions(private_directory, 0o700) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let refused_directory = root_directory / "refused"
+match filesystem.make_directory_with_permissions(refused_directory, 0o1000) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line("{filesystem.path_exists(refused_directory)}")
+filesystem.remove_directory_tree(root_directory)?

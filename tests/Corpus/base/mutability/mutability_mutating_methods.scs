@@ -1,0 +1,9 @@
+let mutable xs = [1]
+xs.append(2)
+xs.append(3)
+io.write_standard_output_line("xs={xs.length()}")
+let mutable m = {"a": 1, "b": 2}
+let removed = m.remove_key("a")
+io.write_standard_output_line("removed={removed}")
+io.write_standard_output_line("len={m.length()}")
+io.write_standard_output_line("keys={m.keys().join(",")}")

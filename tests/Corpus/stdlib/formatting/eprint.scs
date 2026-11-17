@@ -1,0 +1,3 @@
+io.write_standard_output_line("avant")
+io.write_standard_error_line("avertissement")
+io.write_standard_output_line("apr\u{E8}s")

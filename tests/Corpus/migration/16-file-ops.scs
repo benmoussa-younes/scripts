@@ -1,0 +1,41 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 16: mkdir -p, cp, mv, rm (file operations)
+
+function print_entry_names(directory_to_show: path) -> result<unit, error> {
+    let found_entries = filesystem.list_directory(directory_to_show)?.transform(entry => entry.path)
+    for found_entry in found_entries {
+        io.write_standard_output_line((found_entry).base_name())
+    }
+    return ok()
+}
+
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-16")?
+let work_directory = temporary_directory / "a"
+let deep_directory = work_directory / "b" / "c"
+let source_file = work_directory / "one.txt"
+let copy_target = work_directory / "two.txt"
+let moved_file = work_directory / "moved.txt"
+
+filesystem.make_directory_tree(deep_directory)?
+filesystem.write_file_overwrite("data\n", source_file)?
+filesystem.copy_file(source_file, copy_target)?
+io.write_standard_output_line("copie ok")
+match filesystem.copy_file(source_file, copy_target) {
+    ok(_) => io.write_standard_output_line("copie ecrasee")
+    error(copy_failure) => io.write_standard_output_line("copie refusee: {copy_failure.kind}")
+}
+filesystem.copy_file_overwrite(source_file, copy_target)?
+io.write_standard_output_line("copie ecrasee explicitement")
+filesystem.move_path(copy_target, moved_file)?
+let copy_target_exists = filesystem.path_exists(copy_target)
+io.write_standard_output_line("ancien chemin existe: {copy_target_exists}")
+print_entry_names(work_directory)?
+filesystem.remove_directory_tree(work_directory / "b")?
+print_entry_names(work_directory)?
+filesystem.remove_file(moved_file)?
+match filesystem.remove_file(moved_file) {
+    ok(_) => io.write_standard_output_line("deuxieme rm: supprime")
+    error(remove_failure) => io.write_standard_output_line("deuxieme rm: {remove_failure.kind}")
+}
+
+filesystem.remove_directory_tree(temporary_directory)?

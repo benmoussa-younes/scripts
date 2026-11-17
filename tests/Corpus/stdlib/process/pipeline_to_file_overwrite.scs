@@ -1,0 +1,65 @@
+# A pipeline writes into its own temporary directory: printf | grep, atomically.
+let work_directory = filesystem.make_temporary_directory("scripts-conformance-pipeline-")?
+let basic_destination = work_directory / "basic.txt"
+let basic = [
+    process.request("printf", ["a\nb\n"]),
+    process.request("grep", ["b"]),
+]
+let basic_results = process.pipeline_to_file_overwrite(basic, basic_destination)?
+io.write_standard_output_line("basic={basic_results.length()} {basic_results[0].program}/{basic_results[1].program}")
+io.write_standard_output_line("stdout={basic_results[0].standard_output.length()}/{basic_results[1].standard_output.length()}")
+io.write_standard_output_line("file={filesystem.read_file(basic_destination)?.trim_whitespace()}")
+
+# A failing middle stage still lets every stage run: a non-zero code is data.
+let middle_destination = work_directory / "middle.txt"
+let failing = [
+    process.request("printf", ["x\n"]),
+    process.request("false", []),
+    process.request("cat", []),
+]
+let failing_results = process.pipeline_to_file_overwrite(failing, middle_destination)?
+io.write_standard_output_line("middle={failing_results[0].exit_code},{failing_results[1].exit_code},{failing_results[2].exit_code} bytes={filesystem.read_file(middle_destination)?.length()}")
+
+# Binary bytes are never decoded on the intermediate link.
+let binary_destination = work_directory / "binary.bin"
+let binary = [
+    process.request("printf", ["\\000\\377"]),
+    process.request("cat", []),
+]
+let _binary = process.pipeline_to_file_overwrite(binary, binary_destination)?
+let dump = process.run(process.request("od", ["-An", "-tx1", (binary_destination).to_string()]))?
+io.write_standard_output_line("bytes={dump.standard_output.trim_whitespace()}")
+
+# Atomic replacement of an existing destination, with no scratch file left behind.
+let atomic_destination = work_directory / "atomic.txt"
+filesystem.write_file_overwrite("ancien", atomic_destination)?
+let replacement = [process.request("printf", ["nouveau"])]
+let _replacement = process.pipeline_to_file_overwrite(replacement, atomic_destination)?
+io.write_standard_output_line("atomic={filesystem.read_file(atomic_destination)?}")
+let scratch = filesystem.list_directory(work_directory)?.filter(entry => (entry.path).base_name().starts_with(".scs-tmp-"))
+io.write_standard_output_line("scratch={scratch.length()}")
+
+# stderr is captured per stage.
+let noisy_destination = work_directory / "noisy.txt"
+let noisy = [
+    process.request("grep", ["x", "scripts-spec-absent-file"]),
+    process.request("cat", []),
+]
+let noisy_results = process.pipeline_to_file_overwrite(noisy, noisy_destination)?
+io.write_standard_output_line("stderr={noisy_results[0].standard_error.length() > 0} code={noisy_results[0].exit_code} file={filesystem.read_file(noisy_destination)?.length()}")
+
+# A stage that cannot be launched: spawn_failed, destination untouched.
+let missing_destination = work_directory / "missing.txt"
+let missing = [process.request("scripts-spec-inexistant-program", [])]
+match process.pipeline_to_file_overwrite(missing, missing_destination) {
+    ok(_) => io.write_standard_output_line("missing=ok")
+    error(failure) => io.write_standard_output_line("missing={failure.kind} {failure.subject} {filesystem.path_exists(missing_destination)}")
+}
+
+# An empty request list is invalid_argument.
+let empty_destination = work_directory / "empty.txt"
+match process.pipeline_to_file_overwrite([], empty_destination) {
+    ok(_) => io.write_standard_output_line("empty=ok")
+    error(failure) => io.write_standard_output_line("empty={failure.kind} {filesystem.path_exists(empty_destination)}")
+}
+filesystem.remove_directory_tree(work_directory)?

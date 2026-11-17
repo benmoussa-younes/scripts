@@ -1,0 +1,8 @@
+let input_path = p"stdin-file.txt"
+filesystem.write_file_overwrite("depuis le fichier", input_path)?
+let outcome = process.run(process.request("cat", []).with_standard_input_from_file(input_path))?
+io.write_standard_output_line(outcome.standard_output)
+filesystem.write_file_overwrite("", input_path)?
+let empty_outcome = process.run(process.request("cat", []).with_standard_input_from_file(input_path))?
+io.write_standard_output_line("{empty_outcome.standard_output.length()}")
+filesystem.remove_file(input_path)?

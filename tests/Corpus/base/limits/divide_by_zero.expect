@@ -1,0 +1,9 @@
+exit: 253
+stderr:
+error[SCRIPTS-RUNTIME-0002]: division by zero: `1 / 0`
+  --> divide_by_zero.scs:2:1
+   |
+ 2 | let x = 1 / zero
+   | ^^^^^^^^^^^^^^^^
+   = cause: integer `/` or `%` with a zero divisor
+   = suggestion: test the divisor (`if divisor != 0 { … }`) before dividing

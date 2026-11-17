@@ -1,0 +1,15 @@
+let root_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+filesystem.make_directory(root_directory / "a")?
+filesystem.write_file_overwrite("", root_directory / "a" / "x.txt")?
+filesystem.write_file_overwrite("", root_directory / "b.txt")?
+let report = filesystem.walk_directory(root_directory)?
+for entry in report.entries {
+    io.write_standard_output_line((entry.path).base_name())
+}
+let paths = report.entries.transform(entry => entry.path)
+io.write_standard_output_line(paths.transform(path_value => path_value.base_name()).join(","))
+match filesystem.walk_directory(root_directory / "b.txt") {
+    ok(found) => io.write_standard_output_line("parcouru")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

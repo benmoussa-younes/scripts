@@ -1,0 +1,3 @@
+io.write_standard_output_line("[{"lib/foo.scs".strip_prefix("lib/")}]")
+io.write_standard_output_line("[{"lib/foo.scs".strip_prefix("x")}]")
+io.write_standard_output_line("[{"abc".strip_prefix("")}]")

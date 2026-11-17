@@ -1,0 +1,10 @@
+let mutable values = [1, 2, 3]
+let removed = values.remove_at(1)?
+io.write_standard_output_line("{removed} {values.transform(value => "{value}").join(",")}")
+match values.remove_at(9) {
+    ok(_) => io.write_standard_output_line("removed")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let mutable shared = [1, 2, 3]
+let inner = shared.remove_at(shared.remove_at(0)?)?
+io.write_standard_output_line("{inner} {shared.transform(value => "{value}").join(",")}")

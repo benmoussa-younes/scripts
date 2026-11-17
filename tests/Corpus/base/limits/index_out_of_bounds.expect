@@ -1,0 +1,9 @@
+exit: 253
+stderr:
+error[SCRIPTS-RUNTIME-0004]: list index out of bounds: 3 for a list of length 3
+  --> index_out_of_bounds.scs:2:1
+   |
+ 2 | let x = items[items.length()]
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = cause: `list[i]` with `i < 0` or `i >= length`
+   = suggestion: use `.get_at_index(3)`, which returns a `result` (`missing_index`), or test `.length()`

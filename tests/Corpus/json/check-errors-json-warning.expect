@@ -1,0 +1,10 @@
+exit: 0
+stream: stdout
+json-last
+check: doc["schema_version"] == 1
+check: doc["success"] is True
+check: doc["errors"] == []
+check: len(doc["warnings"]) == 1
+check: doc["warnings"][0]["code"] == "SCRIPTS-LINT-0002"
+check: doc["warnings"][0]["severity"] == "warning"
+check: doc["warnings"][0]["line"] == 2

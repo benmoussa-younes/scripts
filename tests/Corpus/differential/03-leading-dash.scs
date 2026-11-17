@@ -1,0 +1,7 @@
+#!/usr/bin/scripts run
+# scripts → "-n" is data, not an option: no program re-parses the list.
+let dash_n = "-n"
+let dash_dash = "--"
+let dash_rf = "-rf"
+let shown = process.run(process.request("printf", ["[%s]\n", dash_n, dash_dash, dash_rf]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

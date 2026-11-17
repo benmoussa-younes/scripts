@@ -1,0 +1,5 @@
+stdout:
+true
+echo
+not_found
+exit: 0

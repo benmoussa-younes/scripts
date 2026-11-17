@@ -1,0 +1,4 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  displays calls `helper.doubler`(21) on the standard output

@@ -1,0 +1,5 @@
+# expect: SCRIPTS-PARSE-0028 2:8
+if true
+{
+    io.write_standard_output_line("a")
+}

@@ -1,0 +1,7 @@
+io.write_standard_output_line(encoding.hex_encode(""))
+io.write_standard_output_line(encoding.hex_encode("f"))
+io.write_standard_output_line(encoding.hex_encode("fo"))
+io.write_standard_output_line(encoding.hex_encode("foo"))
+io.write_standard_output_line(encoding.hex_encode("foobar"))
+io.write_standard_output_line(encoding.hex_encode("A"))
+io.write_standard_output_line(encoding.hex_encode("café"))

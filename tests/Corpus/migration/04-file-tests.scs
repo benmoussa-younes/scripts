@@ -1,0 +1,39 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 04: file and string tests ([ -f ], [ -d ], [ -s ], -z, -n)
+
+function describe_kind(target_path: path) -> string {
+    match filesystem.get_path_status(target_path) {
+        ok(status) => {
+            return status.kind
+        }
+        error(_) => {
+            return "absent"
+        }
+    }
+}
+
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-04")?
+let a_file = temporary_directory / "a.txt"
+let a_directory = temporary_directory / "sub"
+let missing_entry = temporary_directory / "absent"
+filesystem.write_file_overwrite("x\n", a_file)?
+filesystem.make_directory(a_directory)?
+
+io.write_standard_output_line("a.txt: {describe_kind(a_file)}")
+io.write_standard_output_line("sub: {describe_kind(a_directory)}")
+io.write_standard_output_line("absent: {describe_kind(missing_entry)}")
+let a_file_exists = filesystem.path_exists(a_file)
+io.write_standard_output_line("a.txt existe: {a_file_exists}")
+if filesystem.get_path_status(a_file)?.size_bytes > 0 {
+    io.write_standard_output_line("a.txt non vide")
+}
+let empty_value = ""
+let name_value = "scripts"
+if empty_value == "" {
+    io.write_standard_output_line("chaine vide")
+}
+if name_value != "" {
+    io.write_standard_output_line("chaine non vide")
+}
+
+filesystem.remove_directory_tree(temporary_directory)?

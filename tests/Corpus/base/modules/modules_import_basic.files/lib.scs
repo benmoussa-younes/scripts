@@ -1,0 +1,7 @@
+public let greeting = "hello"
+public function double(n: integer) -> integer {
+    return n * 2
+}
+public function triple(n: integer) -> integer {
+    return n * 3
+}

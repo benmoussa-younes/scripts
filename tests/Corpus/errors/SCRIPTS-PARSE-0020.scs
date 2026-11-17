@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0020 2:33
+io.write_standard_output_line("a{x

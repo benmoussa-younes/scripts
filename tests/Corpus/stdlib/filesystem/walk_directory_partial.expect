@@ -1,0 +1,8 @@
+stdout:
+a directory
+x.txt file
+b.txt file
+sub directory
+skip invalid_encoding
+counts 4 1
+exit: 0

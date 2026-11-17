@@ -1,0 +1,5 @@
+stdout:
+greeting=hello
+d=42
+t=12
+exit: 0

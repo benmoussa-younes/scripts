@@ -1,0 +1,2 @@
+io.write_standard_output_line("h\u{E9}llo".uppercased())
+io.write_standard_output_line("abc".uppercased())

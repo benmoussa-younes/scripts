@@ -1,0 +1,10 @@
+#!/usr/bin/scripts run
+# scripts → there is no IFS: splitting is explicit (split).
+let value = "a:b:c"
+let shown = process.run(process.request("printf", ["[%s]\n", value]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())
+let fields = value.split(":")
+io.write_standard_output_line("champs={fields.length()}")
+for field in fields {
+    io.write_standard_output_line("champ={field}")
+}

@@ -1,0 +1,10 @@
+let mutable iterations = 0
+for value in range(0, 5) {
+    iterations += 1
+    io.write_standard_output_line("iteration {value}")
+}
+io.write_standard_output_line("iterations={iterations}")
+for i in range(3, 3) {
+    io.write_standard_output_line("never")
+}
+io.write_standard_output_line("done")

@@ -1,0 +1,12 @@
+exit: 0
+stream: stdout
+# DESIGN §8.4/§8.5: LINT warnings are listed in `warnings`, not in `errors`,
+# and do not affect `success`.
+check: doc["exit_code"] == 0
+check: doc["success"] is True
+check: doc["termination"] == "normal"
+check: doc["errors"] == []
+check: len(doc["warnings"]) == 1
+check: doc["warnings"][0]["code"] == "SCRIPTS-LINT-0002"
+check: doc["warnings"][0]["severity"] == "warning"
+check: doc["warnings"][0]["file"] == "run-json-out-warning.scs"

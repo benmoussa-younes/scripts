@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Scripts.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Scripts.Core\Scripts.Core.csproj" />
+    <ProjectReference Include="..\..\src\Scripts.Syntax\Scripts.Syntax.csproj" />
+  </ItemGroup>
+</Project>

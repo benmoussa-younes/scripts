@@ -1,0 +1,10 @@
+let mutable values = [1, 2]
+values.insert_at(1, 9)?
+io.write_standard_output_line(values.transform(value => "{value}").join(","))
+match values.insert_at(9, 0) {
+    ok(_) => io.write_standard_output_line("inserted")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let mutable moving = [1, 2]
+moving.insert_at(0, moving.remove_at(1)?)?
+io.write_standard_output_line(moving.transform(value => "{value}").join(","))

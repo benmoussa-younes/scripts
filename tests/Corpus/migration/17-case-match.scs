@@ -1,0 +1,46 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 17: case ... esac -> match
+
+function classify(command_word: string) -> string {
+    match command_word {
+        "start" | "begin" => {
+            return "demarrage"
+        }
+        "stop" => {
+            return "arret"
+        }
+        _ => {
+            return "inconnu"
+        }
+    }
+}
+
+function describe_code(exit_code_value: integer) -> string {
+    return match exit_code_value {
+        0 => "succes"
+        1 | 2 => "avertissement"
+        _ => "erreur"
+    }
+}
+
+function kind_of_file(candidate_name: string) -> string {
+    if candidate_name.ends_with(".txt") {
+        return "texte"
+    } else if candidate_name.ends_with(".log") {
+        return "journal"
+    }
+    return "autre"
+}
+
+let words = ["start", "begin", "stop", "bogus"]
+for word in words {
+    io.write_standard_output_line("{word} -> {classify(word)}")
+}
+let codes = [0, 2, 127]
+for code_value in codes {
+    io.write_standard_output_line("{code_value} -> {describe_code(code_value)}")
+}
+let candidate_names = ["x.txt", "y.log", "z.bin"]
+for candidate_name_value in candidate_names {
+    io.write_standard_output_line("{candidate_name_value} -> {kind_of_file(candidate_name_value)}")
+}

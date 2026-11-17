@@ -1,0 +1,5 @@
+stdout:
+success 2
+other subject=false message=the program `false` exited with code 1
+other subject=false message=the program `false` exited with code 1
+exit: 0

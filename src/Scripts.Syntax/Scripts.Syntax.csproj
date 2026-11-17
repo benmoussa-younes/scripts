@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Scripts.Syntax</RootNamespace>
+    <AssemblyName>Scripts.Syntax</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scripts.Core\Scripts.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Scripts.Syntax.Tests" />
+  </ItemGroup>
+</Project>

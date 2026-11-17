@@ -1,0 +1,14 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 20: script arguments ($1, $@, $#)
+
+function report_arguments(argument_values: list<string>) {
+    io.write_standard_output_line("arguments: {argument_values.length()}")
+    let target_name = argument_values.get_at_index(0).value_or("monde")
+    io.write_standard_output_line("Bonjour {target_name}")
+    for received_argument in argument_values {
+        io.write_standard_output_line("arg=[{received_argument}]")
+    }
+}
+
+report_arguments(process.arguments())
+report_arguments(["un", "deux mots"])

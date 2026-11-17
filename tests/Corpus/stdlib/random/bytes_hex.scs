@@ -1,0 +1,13 @@
+let empty = random.bytes_hex(0)?
+let is_empty = empty == ""
+io.write_standard_output_line("{is_empty}")
+let value = random.bytes_hex(16)?
+io.write_standard_output_line("{value.length()}")
+match value.matches(r"^[0-9a-f]{32}$") {
+    ok(valid) => io.write_standard_output_line("{valid}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match random.bytes_hex(1048577) {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,16 @@
+io.write_standard_output_line(encoding.hex_decode("")?)
+io.write_standard_output_line(encoding.hex_decode("666f6f626172")?)
+io.write_standard_output_line(encoding.hex_decode("41")?)
+io.write_standard_output_line(encoding.hex_decode("4A")?)
+match encoding.hex_decode("abc") {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match encoding.hex_decode("zz") {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match encoding.hex_decode("ff") {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,23 @@
+io.write_standard_output_line("{random.integer_below(1)?}")
+let mutable minimum = 97
+let mutable maximum = -1
+for index in range(0, 1000) {
+    let value = random.integer_below(97)?
+    if value < minimum {
+        minimum = value
+    }
+    if value > maximum {
+        maximum = value
+    }
+}
+io.write_standard_output_line("{minimum >= 0 and maximum < 97 and minimum != maximum}")
+let huge = random.integer_below(9223372036854775807)?
+io.write_standard_output_line("{huge >= 0}")
+match random.integer_below(0) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match random.integer_below(-1) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,4 @@
+stdout:
+invalid_integer
+5
+exit: 0

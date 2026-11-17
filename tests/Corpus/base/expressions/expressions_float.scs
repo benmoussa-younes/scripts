@@ -1,0 +1,8 @@
+io.write_standard_output_line("f1={1.5 + 2.5}")
+io.write_standard_output_line("f2={10.0 / 4.0}")
+io.write_standard_output_line("f3={2.0 * 3.5}")
+io.write_standard_output_line("f4={5.5 - 0.5}")
+let neg = 1.25
+io.write_standard_output_line("f5={-neg}")
+io.write_standard_output_line("f6={1.0 / 3.0}")
+io.write_standard_output_line("cmp={1.5 < 2.0}")

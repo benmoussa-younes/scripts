@@ -1,0 +1,11 @@
+let items = [10, 20, 30]
+let second = items.get_at_index(1).value_or_fail()
+io.write_standard_output_line("{second}")
+match items.get_at_index(3) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match items.get_at_index(-1) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

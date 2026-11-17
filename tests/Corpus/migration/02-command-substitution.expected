@@ -1,0 +1,6 @@
+salutation: bonjour
+majuscules: HELLO
+lignes: 3
+code=1
+stdout vide: true
+stderr fusionne: true

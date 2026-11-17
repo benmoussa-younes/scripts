@@ -1,0 +1,4 @@
+# expect: SCRIPTS-RUNTIME-0019 4:1 exit=253
+# run: scripts run script.scs > /dev/full
+io.write_standard_output_line("x")
+io.write_standard_error_line("y")

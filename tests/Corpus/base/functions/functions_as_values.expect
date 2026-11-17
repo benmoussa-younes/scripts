@@ -1,0 +1,5 @@
+stdout:
+evens=3
+doubled0=2 last=12
+total=21
+exit: 0

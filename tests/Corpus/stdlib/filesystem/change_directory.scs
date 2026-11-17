@@ -1,0 +1,13 @@
+match filesystem.set_current_directory(p"/scripts-spec-inexistant") {
+    ok(_) => io.write_standard_output_line("changé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.set_current_directory(p"") {
+    ok(_) => io.write_standard_output_line("changé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+filesystem.set_current_directory(work_directory)?
+io.write_standard_output_line("{filesystem.path_exists(filesystem.get_current_directory()?)}")
+filesystem.set_current_directory(p"/")?
+filesystem.remove_directory_tree(work_directory)?

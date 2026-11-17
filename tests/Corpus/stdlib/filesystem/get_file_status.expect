@@ -1,0 +1,11 @@
+stdout:
+file
+5
+true
+true
+true
+true
+directory
+true
+not_found
+exit: 0

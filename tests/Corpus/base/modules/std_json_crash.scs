@@ -1,0 +1,47 @@
+
+# BLOCKER 2: an isolated half-surrogate (\ud800/\udc00) must never
+# crash the interpreter (exit 253); it is a clean invalid_syntax. A valid
+# pair must always decode.
+match json.decode("\"\\ud800\"") {
+    ok(parsed) => io.write_standard_output_line("d800: ok")
+    error(e) => io.write_standard_output_line("d800: {e.kind}")
+}
+match json.decode("\"\\udc00\"") {
+    ok(parsed) => io.write_standard_output_line("dc00: ok")
+    error(e) => io.write_standard_output_line("dc00: {e.kind}")
+}
+match json.decode("\"\\ud800x\"") {
+    ok(parsed) => io.write_standard_output_line("d800x: ok")
+    error(e) => io.write_standard_output_line("d800x: {e.kind}")
+}
+match json.decode("\"a\\udc00b\"") {
+    ok(parsed) => io.write_standard_output_line("low: ok")
+    error(e) => io.write_standard_output_line("low: {e.kind}")
+}
+match json.decode("[1,\"\\ud800\"]") {
+    ok(parsed) => io.write_standard_output_line("nested: ok")
+    error(e) => io.write_standard_output_line("nested: {e.kind}")
+}
+match json.decode("\"\\ud83d\\ude00\"") {
+    ok(parsed) => io.write_standard_output_line("pair: {parsed.as_string()?}")
+    error(e) => io.write_standard_output_line("pair: {e.kind}")
+}
+
+# BLOCKER 3: the maximum depth is 1000 (DESIGN 3.5/5.8). 1000 is accepted,
+# 1001 is depth_exceeded — and never a crash.
+let deep = filesystem.read_file("std_json_crash.deep1000".to_path())?
+match json.decode(deep) {
+    ok(parsed) => io.write_standard_output_line("1000: {parsed.kind()}")
+    error(e) => io.write_standard_output_line("1000: {e.kind}")
+}
+let too_deep = filesystem.read_file("std_json_crash.deep1001".to_path())?
+match json.decode(too_deep) {
+    ok(parsed) => io.write_standard_output_line("1001: {parsed.kind()}")
+    error(e) => io.write_standard_output_line("1001: {e.kind}")
+}
+
+# An accepted depth-1000 document re-encodes cleanly.
+match json.decode(deep) {
+    ok(parsed) => io.write_standard_output_line("encode1000: {json.encode(parsed)?.length()}")
+    error(e) => io.write_standard_output_line("encode1000: {e.kind}")
+}

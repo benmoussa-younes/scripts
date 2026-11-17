@@ -1,0 +1,2 @@
+import "lib/tools.scs" as tools
+io.write_standard_output_line(tools.greet("world"))

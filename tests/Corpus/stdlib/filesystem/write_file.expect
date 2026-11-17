@@ -1,0 +1,5 @@
+stdout:
+salut
+is_a_directory
+not_found
+exit: 0

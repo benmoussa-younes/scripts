@@ -1,0 +1,5 @@
+# expect: SCRIPTS-PARSE-0030 3:6
+let xs = [
+    1
+    -2
+]

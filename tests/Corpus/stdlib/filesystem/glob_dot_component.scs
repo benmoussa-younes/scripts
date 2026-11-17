@@ -1,0 +1,10 @@
+let root = filesystem.make_temporary_directory("scripts-glob-dot-")?
+match filesystem.glob(root, "./*.txt") {
+    ok(_) => io.write_standard_output_line("glob ok")
+    error(e) => io.write_standard_output_line("glob {e.kind}")
+}
+match p"file.txt".matches_glob("./file.txt") {
+    ok(_) => io.write_standard_output_line("match ok")
+    error(e) => io.write_standard_output_line("match {e.kind}")
+}
+filesystem.remove_directory_tree(root)?

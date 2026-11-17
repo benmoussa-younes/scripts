@@ -1,0 +1,11 @@
+let root = filesystem.make_temporary_directory("scripts-glob-terminal-")?
+filesystem.make_directory(root / "dir")?
+filesystem.write_file_overwrite("", root / "dir" / "f")?
+filesystem.write_file_overwrite("", root / "file")?
+io.write_standard_output_line(filesystem.glob(root, "dir/**")?.transform(m => m.base_name()).join(","))
+io.write_standard_output_line(filesystem.glob(root, "file/**")?.transform(m => m.base_name()).join(","))
+io.write_standard_output_line(filesystem.glob(root, "**")?.transform(m => m.base_name()).join(","))
+io.write_standard_output_line("{p"file".matches_glob("file/**")?}")
+io.write_standard_output_line(filesystem.glob(root, "dir/**/**")?.transform(m => m.base_name()).join(","))
+io.write_standard_output_line(filesystem.glob(root, "file/**/**")?.transform(m => m.base_name()).join(","))
+filesystem.remove_directory_tree(root)?

@@ -1,0 +1,10 @@
+stdout:
+true
+secret
+already_exists
+secret
+already_exists
+false
+invalid_argument
+false
+exit: 0

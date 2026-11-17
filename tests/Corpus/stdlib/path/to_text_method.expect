@@ -1,0 +1,5 @@
+stdout:
+/a/b.txt
+/A/B.TXT
+/tmp/
+exit: 0

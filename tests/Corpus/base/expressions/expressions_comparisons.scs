@@ -1,0 +1,11 @@
+let a = 5
+let b = 5
+let c = 9
+io.write_standard_output_line("eq={a == b}")
+io.write_standard_output_line("ne={a != c}")
+io.write_standard_output_line("lt={a < c}")
+io.write_standard_output_line("le={a <= b}")
+io.write_standard_output_line("gt={c > a}")
+io.write_standard_output_line("ge={c >= a}")
+io.write_standard_output_line("streq={"abc" == "abc"}")
+io.write_standard_output_line("strlt={"apple" < "banana"}")

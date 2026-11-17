@@ -1,0 +1,9 @@
+exit: 0
+stream: stdout
+text-contains: scripts @VERSION@
+text-contains: USAGE
+text-contains: scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]
+text-contains: --json-out
+text-contains: --errors-json
+text-contains: scripts describe --format json
+text-contains: EXIT CODES

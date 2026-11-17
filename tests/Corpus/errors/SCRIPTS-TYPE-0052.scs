@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0052 2:10
+function f() -> integer {
+    io.write_standard_output_line("a")
+}

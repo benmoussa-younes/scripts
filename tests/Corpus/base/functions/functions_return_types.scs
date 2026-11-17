@@ -1,0 +1,12 @@
+function identity(x: integer) -> integer {
+    return x
+}
+function takes_unit() {
+    io.write_standard_output_line("unit called")
+}
+io.write_standard_output_line("id={identity(9)}")
+takes_unit()
+function concat3(a: string, b: string, c: string) -> string {
+    return a + b + c
+}
+io.write_standard_output_line(concat3("a", "b", "c"))

@@ -1,0 +1,10 @@
+nombre: 4
+premier: pomme
+dixieme: aucun
+- pomme
+- poire avec espace
+- cerise
+- kiwi
+joint: pomme,poire avec espace,cerise,kiwi
+tri: cerise|kiwi|poire avec espace|pomme
+snapshot: 4 / fruits: 5

@@ -1,0 +1,26 @@
+let root_directory = filesystem.make_temporary_directory("scripts-directory-perm-errors-")?
+let existing_file = root_directory / "file.txt"
+filesystem.write_file_overwrite("x", existing_file)?
+match filesystem.make_directory_with_permissions(existing_file, 0o750) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let link_target = root_directory / "target"
+filesystem.make_directory(link_target)?
+let link_path = root_directory / "link"
+filesystem.make_symbolic_link(link_target, link_path)?
+match filesystem.make_directory_with_permissions(link_path, 0o750) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let parent_file = root_directory / "parent"
+filesystem.write_file_overwrite("x", parent_file)?
+match filesystem.make_directory_with_permissions(parent_file / "child", 0o750) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.make_directory_with_permissions(root_directory / "absent" / "child", 0o750) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

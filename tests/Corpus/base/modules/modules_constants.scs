@@ -1,0 +1,4 @@
+import "config.scs" as config
+io.write_standard_output_line("name={config.NAME}")
+io.write_standard_output_line("version={config.VERSION}")
+io.write_standard_output_line("text={config.version_text()}")

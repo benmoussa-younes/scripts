@@ -1,0 +1,11 @@
+
+let document = json.decode("\{\"nom\": \"alice\", \"n\": 1\}")?
+let fields = document.as_map()?
+io.write_standard_output_line(fields.keys().join(","))
+io.write_standard_output_line("{fields.length()}")
+io.write_standard_output_line(fields.get_value("nom")?.as_string().value_or("?"))
+
+match json.decode("[]")?.as_map() {
+    ok(table) => io.write_standard_output_line("{table.length()}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/scripts run
+# scripts → process.arguments() returns the argument list as is,
+# each element remaining a single argument (never joined nor split).
+let args = process.arguments()
+io.write_standard_output_line("nombre={args.length()}")
+for received_argument in args {
+    io.write_standard_output_line("arg=[{received_argument}]")
+}
+let joined = args.join("|")
+io.write_standard_output_line("joint={joined}")

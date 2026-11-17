@@ -1,0 +1,2 @@
+# expect: SCRIPTS-MODULE-0009 2:20 file=lib.scs
+import "lib.scs" as lib

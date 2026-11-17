@@ -1,0 +1,4 @@
+exit: 250
+stream: stderr
+text-contains: SCRIPTS-CLI-0006
+text-contains: --format json

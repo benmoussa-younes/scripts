@@ -1,0 +1,17 @@
+io.write_standard_output_line("abc".replace_regex("b", r"[{0}]")?)
+io.write_standard_output_line("a1b22".replace_regex("(\\d+)", r"[{1}]")?)
+io.write_standard_output_line("x".replace_regex("x", r"{{x}}")?)
+io.write_standard_output_line("ab".replace_regex("(a)(b)", r"{{{1}}}")?)
+io.write_standard_output_line("a".replace_regex("a", r"$1")?)
+match "a".replace_regex("a", r"{1}") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "a".replace_regex("a", r"{9}") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "a".replace_regex("(", "x") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

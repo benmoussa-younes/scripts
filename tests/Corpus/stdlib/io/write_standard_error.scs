@@ -1,0 +1,2 @@
+io.write_standard_error("progress")
+io.write_standard_output_line("done")

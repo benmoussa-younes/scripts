@@ -1,0 +1,32 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 19: arithmetic ($((a + b)))
+let left_operand = 7
+let right_operand = 3
+let negative_value = -7
+io.write_standard_output_line("somme: {left_operand + right_operand}")
+io.write_standard_output_line("division: {left_operand / right_operand}")
+io.write_standard_output_line("reste: {left_operand % right_operand}")
+io.write_standard_output_line("negatif division: {negative_value / 2}")
+io.write_standard_output_line("negatif reste: {negative_value % 3}")
+if left_operand > right_operand {
+    io.write_standard_output_line("7 > 3")
+}
+
+let mutable total = 0
+for step_value in range(1, 5) {
+    total += step_value
+}
+io.write_standard_output_line("total: {total}")
+
+let mutable counter = 0
+while counter < 3 {
+    counter += 1
+}
+io.write_standard_output_line("compteur: {counter}")
+
+let parsed_number = "42".parse_integer()?
+io.write_standard_output_line("analyse: {parsed_number + 1}")
+match "4x2".parse_integer() {
+    ok(unexpected_number) => io.write_standard_output_line("nombre: {unexpected_number}")
+    error(parse_failure) => io.write_standard_output_line("erreur: {parse_failure.kind}")
+}

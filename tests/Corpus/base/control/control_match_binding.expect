@@ -1,0 +1,5 @@
+stdout:
+zero
+nonzero:7
+yes
+exit: 0

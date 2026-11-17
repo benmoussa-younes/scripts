@@ -1,0 +1,5 @@
+stdout:
+true
+content
+not_a_directory
+exit: 0

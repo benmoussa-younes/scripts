@@ -1,0 +1,4 @@
+stdout:
+true a.txt
+not_found
+exit: 0

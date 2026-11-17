@@ -1,0 +1,10 @@
+let mutable xs = [10, 20, 30]
+xs[0] = 100
+xs[2] = xs[0] + xs[1]
+io.write_standard_output_line("xs0={xs[0]}")
+io.write_standard_output_line("xs2={xs[2]}")
+let mutable m = {"a": 1}
+m["a"] = 5
+m["b"] = 6
+io.write_standard_output_line("ma={m["a"]}")
+io.write_standard_output_line("mb={m["b"]}")

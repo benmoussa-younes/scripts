@@ -1,0 +1,45 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: scripts
+Source: https://github.com/benmoussa-younes/scripts
+
+Files: *
+Copyright: 2026 Younes BENMOUSSA <younes.benmoussa@pm.me>
+License: GPL-3.0-or-later
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ .
+ On Debian systems the full text of the GNU General Public License version 3 is
+ available in /usr/share/common-licenses/GPL-3.
+ .
+ The complete text of the licence shipped with the package is also installed as
+ /usr/share/doc/scripts/LICENSE.
+
+Files: src/Scripts.Core/Compatibility/Core/Results/* src/Scripts.Core/Compatibility/Core/Serialization/Values/* src/Scripts.Core/Compatibility/Core/Concurrency/*
+Copyright: 2026 Younes BENMOUSSA <younes.benmoussa@pm.me>
+License: LGPL-3.0-or-later
+ This library is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Lesser General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option) any
+ later version.
+ .
+ This library is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ .
+ On Debian systems the full text of the GNU Lesser General Public License
+ version 3 is available in /usr/share/common-licenses/LGPL-3, and the package
+ ships it as /usr/share/doc/scripts/LICENSE.LGPL3.
+
+Files: README.md AGENTS.md CHANGELOG.md NOTICE THIRD-PARTY
+Copyright: 2026 Younes BENMOUSSA <younes.benmoussa@pm.me>
+License: CC-BY-SA-4.0
+ This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+ International License. To view a copy of this license, visit
+ https://creativecommons.org/licenses/by-sa/4.0/ or see the complete text
+ installed as /usr/share/doc/scripts/LICENSE.CC-BY-SA-4.0.

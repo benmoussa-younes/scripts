@@ -1,0 +1,5 @@
+let fixed = 10
+let mutable counter = 0
+counter = fixed + 5
+counter += 1
+io.write_standard_output_line("counter={counter}")

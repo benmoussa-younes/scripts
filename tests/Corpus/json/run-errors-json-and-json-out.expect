@@ -1,0 +1,13 @@
+exit: 250
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 250
+check: doc["success"] is False
+check: doc["termination"] == "static_error"
+check: doc["stdout"] == ""
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-CLI-0011"
+check: doc["errors"][0]["severity"] == "error"
+check: doc["errors"][0]["message"] == "`--errors-json` and `--json-out` cannot be combined"
+check: doc["errors"][0]["suggestion"] == "keep one of the two flags"
+check: doc["errors"][0]["file"] is None

@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0004 1:1
+io.write_standard_output_line("petit")

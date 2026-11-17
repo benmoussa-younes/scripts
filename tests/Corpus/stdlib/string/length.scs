@@ -1,0 +1,8 @@
+let word = "h\u{E9}llo"
+io.write_standard_output_line("{word.length()}")
+let emoji = "\u{1F600}"
+io.write_standard_output_line("{emoji.length()}")
+let empty = ""
+io.write_standard_output_line("{empty.length()}")
+let with_nul = "a\u{0}b"
+io.write_standard_output_line("{with_nul.length()}")

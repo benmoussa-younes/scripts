@@ -1,0 +1,9 @@
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "x")?
+environment.remove_variable("SCRIPTS_STDLIB_VARIABLE")?
+environment.remove_variable("SCRIPTS_STDLIB_VARIABLE")?
+let absent = not environment.get_variable("SCRIPTS_STDLIB_VARIABLE").is_ok()
+io.write_standard_output_line("{absent}")
+match environment.remove_variable("A=B") {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.subject)
+}

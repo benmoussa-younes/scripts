@@ -1,0 +1,8 @@
+stdout:
+a.txt file
+b.txt file
+sub directory
+a.txt,b.txt,sub
+not_a_directory
+not_found
+exit: 0

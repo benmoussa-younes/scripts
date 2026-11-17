@@ -1,0 +1,2 @@
+# expect: SCRIPTS-MODULE-0003 2:8 file=m32.scs
+import "m1.scs" as chain

@@ -1,0 +1,5 @@
+stdout:
+2 1,3
+missing_index
+3 2
+exit: 0

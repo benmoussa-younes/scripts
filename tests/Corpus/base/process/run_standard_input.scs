@@ -1,0 +1,3 @@
+let outcome = process.run(process.request("cat", []).with_standard_input("entree\n"))?
+io.write_standard_output_line(outcome.standard_output.trim_whitespace())
+io.write_standard_output_line("{outcome.exit_code}")

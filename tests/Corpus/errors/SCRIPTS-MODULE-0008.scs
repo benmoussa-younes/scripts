@@ -1,0 +1,3 @@
+# expect: SCRIPTS-MODULE-0008 2:1 file=lib.scs
+import "lib.scs" as lib
+io.write_standard_output_line("a")

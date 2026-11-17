@@ -1,0 +1,3 @@
+let kept = {"a": 1, "b": 2}.filter((key, value) => value > 1)
+io.write_standard_output_line(kept.keys().join(","))
+io.write_standard_output_line("{kept.contains_key("a")}")

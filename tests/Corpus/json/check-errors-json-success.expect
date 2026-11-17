@@ -1,0 +1,5 @@
+exit: 0
+stream: stdout
+json-last
+check: doc == {"schema_version": 1, "success": True, "errors": [], "warnings": []}
+check: list(doc.keys()) == ["schema_version", "success", "errors", "warnings"]

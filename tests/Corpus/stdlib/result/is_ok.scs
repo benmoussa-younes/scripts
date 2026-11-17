@@ -1,0 +1,3 @@
+let good = "12".parse_integer().is_ok()
+let bad = "x".parse_integer().is_ok()
+io.write_standard_output_line("{good} {bad}")

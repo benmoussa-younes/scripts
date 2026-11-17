@@ -1,0 +1,18 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 12: associative arrays (declare -A)
+let mutable ages = {"ana": 31, "bob": 27}
+ages["carl"] = 40
+ages["ana"] = 32
+io.write_standard_output_line("taille: {ages.length()}")
+let ana_age = ages["ana"]
+io.write_standard_output_line("ana: {ana_age}")
+let zoe_age = ages.get_value("zoe").value_or(-1)
+io.write_standard_output_line("zoe: {zoe_age}")
+let zoe_present = ages.contains_key("zoe")
+io.write_standard_output_line("zoe presente: {zoe_present}")
+let bob_removed = ages.remove_key("bob")
+io.write_standard_output_line("bob supprime: {bob_removed}")
+let _ = ages.remove_key("nobody")
+for age_key in ages.keys().sorted() {
+    io.write_standard_output_line("{age_key}={ages[age_key]}")
+}

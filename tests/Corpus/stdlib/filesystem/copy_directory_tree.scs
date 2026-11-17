@@ -1,0 +1,53 @@
+let root_directory = filesystem.make_temporary_directory("scripts-copy-tree-")?
+let source_directory = root_directory / "source"
+let destination_directory = root_directory / "copy"
+filesystem.make_directory(source_directory)?
+filesystem.write_file_overwrite("one", source_directory / "a.txt")?
+filesystem.make_directory(source_directory / "sub")?
+filesystem.write_file_overwrite("two", source_directory / "sub" / "b.txt")?
+let setuid_file = source_directory / "setuid.sh"
+filesystem.write_file_overwrite("#!/bin/sh", setuid_file)?
+filesystem.set_permissions(setuid_file, 0o4755)?
+let setgid_directory = source_directory / "group"
+filesystem.make_directory(setgid_directory)?
+filesystem.set_permissions(setgid_directory, 0o2775)?
+let sticky_file = source_directory / "sticky.sh"
+filesystem.write_file_overwrite("#!/bin/sh", sticky_file)?
+filesystem.set_permissions(sticky_file, 0o1755)?
+let ordinary_directory = source_directory / "ordinary"
+filesystem.make_directory(ordinary_directory)?
+filesystem.set_permissions(ordinary_directory, 0o750)?
+let ordinary_file = source_directory / "plain.txt"
+filesystem.write_file_overwrite("data", ordinary_file)?
+filesystem.set_permissions(ordinary_file, 0o640)?
+let source_setuid = filesystem.get_path_status(setuid_file)?
+io.write_standard_output_line("{source_setuid.permissions == 0o4755}")
+let source_setgid = filesystem.get_path_status(setgid_directory)?
+io.write_standard_output_line("{source_setgid.permissions == 0o2775}")
+let source_sticky = filesystem.get_path_status(sticky_file)?
+io.write_standard_output_line("{source_sticky.permissions == 0o1755}")
+let source_ordinary_directory = filesystem.get_path_status(ordinary_directory)?
+io.write_standard_output_line("{source_ordinary_directory.permissions == 0o750}")
+let source_ordinary_file = filesystem.get_path_status(ordinary_file)?
+io.write_standard_output_line("{source_ordinary_file.permissions == 0o640}")
+filesystem.copy_directory_tree(source_directory, destination_directory)?
+io.write_standard_output_line(filesystem.read_file(destination_directory / "sub" / "b.txt")?)
+let copied_setuid = filesystem.get_path_status(destination_directory / "setuid.sh")?
+io.write_standard_output_line("{copied_setuid.permissions == 0o755}")
+let copied_setgid = filesystem.get_path_status(destination_directory / "group")?
+io.write_standard_output_line("{copied_setgid.permissions == 0o775}")
+let copied_sticky = filesystem.get_path_status(destination_directory / "sticky.sh")?
+io.write_standard_output_line("{copied_sticky.permissions == 0o755}")
+let copied_ordinary_directory = filesystem.get_path_status(destination_directory / "ordinary")?
+io.write_standard_output_line("{copied_ordinary_directory.permissions == 0o750}")
+let copied_ordinary_file = filesystem.get_path_status(destination_directory / "plain.txt")?
+io.write_standard_output_line("{copied_ordinary_file.permissions == 0o640}")
+match filesystem.copy_directory_tree(source_directory, destination_directory) {
+    ok(_) => io.write_standard_output_line("copied")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.copy_directory_tree(source_directory, source_directory / "inner") {
+    ok(_) => io.write_standard_output_line("copied")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

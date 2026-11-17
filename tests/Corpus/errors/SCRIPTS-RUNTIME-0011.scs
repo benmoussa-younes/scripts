@@ -1,0 +1,5 @@
+# expect: SCRIPTS-RUNTIME-0011 3:5 exit=253
+function f(n: integer) -> integer {
+    return f(n + 1)
+}
+let x = f(0)

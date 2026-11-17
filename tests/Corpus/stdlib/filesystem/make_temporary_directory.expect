@@ -1,0 +1,5 @@
+stdout:
+true
+true
+invalid_argument
+exit: 0

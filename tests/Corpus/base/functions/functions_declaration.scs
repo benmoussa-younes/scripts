@@ -1,0 +1,12 @@
+function add(a: integer, b: integer) -> integer {
+    return a + b
+}
+function no_return(a: integer) {
+    io.write_standard_output_line("side effect {a}")
+}
+io.write_standard_output_line("sum={add(3, 4)}")
+no_return(5)
+function greet() -> string {
+    return "hi"
+}
+io.write_standard_output_line(greet())

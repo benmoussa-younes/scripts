@@ -1,0 +1,8 @@
+stdout:
+plain
+with spaces   kept
+tabs	between
+quote='single' and "double"
+unicode: café é
+combined=abc len=3
+exit: 0

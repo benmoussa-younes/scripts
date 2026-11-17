@@ -1,0 +1,4 @@
+let merged = {"a": 1, "b": 2}.merged_with({"b": 3, "c": 4})
+io.write_standard_output_line(merged.keys().join(","))
+io.write_standard_output_line("{merged.get_value("b")?}")
+io.write_standard_output_line("{merged.get_value("a")?}")

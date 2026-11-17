@@ -1,0 +1,4 @@
+let handle = process.spawn("printf", ["arriere-plan"])?
+let outcome = process.wait_for_process(handle, 0)?
+io.write_standard_output_line(outcome.standard_output)
+io.write_standard_output_line("{outcome.exit_code}")

@@ -1,0 +1,12 @@
+let n = 5
+match n {
+    0 | 2 | 4 => io.write_standard_output_line("even small")
+    1 | 3 => io.write_standard_output_line("odd small")
+    _ => io.write_standard_output_line("big")
+}
+let status = "ok"
+match status {
+    "ok" => io.write_standard_output_line("everything fine")
+    "fail" => io.write_standard_output_line("problem")
+    _ => io.write_standard_output_line("unknown")
+}

@@ -1,0 +1,16 @@
+io.write_standard_output_line(encoding.base64_decode("")?)
+io.write_standard_output_line(encoding.base64_decode("Zg==")?)
+io.write_standard_output_line(encoding.base64_decode("Zm8=")?)
+io.write_standard_output_line(encoding.base64_decode("Zm9v")?)
+io.write_standard_output_line(encoding.base64_decode("Zm9vYg==")?)
+io.write_standard_output_line(encoding.base64_decode("Zm9vYmE=")?)
+io.write_standard_output_line(encoding.base64_decode("Zm9vYmFy")?)
+io.write_standard_output_line(encoding.base64_decode("Y2Fmw6k=")?)
+match encoding.base64_decode("a") {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match encoding.base64_decode("/w==") {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

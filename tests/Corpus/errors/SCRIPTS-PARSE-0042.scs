@@ -1,0 +1,3 @@
+# expect: SCRIPTS-PARSE-0042 2:12
+function f(a) {
+}

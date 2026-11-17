@@ -1,0 +1,4 @@
+import "lib.scs" as lib
+io.write_standard_output_line("greeting={lib.greeting}")
+io.write_standard_output_line("d={lib.double(21)}")
+io.write_standard_output_line("t={lib.triple(4)}")

@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0043 2:26
+let g: function(integer) = 1

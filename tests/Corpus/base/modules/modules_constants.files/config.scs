@@ -1,0 +1,6 @@
+public let VERSION = 2
+public let NAME = "core"
+let SECRET = 99
+public function version_text() -> string {
+    return NAME + " v{VERSION}"
+}

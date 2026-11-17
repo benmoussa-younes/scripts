@@ -1,0 +1,6 @@
+let ordered = ["pomme", "abricot", "cerise"].sorted()
+io.write_standard_output_line(ordered.join(","))
+let numbers = [3, 1, 2].sorted()
+io.write_standard_output_line("{numbers.get_at_index(0).value_or_fail()}")
+let empty: list<integer> = []
+io.write_standard_output_line("{empty.sorted().length()}")

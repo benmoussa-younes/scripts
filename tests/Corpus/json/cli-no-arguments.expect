@@ -1,0 +1,5 @@
+exit: 250
+stream: stderr
+text-contains: SCRIPTS-CLI-0001
+text-contains: no command provided
+text-contains: scripts help

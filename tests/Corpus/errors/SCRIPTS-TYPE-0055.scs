@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0055 2:18
+let m = {"a": 1, "a": 2}

@@ -1,0 +1,11 @@
+exit: 251
+stream: stderr
+# DESIGN §8.3: `run` writes the document to stderr as the last line whenever
+# there is at least one diagnostic (error or warning). A static (TYPE) error is
+# a diagnostic, so the last line of stderr is the JSON document.
+json-last
+check: doc["schema_version"] == 1
+check: doc["success"] is False
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-TYPE-0012"
+check: doc["errors"][0]["severity"] == "error"

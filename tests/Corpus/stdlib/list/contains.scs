@@ -1,0 +1,4 @@
+let found = [1, 2, 3].contains(2)
+let missing = [1, 2, 3].contains(9)
+let empty: list<integer> = []
+io.write_standard_output_line("{found} {missing} {empty.contains(1)}")

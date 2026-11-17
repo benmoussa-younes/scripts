@@ -1,0 +1,12 @@
+let root_directory = filesystem.make_temporary_directory("scripts-lock-release-")?
+let lock_path = root_directory / "state.lock"
+let lock = filesystem.acquire_file_lock(lock_path, 0)?
+match lock.release() {
+    ok(_) => io.write_standard_output_line("released")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match lock.release() {
+    ok(_) => io.write_standard_output_line("released again")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

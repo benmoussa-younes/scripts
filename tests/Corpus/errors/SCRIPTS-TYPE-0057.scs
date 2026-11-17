@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0057 2:16
+let s = [1, 2].join(",")

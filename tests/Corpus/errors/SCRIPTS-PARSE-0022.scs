@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0022 2:32
+io.write_standard_output_line("{0}")

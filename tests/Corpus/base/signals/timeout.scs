@@ -1,0 +1,5 @@
+match process.run(process.request("sleep", ["5"]).with_timeout(50)) {
+    ok(result) => io.write_standard_output_line("ok {result.exit_code}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line("le script continue apres le delai")

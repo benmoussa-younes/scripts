@@ -1,0 +1,6 @@
+# expect: SCRIPTS-PARSE-0058 5:14
+function f(a: integer, b: integer) -> integer {
+    return a + b
+}
+let x = f(1, b = 2)
+io.write_standard_output_line(x)

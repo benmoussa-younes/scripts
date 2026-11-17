@@ -1,0 +1,9 @@
+exit: 0
+stream: stdout
+check: doc["limits"]["maximum_source_bytes"] == 4194304
+check: doc["limits"]["maximum_syntax_depth"] == 200
+check: doc["limits"]["maximum_import_depth"] == 32
+check: doc["limits"]["maximum_call_depth"] == 10000
+check: doc["limits"]["maximum_range_length"] == 10000000
+check: doc["limits"]["maximum_script_exit_code"] == 255
+check: all(isinstance(v, int) for v in doc["limits"].values())

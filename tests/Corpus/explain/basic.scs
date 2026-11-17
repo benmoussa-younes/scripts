@@ -1,0 +1,8 @@
+let n = 3
+let mutable total = 0
+total += n
+if total > 2 {
+    io.write_standard_output_line("grand")
+} else {
+    io.write_standard_output_line("petit")
+}

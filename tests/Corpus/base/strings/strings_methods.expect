@@ -1,0 +1,11 @@
+stdout:
+len=5
+upper=HELLO
+lower=hello
+trim=pad|
+contains=true
+starts=true
+ends=true
+replace=HeLLo
+split=He--o
+exit: 0

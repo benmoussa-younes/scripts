@@ -1,0 +1,15 @@
+let root_directory = filesystem.make_temporary_directory("scripts-readlink-")?
+let target_path = root_directory / "target.txt"
+let link_path = root_directory / "link.txt"
+filesystem.write_file_overwrite("target", target_path)?
+filesystem.make_symbolic_link(target_path, link_path)?
+io.write_standard_output_line("{filesystem.read_link(link_path)? == target_path}")
+match filesystem.read_link(target_path) {
+    ok(_) => io.write_standard_output_line("link")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.read_link(target_path / "below") {
+    ok(_) => io.write_standard_output_line("link")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

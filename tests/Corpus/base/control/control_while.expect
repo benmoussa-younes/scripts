@@ -1,0 +1,7 @@
+stdout:
+i=5
+total=10
+count=3
+count=2
+count=1
+exit: 0

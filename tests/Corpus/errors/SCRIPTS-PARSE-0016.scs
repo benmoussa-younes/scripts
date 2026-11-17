@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0016 2:31
+io.write_standard_output_line("abc)

@@ -1,0 +1,1 @@
+scripts describe --format yaml

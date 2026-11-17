@@ -1,0 +1,6 @@
+stdout:
+true
+already_exists
+invalid_argument
+false
+exit: 0

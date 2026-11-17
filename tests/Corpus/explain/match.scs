@@ -1,0 +1,5 @@
+let value = "42".parse_integer()
+match value {
+    ok(n) => io.write_standard_output_line("nombre {n}")
+    error(e) => io.write_standard_output_line("erreur")
+}

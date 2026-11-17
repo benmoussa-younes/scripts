@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0049 2:1
+public let x = 1

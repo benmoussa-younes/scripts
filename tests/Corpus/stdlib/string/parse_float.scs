@@ -1,0 +1,12 @@
+let parsed = "2.5".parse_float().value_or_fail()
+io.write_standard_output_line("{parsed}")
+match "abc".parse_float() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "1e999".parse_float() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let negative_zero = "-0.0".parse_float().value_or_fail()
+io.write_standard_output_line("{negative_zero}")

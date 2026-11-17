@@ -1,0 +1,224 @@
+exit: 0
+stream: stdout
+# The 206 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 99 module functions + 103 methods.
+check: len(doc["functions"]) == 206
+check: sum(1 for f in doc["functions"] if f["kind"] == "function") == 4
+check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 99
+check: sum(1 for f in doc["functions"] if f["kind"] == "method") == 103
+check: {f["kind"] for f in doc["functions"]} == {"function", "method", "module_function"}
+check: all(list(f.keys()) == ["qualified_name", "signature", "examples", "kind", "receiver", "parameters", "returns", "error_types", "error_kinds", "dangerous", "destructive", "mutates_receiver", "deterministic", "effects", "description", "semantics", "explain"] for f in doc["functions"])
+# "description", the whole one-line semantics, then the explain template (DESIGN §10).
+check: all(list(f.keys())[-3:] == ["description", "semantics", "explain"] for f in doc["functions"])
+check: all(isinstance(f["semantics"], str) and len(f["semantics"]) > 0 for f in doc["functions"])
+check: all(f["semantics"].startswith(f["description"]) for f in doc["functions"])
+check: all(len(f["semantics"]) > len(f["description"]) for f in doc["functions"])
+check: all(not any(c in f["semantics"] for c in "\n\r\t") for f in doc["functions"])
+# The micro-semantics kept beyond the index sentence: backticks are preserved.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.format_template")["semantics"].startswith("parses the receiver")
+check: "`{{`" in next(f for f in doc["functions"] if f["qualified_name"] == "string.format_template")["semantics"]
+check: "invalid_format" in next(f for f in doc["functions"] if f["qualified_name"] == "string.format_template")["semantics"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.pipeline")["error_kinds"] == ["spawn_failed", "invalid_argument", "timed_out", "invalid_encoding"]
+check: all(isinstance(f["parameters"], list) for f in doc["functions"])
+check: all({"name", "type"} <= set(p.keys()) for f in doc["functions"] for p in f["parameters"])
+
+# Detail of a few selected entries.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output_line")["returns"] == "unit"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "assert")["signature"] == "assert(condition: boolean, message: string) -> unit"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "assert")["parameters"] == [{"name": "condition", "type": "boolean"}, {"name": "message", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "assert")["returns"] == "unit"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "assert")["error_types"] == []
+check: next(f for f in doc["functions"] if f["qualified_name"] == "assert")["effects"] == ["none"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["parameters"] == [{"name": "request", "type": "run_request"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["returns"] == "result<process_result, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["error_types"] == ["error"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "encoding.base64_encode")["signature"] == "encoding.base64_encode(text: string) -> string"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "encoding.base64_decode")["error_kinds"] == ["invalid_argument", "invalid_encoding"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "random.bytes_hex")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "encoding.hex_encode")["deterministic"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "random.integer_below")["effects"] == ["system_read"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_inherit")["parameters"] == [{"name": "request", "type": "run_request"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_inherit")["returns"] == "result<integer, error>"
+# The four exec* globals are removed; process.request + process.run/run_inherit replace them.
+check: not any(f["qualified_name"] in {"exec", "exec_with_input", "exec_with_timeout", "exec_inherit"} for f in doc["functions"])
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.arguments")["returns"] == "list<string>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.exit_with_code")["returns"] == "never"
+
+# Flags: process.run_shell dangerous, remove_* destructive, process.run non-deterministic.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_shell")["dangerous"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_shell")["destructive"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.remove_directory_tree")["destructive"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output_line")["deterministic"] is True
+
+# string/list/map/result methods present, with a receiver.
+check: "string.split" in {f["qualified_name"] for f in doc["functions"]}
+check: "list<T>.length" in {f["qualified_name"] for f in doc["functions"]}
+check: "map<K,V>.keys" in {f["qualified_name"] for f in doc["functions"]}
+check: "result<T,E>.value_or_fail" in {f["qualified_name"] for f in doc["functions"]}
+# Ajouts v1.0.0.
+check: "string.substring" in {f["qualified_name"] for f in doc["functions"]}
+check: "string.strip_prefix" in {f["qualified_name"] for f in doc["functions"]}
+check: "string.strip_suffix" in {f["qualified_name"] for f in doc["functions"]}
+check: "string.replace_first" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file")["signature"] == "filesystem.read_file(file_path: path) -> result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["signature"] == "filesystem.read_file_no_follow(file_path: path) -> result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["parameters"] == [{"name": "file_path", "type": "path"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["error_kinds"] == ["not_found", "permission_denied", "not_a_directory", "is_a_directory", "invalid_path", "invalid_encoding", "too_large", "other"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["effects"] == ["filesystem_read"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_no_follow")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.for_each_line")["signature"] == "filesystem.for_each_line(file_path: path, visit: function(string) -> result<unit, error>) -> result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.for_each_line")["error_kinds"] == ["not_found", "permission_denied", "already_exists", "not_a_directory", "is_a_directory", "directory_not_empty", "invalid_path", "invalid_encoding", "too_large", "cross_device", "same_file", "invalid_argument", "timed_out", "invalid_integer", "invalid_float", "invalid_regex", "invalid_format", "out_of_range", "missing_key", "missing_index", "invalid_syntax", "depth_exceeded", "not_encodable", "invalid_worker_count", "transform_failed", "spawn_failed", "other", "end_of_file"]
+check: "the reader's own file failures are a subset" in next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.for_each_line")["semantics"]
+check: all(f["signature"].endswith(")") or " -> " in f["signature"] for f in doc["functions"])
+check: "list<T>.sorted_by" in {f["qualified_name"] for f in doc["functions"]}
+check: "process_result.require_success" in {f["qualified_name"] for f in doc["functions"]}
+# pipeline_result.require_success: receiver and return type (STD-008).
+check: next(f for f in doc["functions"] if f["qualified_name"] == "pipeline_result.require_success")["receiver"] == "pipeline_result"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "pipeline_result.require_success")["returns"] == "result<pipeline_result, error>"
+# Modules standard v1.1.0.
+check: "io.read_standard_input" in {f["qualified_name"] for f in doc["functions"]}
+check: "process.defer" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.read_standard_input")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.read_standard_input")["receiver"] is None
+check: "io.read_standard_input_line" in {f["qualified_name"] for f in doc["functions"]}
+check: "io.write_standard_output" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.read_standard_input_line")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.read_standard_input_line")["error_kinds"] == ["end_of_file", "invalid_encoding", "too_large", "other"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output")["returns"] == "unit"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output")["effects"] == ["stdout"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output")["deterministic"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.split")["kind"] == "method"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.split")["receiver"] == "string"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "list<T>.length")["receiver"] == "list<T>"
+# path methods (§7.5.1): there is no `path` namespace, only the five methods.
+check: {f["qualified_name"] for f in doc["functions"] if f["qualified_name"].startswith("path.")} == {"path.base_name", "path.extension", "path.parent", "path.to_string", "path.is_absolute", "path.matches_glob", "path.normalized", "path.file_stem", "path.with_extension"}
+check: "filesystem.sha256_file" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "list<T>.append")["mutates_receiver"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "list<T>.insert_at")["mutates_receiver"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "list<T>.remove_at")["mutates_receiver"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "list<T>.slice")["mutates_receiver"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file")["mutates_receiver"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file")["examples"][0]["output"] == "not_found"
+check: all(f["examples"][0]["code"].strip() for f in doc["functions"])
+check: not ({"path.join", "hostname", "list<T>.first", "result<T,E>.is_error"} & {f["qualified_name"] for f in doc["functions"]})
+check: next(f for f in doc["functions"] if f["qualified_name"] == "path.base_name")["kind"] == "method"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "path.base_name")["receiver"] == "path"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "path.parent")["returns"] == "path"
+# The five module-function counterparts are removed; only the methods remain.
+check: not any(f["kind"] == "module_function" and f["qualified_name"] in {"path.base_name", "path.extension", "path.parent", "path.to_string", "path.is_absolute", "path.matches_glob", "path.normalized", "path.file_stem", "path.with_extension"} for f in doc["functions"])
+# Uniqueness contract: `qualified_name` is unique across the catalogue; `(kind, qualified_name)` is unique too.
+check: len({f["qualified_name"] for f in doc["functions"]}) == len(doc["functions"])
+check: len({(f["kind"], f["qualified_name"]) for f in doc["functions"]}) == len(doc["functions"])
+# The method has no parameter.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "path.base_name")["parameters"] == []
+# json: the module functions (DESIGN §7.10/§7.10b); `json.encode` replaces the removed `to_json` methods.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.encode")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.encode")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.decode")["returns"] == "result<json_value, error>"
+check: not any(f["qualified_name"] in {"string.to_json", "list<T>.to_json", "map<K,V>.to_json"} for f in doc["functions"])
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json_value.kind")["receiver"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json_value.kind")["returns"] == "string"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json_value.as_integer")["returns"] == "result<integer, error>"
+check: {f["qualified_name"] for f in doc["functions"] if f["receiver"] == "json_value"} == {"json_value.kind", "json_value.as_string", "json_value.as_integer", "json_value.as_float", "json_value.as_boolean", "json_value.as_list", "json_value.as_map"}
+# filesystem v1.x: merged list/walk entries, the partial walk report, and the atomic file write (DESIGN §7.10a).
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["parameters"] == [{"name": "root_path", "type": "path"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["returns"] == "result<walk_report, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["effects"] == ["filesystem_read"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["destructive"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["dangerous"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.walk_directory")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.list_directory")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.list_directory")["parameters"] == [{"name": "directory_path", "type": "path"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.list_directory")["returns"] == "result<list<directory_entry>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.list_directory")["effects"] == ["filesystem_read"]
+# The three former filesystem entries are gone, as are the two global directory calls.
+check: not any(f["qualified_name"] in {"filesystem.list_directory_entries", "filesystem.walk_directory_entries", "filesystem.walk_directory_report"} for f in doc["functions"])
+check: not any(f["kind"] == "function" and f["qualified_name"] in {"list_directory", "walk_directory"} for f in doc["functions"])
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["parameters"] == [{"name": "content", "type": "string"}, {"name": "destination_path", "type": "path"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["returns"] == "result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["effects"] == ["filesystem_write"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["destructive"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_overwrite_atomically")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["parameters"] == [{"name": "file_path", "type": "path"}, {"name": "maximum_bytes", "type": "integer"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["error_kinds"] == ["not_found", "permission_denied", "not_a_directory", "is_a_directory", "invalid_path", "invalid_encoding", "too_large", "invalid_argument", "other"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["effects"] == ["filesystem_read"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["destructive"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.read_file_bounded")["deterministic"] is False
+# process: the request constructor, the single-request runner and the bounded wait (DESIGN §7.3).
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.request")["returns"] == "run_request"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["returns"] == "result<process_result, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_inherit")["returns"] == "result<integer, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.script_path")["returns"] == "path"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.null_value")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.from_string")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.from_integer")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.from_float")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.from_boolean")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.array")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "json.object")["returns"] == "json_value"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "time.unix_seconds")["returns"] == "integer"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "time.monotonic_milliseconds")["returns"] == "integer"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "time.sleep_milliseconds")["returns"] == "result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "time.sleep_milliseconds")["error_kinds"] == ["invalid_argument"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.spawn")["returns"] == "result<process_handle, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.spawn")["parameters"] == [{"name": "program", "type": "string"}, {"name": "arguments", "type": "list<string>"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.wait_for_process")["returns"] == "result<process_result, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.wait_for_process")["parameters"] == [{"name": "handle", "type": "process_handle"}, {"name": "timeout_milliseconds", "type": "integer"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.wait_for_process")["error_kinds"] == ["invalid_argument", "timed_out", "invalid_encoding", "other"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.terminate")["returns"] == "result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.terminate")["parameters"] == [{"name": "handle", "type": "process_handle"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "process.terminate")["destructive"] is True
+check: not any(f["qualified_name"] in {"spawn_process", "wait_for_process", "kill_process", "process.wait_for_process_with_timeout"} for f in doc["functions"])
+# parallel: three bounded, deterministic module functions (DESIGN §7.10.1).
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.transform")["parameters"] == [{"name": "items", "type": "list<T>"}, {"name": "worker_count", "type": "integer"}, {"name": "mapper", "type": "function(T) -> U"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.transform")["returns"] == "result<list<U>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.transform")["error_kinds"] == ["invalid_worker_count", "transform_failed"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.run_all")["returns"] == "result<list<process_result>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.run_all")["error_kinds"] == ["invalid_worker_count", "invalid_argument", "spawn_failed", "timed_out", "invalid_encoding"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.run_all")["effects"] == ["process", "environment_read"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.run_all")["deterministic"] is False
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.walk_directory")["returns"] == "result<list<path>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "parallel.walk_directory")["deterministic"] is True
+# file locking (STD-003): the exclusive advisory lock and the opaque handle method.
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.acquire_file_lock")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.acquire_file_lock")["returns"] == "result<file_lock, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.acquire_file_lock")["error_kinds"] == ["not_found", "permission_denied", "not_a_directory", "is_a_directory", "invalid_path", "invalid_argument", "timed_out", "other"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "file_lock.release")["kind"] == "method"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "file_lock.release")["receiver"] == "file_lock"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "file_lock.release")["returns"] == "result<unit, error>"
+# exact creation modes (STD-006a).
+check: "filesystem.write_file_exclusive_with_permissions" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_exclusive_with_permissions")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_exclusive_with_permissions")["parameters"] == [{"name": "content", "type": "string"}, {"name": "destination_path", "type": "path"}, {"name": "permissions", "type": "integer"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_exclusive_with_permissions")["returns"] == "result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.write_file_exclusive_with_permissions")["error_kinds"] == ["already_exists", "not_found", "not_a_directory", "is_a_directory", "permission_denied", "invalid_argument", "invalid_path", "other"]
+check: "filesystem.make_directory_with_permissions" in {f["qualified_name"] for f in doc["functions"]}
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.make_directory_with_permissions")["kind"] == "module_function"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.make_directory_with_permissions")["parameters"] == [{"name": "directory_path", "type": "path"}, {"name": "permissions", "type": "integer"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.make_directory_with_permissions")["returns"] == "result<unit, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.make_directory_with_permissions")["error_kinds"] == ["not_found", "permission_denied", "already_exists", "not_a_directory", "invalid_argument", "invalid_path", "other"]
+# string regex and padding methods (SPEC-STDLIB §7.6).
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.capture_groups")["kind"] == "method"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.capture_groups")["receiver"] == "string"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.capture_groups")["parameters"] == [{"name": "pattern", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.capture_groups")["returns"] == "result<list<string>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.capture_groups")["error_kinds"] == ["not_found", "invalid_regex"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.replace_regex")["parameters"] == [{"name": "pattern", "type": "string"}, {"name": "replacement_text", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.replace_regex")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.replace_regex")["error_kinds"] == ["invalid_regex", "invalid_format"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.split_regex")["parameters"] == [{"name": "pattern", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.split_regex")["returns"] == "result<list<string>, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.split_regex")["error_kinds"] == ["invalid_argument", "invalid_regex"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_start")["parameters"] == [{"name": "width", "type": "integer"}, {"name": "padding_text", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_start")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_start")["error_kinds"] == ["out_of_range", "invalid_argument"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_end")["parameters"] == [{"name": "width", "type": "integer"}, {"name": "padding_text", "type": "string"}]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_end")["returns"] == "result<string, error>"
+check: next(f for f in doc["functions"] if f["qualified_name"] == "string.pad_end")["error_kinds"] == ["out_of_range", "invalid_argument"]
+check: next(f for f in doc["functions"] if f["qualified_name"] == "file_lock.release")["mutates_receiver"] is True
+check: next(f for f in doc["functions"] if f["qualified_name"] == "file_lock.release")["dangerous"] is False

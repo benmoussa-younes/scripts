@@ -1,0 +1,9 @@
+stdout:
+first "quoted" line
+  second ""two"" line
+{not} interpolation, \n stays literal
+
+lines=3
+length=80
+true
+exit: 0

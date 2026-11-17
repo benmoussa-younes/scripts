@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0005 2:207
+let x = <repeat 250 "[">1<repeat 250 "]">

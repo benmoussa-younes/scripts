@@ -1,0 +1,2 @@
+let scaled = {"a": 1, "b": 2}.transform_values(value => value * 10)
+io.write_standard_output_line(scaled.values().transform(value => "{value}").join(","))

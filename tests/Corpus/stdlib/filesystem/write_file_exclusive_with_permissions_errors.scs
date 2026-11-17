@@ -1,0 +1,19 @@
+let root_directory = filesystem.make_temporary_directory("scripts-exclusive-perm-errors-")?
+let parent_file = root_directory / "parent"
+filesystem.write_file_overwrite("not a directory", parent_file)?
+match filesystem.write_file_exclusive_with_permissions("x", parent_file / "child.txt", 0o600) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.write_file_exclusive_with_permissions("x", root_directory / "absent" / "child.txt", 0o600) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let existing_directory = root_directory / "existing"
+filesystem.make_directory(existing_directory)?
+match filesystem.write_file_exclusive_with_permissions("x", existing_directory, 0o600) {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line(filesystem.read_file(parent_file)?)
+filesystem.remove_directory_tree(root_directory)?

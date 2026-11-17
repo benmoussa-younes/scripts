@@ -1,0 +1,6 @@
+let p = p"/tmp/a.txt"
+io.write_standard_output_line(p.base_name())
+io.write_standard_output_line(p"/tmp/dir/".base_name())
+io.write_standard_output_line((p"/x/y/z.md").base_name())
+io.write_standard_output_line(p"/".base_name())
+io.write_standard_output_line("[{p"".base_name()}]")

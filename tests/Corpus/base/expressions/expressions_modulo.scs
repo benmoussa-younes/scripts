@@ -1,0 +1,9 @@
+io.write_standard_output_line("p1={10 % 3}")
+io.write_standard_output_line("p2={-10 % 3}")
+io.write_standard_output_line("p3={10 % -3}")
+io.write_standard_output_line("p4={-10 % -3}")
+io.write_standard_output_line("p5={7 % 7}")
+io.write_standard_output_line("p6={1 % 5}")
+let mutable x = 17
+x %= 5
+io.write_standard_output_line("x={x}")

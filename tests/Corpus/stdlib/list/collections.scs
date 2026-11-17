@@ -1,0 +1,46 @@
+let xs = [3, 1, 2, 7, 18]
+io.write_standard_output_line("any={xs.any_match(n => n > 17)}")
+io.write_standard_output_line("all={xs.all_match(n => n > 0)}")
+io.write_standard_output_line("count={xs.count(n => n % 2 == 0)}")
+match xs.find_first(n => n > 6) {
+    ok(value) => io.write_standard_output_line("find={value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match xs.find_first(n => n > 99) {
+    ok(value) => io.write_standard_output_line("find={value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match xs.get_at_index(0) {
+    ok(value) => io.write_standard_output_line("first={value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line("sum={xs.sum()}")
+match xs.minimum() {
+    ok(value) => io.write_standard_output_line("min={value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match xs.maximum() {
+    ok(value) => io.write_standard_output_line("max={value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Empty lists: identities and failure kinds.
+let empty: list<integer> = []
+io.write_standard_output_line("vide={empty.any_match(n => n > 0)} {empty.all_match(n => n > 0)} {empty.count(n => n > 0)} {empty.sum()}")
+match empty.get_at_index(0) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line("first_vide={failure.kind}")
+}
+match empty.minimum() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line("min_vide={failure.kind}")
+}
+match empty.maximum() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line("max_vide={failure.kind}")
+}
+
+# min/max on list<string> (ordinal order).
+let noms = ["pomme", "abricot", "cerise"]
+io.write_standard_output_line("{noms.minimum().value_or("?")}")
+io.write_standard_output_line("{noms.maximum().value_or("?")}")

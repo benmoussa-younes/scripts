@@ -1,0 +1,66 @@
+let work_directory = filesystem.make_temporary_directory("scripts-nofollow-")?
+let file_path = work_directory / "note.txt"
+filesystem.write_file_overwrite("bonjour", file_path)?
+
+# A regular file is read like filesystem.read_file.
+match filesystem.read_file_no_follow(file_path) {
+    ok(content) => io.write_standard_output_line("regular {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A final symbolic link to a regular file is refused.
+let file_link = work_directory / "file-link"
+filesystem.make_symbolic_link(file_path, file_link)?
+match filesystem.read_file_no_follow(file_link) {
+    ok(content) => io.write_standard_output_line("link {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A dangling final symbolic link is refused, not reported missing.
+let dangling_link = work_directory / "dangling-link"
+filesystem.make_symbolic_link(work_directory / "absent.txt", dangling_link)?
+match filesystem.read_file_no_follow(dangling_link) {
+    ok(content) => io.write_standard_output_line("dangling {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A trailing slash never turns the final link into a followed prefix component.
+match filesystem.read_file_no_follow((file_link.to_string() + "/").to_path()) {
+    ok(content) => io.write_standard_output_line("trailing {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# An intermediate symbolic link to a directory is followed.
+let directory_link = work_directory / "directory-link"
+filesystem.make_symbolic_link(work_directory, directory_link)?
+match filesystem.read_file_no_follow(directory_link / "note.txt") {
+    ok(content) => io.write_standard_output_line("intermediate {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A directory and a missing path keep their filesystem.read_file errors.
+match filesystem.read_file_no_follow(work_directory) {
+    ok(content) => io.write_standard_output_line("directory {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.read_file_no_follow(work_directory / "absent.txt") {
+    ok(content) => io.write_standard_output_line("missing {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A NUL in the path is invalid_path.
+match filesystem.read_file_no_follow("a\0b".to_path()) {
+    ok(content) => io.write_standard_output_line("nul {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Invalid UTF-8 is invalid_encoding (the bytes are produced by printf, no fixture).
+let bad_path = work_directory / "bad.bin"
+let stages = process.pipeline_to_file_overwrite([process.request("printf", ["\\377"])], bad_path)?
+assert(stages.length() == 1, "the invalid-byte file is written by one stage")
+match filesystem.read_file_no_follow(bad_path) {
+    ok(content) => io.write_standard_output_line("bytes {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+filesystem.remove_directory_tree(work_directory)?

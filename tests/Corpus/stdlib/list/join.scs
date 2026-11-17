@@ -1,0 +1,4 @@
+io.write_standard_output_line(["a", "b", "c"].join("-"))
+let single_item = ["x"].join(", ")
+io.write_standard_output_line(single_item)
+io.write_standard_output_line("[{[""].join(",")}]")

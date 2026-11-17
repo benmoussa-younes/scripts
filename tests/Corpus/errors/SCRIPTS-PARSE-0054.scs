@@ -1,0 +1,5 @@
+# expect: SCRIPTS-PARSE-0054 3:9
+let value = match 1 {
+    1 =>
+    2, _ => 0
+}

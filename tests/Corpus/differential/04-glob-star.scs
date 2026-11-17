@@ -1,0 +1,12 @@
+#!/usr/bin/scripts run
+# scripts → "*" is data: no glob exists in the language.
+# We show that even with files present, the star is not expanded.
+let temporary_directory = filesystem.make_temporary_directory("scripts-differential-04")?
+filesystem.write_file_overwrite("contenu\n", temporary_directory / "alpha.txt")?
+filesystem.write_file_overwrite("contenu\n", temporary_directory / "beta.txt")?
+
+let pattern = "*"
+let shown = process.run(process.request("printf", ["[%s]\n", pattern]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())
+
+filesystem.remove_directory_tree(temporary_directory)?

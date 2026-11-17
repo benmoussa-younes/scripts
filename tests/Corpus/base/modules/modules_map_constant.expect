@@ -1,0 +1,5 @@
+stdout:
+t=30
+h=localhost
+host=localhost timeout=30
+exit: 0

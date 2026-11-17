@@ -1,0 +1,10 @@
+stdout:
+eq=true
+ne=true
+lt=true
+le=true
+gt=true
+ge=true
+streq=true
+strlt=true
+exit: 0

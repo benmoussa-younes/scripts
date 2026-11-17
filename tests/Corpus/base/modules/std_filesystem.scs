@@ -1,0 +1,25 @@
+
+# walk: path + kind of each entry, without filesystem.get_path_status
+let root = "tree".to_path()
+filesystem.make_directory(root / "empty")?
+for entry in filesystem.walk_directory(root)?.entries {
+    io.write_standard_output_line("{(entry.path).base_name()} {entry.kind}")
+}
+
+io.write_standard_output_line("--- list ---")
+for entry in filesystem.list_directory(root)? {
+    io.write_standard_output_line("{(entry.path).base_name()} {entry.kind}")
+}
+
+io.write_standard_output_line("--- empty ---")
+io.write_standard_output_line("{filesystem.list_directory(root / "empty")?.length()}")
+
+io.write_standard_output_line("--- errors ---")
+match filesystem.walk_directory(root / "b.txt") {
+    ok(report) => io.write_standard_output_line("ok {report.entries.length()}")
+    error(e) => io.write_standard_output_line("{e.kind}")
+}
+match filesystem.list_directory("absent".to_path()) {
+    ok(entries) => io.write_standard_output_line("ok {entries.length()}")
+    error(e) => io.write_standard_output_line("{e.kind}")
+}

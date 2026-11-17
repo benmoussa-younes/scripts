@@ -1,0 +1,7 @@
+stdout:
+from stdin
+script_path=
+stdin=<>
+argument=-v
+argument=a b
+exit: 0

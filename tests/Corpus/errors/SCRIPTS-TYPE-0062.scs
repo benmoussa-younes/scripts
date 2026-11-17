@@ -1,0 +1,3 @@
+# expect: SCRIPTS-TYPE-0062 2:21
+let failure = error("not_fund", "absent", "/x")
+io.write_standard_output_line(failure.kind)

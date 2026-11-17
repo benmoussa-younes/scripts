@@ -1,0 +1,5 @@
+# expect: SCRIPTS-PARSE-0045 3:5
+match 1 {
+    1.5 => io.write_standard_output_line("a")
+    _ => io.write_standard_output_line("b")
+}

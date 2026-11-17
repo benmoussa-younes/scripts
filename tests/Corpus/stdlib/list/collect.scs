@@ -1,0 +1,22 @@
+let all_ok = ["1", "2", "3"].transform(text => text.parse_integer()).collect()
+match all_ok {
+    ok(numbers) => io.write_standard_output_line(numbers.transform(n => "{n}").join(","))
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Several errors of distinct kinds: it is the FIRST in order that surfaces.
+let several: list<result<integer, error>> = [
+    ok(1),
+    error(error("not_found", "M_FIRST", "s")),
+    error(error("permission_denied", "M_LAST", "s")),
+]
+match several.collect() {
+    ok(numbers) => io.write_standard_output_line("inattendu")
+    error(failure) => io.write_standard_output_line("{failure.kind}/{failure.message}")
+}
+
+let none: list<result<integer, error>> = []
+match none.collect() {
+    ok(numbers) => io.write_standard_output_line("vide={numbers.length()}")
+    error(failure) => io.write_standard_output_line("inattendu")
+}

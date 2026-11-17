@@ -1,0 +1,10 @@
+let a = p"/etc/config"
+let b = p"relative/path"
+let combined = a / "file.conf"
+io.write_standard_output_line("a={a}")
+io.write_standard_output_line("b={b}")
+io.write_standard_output_line("combined={combined}")
+let dir = (combined).parent()
+io.write_standard_output_line("dir={dir}")
+io.write_standard_output_line("base={(combined).base_name()}")
+io.write_standard_output_line("ext={(combined).extension()}")

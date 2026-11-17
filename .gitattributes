@@ -1,0 +1,56 @@
+# Text files are UTF-8 with LF, on every platform (root AGENTS.md).
+* text=auto eol=lf
+
+# Binary fixtures and assets: never normalized.
+*.bin binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.deb binary
+*.gz binary
+
+# Release metadata, not source: a source archive must not carry a checksum file
+# that names the previous release's artefacts (build-deb / build-tarballs
+# regenerate them beside the archives).
+packaging/SHA256SUMS export-ignore
+packaging/SHA256SUMS.asc export-ignore
+packaging/tarballs.sha256 export-ignore
+packaging/RELEASE-EVIDENCE export-ignore
+
+# Agent instructions and the internal handoff are not part of the published
+# source: they describe how the repository is worked on, not how scripts is built
+# or run (owner decision of 2026-10-23). `git archive` honours these rules, so
+# a source tarball never ships them.
+AGENTS.md export-ignore
+**/AGENTS.md export-ignore
+CLAUDE.md export-ignore
+GEMINI.md export-ignore
+
+# Version-control and editor scaffolding: git never archives `.git` itself, and
+# the remaining dotfiles only configure tools inside a checkout.
+.gitattributes export-ignore
+**/.gitattributes export-ignore
+.gitignore export-ignore
+**/.gitignore export-ignore
+.editorconfig export-ignore
+**/.editorconfig export-ignore
+.opencode/ export-ignore
+**/.opencode/ export-ignore
+opencode.json export-ignore
+.vscode/ export-ignore
+**/.vscode/ export-ignore
+
+# Language sources are always LF.
+*.sh text eol=lf
+*.scs text eol=lf
+*.md text eol=lf
+*.cs text eol=lf
+
+# Verbatim licence texts keep their upstream trailing newline.
+LICENSES/* -whitespace

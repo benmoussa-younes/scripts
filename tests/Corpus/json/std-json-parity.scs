@@ -1,0 +1,18 @@
+
+# BLOCKER 1 (DESIGN 7.10a / 8.4): json.encode(v) must render EXACTLY like the
+# `result` field of `run --json-out` for the same value. The program prints the
+# encode text twice (captured in `stdout`) and returns the value (rendered in `result`);
+# the .expect compares them byte-for-byte, extracted from the raw JSON.
+let value = {
+    "accent": "café",
+    "quote": "a\"b",
+    "backslash": "a\\b",
+    "controls": "tab:\u{9} lf:\u{a} cr:\u{d} bs:\u{8} ff:\u{c} nul:\u{0} esc:\u{1b}",
+    "del": "del:\u{7f}",
+    "separators": "ls:\u{2028} ps:\u{2029}",
+    "emoji": "😀🎉",
+    "combining": "e\u{301}a\u{308}",
+}
+io.write_standard_output_line(json.encode(value)?)
+io.write_standard_output_line(json.encode(value)?)
+return value

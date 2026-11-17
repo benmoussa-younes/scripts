@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0032 2:24
+let ys = [1, 2].filter((a, b) => true)

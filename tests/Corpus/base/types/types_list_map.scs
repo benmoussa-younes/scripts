@@ -1,0 +1,8 @@
+let xs: list<integer> = [1, 2, 3]
+let nested: list<list<string>> = [["a", "b"], ["c"]]
+let m: map<string, integer> = {"one": 1, "two": 2}
+io.write_standard_output_line("xs0={xs[0]}")
+io.write_standard_output_line("nested={nested[0][1]}")
+io.write_standard_output_line("mone={m["one"]}")
+io.write_standard_output_line("mkeys={m.keys().join(",")}")
+io.write_standard_output_line("sum={xs.fold(0, (acc: integer, x: integer) => acc + x)}")

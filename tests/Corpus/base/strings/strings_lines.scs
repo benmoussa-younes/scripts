@@ -1,0 +1,5 @@
+let multiline = "first\nsecond\nthird"
+io.write_standard_output_line("lines={multiline.lines().join("/")}")
+let empty = ""
+io.write_standard_output_line("empty_lines={empty.lines().length()}")
+io.write_standard_output_line("empty_split={empty.split(",").length()}")

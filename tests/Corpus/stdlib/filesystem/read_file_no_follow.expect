@@ -1,0 +1,11 @@
+stdout:
+regular bonjour
+invalid_path
+invalid_path
+invalid_path
+intermediate bonjour
+is_a_directory
+not_found
+invalid_path
+invalid_encoding
+exit: 0

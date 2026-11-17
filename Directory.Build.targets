@@ -1,0 +1,97 @@
+<Project>
+  <!--
+    Generates the project's unique version from git (tools/scripts/binaries/version.sh) and exposes it:
+      * to the code via src/Scripts.Core/obj/Generated/BuildVersion.g.cs
+        (partial member LanguageReference.Version);
+      * to the assemblers via VersionPrefix (the X.Y.Z part).
+    No external NuGet dependency.
+
+    Key reliability point: `version.sh` is launched ONLY ONCE per build, even
+    when several projects build in parallel (`dotnet build` on a
+    solution). The value is written to a shared cache file
+    (`obj/Generated/version.txt`), and the target is incremental (Inputs/Outputs):
+    MSBuild serializes the targets that share the same Outputs. Without that, each
+    project launched `version.sh` in parallel, which produced "Broken pipe"
+    and an intermittent build.
+  -->
+  <PropertyGroup>
+    <ScriptsVersionScript>$(MSBuildThisFileDirectory)tools/scripts/binaries/version.sh</ScriptsVersionScript>
+    <ScriptsVersionCacheFile>$(MSBuildThisFileDirectory)src/Scripts.Core/obj/Generated/version.txt</ScriptsVersionCacheFile>
+    <ScriptsGeneratedVersionFile>$(MSBuildThisFileDirectory)src/Scripts.Core/obj/Generated/BuildVersion.g.cs</ScriptsGeneratedVersionFile>
+  </PropertyGroup>
+
+  <!--
+    Computes the version and writes it to the cache. The target runs on EVERY build
+    (no Inputs/Outputs: the version depends on the git state - HEAD, dirty tree -
+    which is not a trackable MSBuild file; an "up to date" cache would keep a
+    stale version after a commit). `version.sh` is deterministic and fast, and
+    `WriteOnlyWhenDifferent` avoids writing an identical cache, which preserves the
+    package's reproducibility. The concurrent call of `version.sh` is safe
+    (script without `head` in the pipe, see the script's comment).
+  -->
+  <Target Name="ResolveScriptsVersion"
+          BeforeTargets="PrepareForBuild;BeforeCompile;CoreCompile;GetAssemblyVersion;GenerateNuspec;GenerateAssemblyInfo;GenerateBuildVersionSource">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(ScriptsVersionCacheFile)'))" />
+    <Exec Command="sh &quot;$(ScriptsVersionScript)&quot;"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ScriptsVersionOutput" />
+    </Exec>
+    <PropertyGroup>
+      <ScriptsVersion>$(_ScriptsVersionOutput.Trim())</ScriptsVersion>
+      <ScriptsVersion Condition="'$(ScriptsVersion)' == ''">0.1.0</ScriptsVersion>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(ScriptsVersionCacheFile)"
+                      Lines="$(ScriptsVersion)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true"
+                      Encoding="utf-8" />
+    <ItemGroup>
+      <FileWrites Include="$(ScriptsVersionCacheFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Makes the version available at evaluation (VersionPrefix read by the
+    assemblers). Reads the cache if present; falls back to 0.1.0 otherwise.
+  -->
+  <PropertyGroup>
+    <ScriptsVersion Condition="'$(ScriptsVersion)' == '' and Exists('$(ScriptsVersionCacheFile)')">$([System.IO.File]::ReadAllText('$(ScriptsVersionCacheFile)').Trim())</ScriptsVersion>
+    <ScriptsVersion Condition="'$(ScriptsVersion)' == ''">0.1.0</ScriptsVersion>
+    <ScriptsVersionCore>$([System.Text.RegularExpressions.Regex]::Match($(ScriptsVersion), '^[0-9]+\.[0-9]+\.[0-9]+').Value)</ScriptsVersionCore>
+    <ScriptsVersionCore Condition="'$(ScriptsVersionCore)' == ''">0.1.0</ScriptsVersionCore>
+    <VersionPrefix>$(ScriptsVersionCore)</VersionPrefix>
+  </PropertyGroup>
+
+  <!-- Writes the generated version source: the Core project includes it in its compilation. -->
+  <Target Name="GenerateBuildVersionSource"
+          DependsOnTargets="ResolveScriptsVersion"
+          BeforeTargets="BeforeCompile;CoreCompile"
+          Condition="'$(MSBuildProjectName)' == 'Scripts.Core'">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(ScriptsGeneratedVersionFile)'))" />
+    <!-- Re-reads the cache (written by ResolveScriptsVersion): the static property
+         ScriptsVersion may be the 0.1.0 fallback if the cache did not exist yet
+         at evaluation. -->
+    <PropertyGroup>
+      <_ScriptsVersionForSource Condition="Exists('$(ScriptsVersionCacheFile)')">$([System.IO.File]::ReadAllText('$(ScriptsVersionCacheFile)').Trim())</_ScriptsVersionForSource>
+      <_ScriptsVersionForSource Condition="'$(_ScriptsVersionForSource)' == ''">$(ScriptsVersion)</_ScriptsVersionForSource>
+    </PropertyGroup>
+    <PropertyGroup>
+      <_ScriptsVersionContent>// &lt;auto-generated /&gt;</_ScriptsVersionContent>
+      <_ScriptsVersionContent>$(_ScriptsVersionContent)%0A// Version computed at build time from git (tools/scripts/binaries/version.sh) — DO NOT EDIT BY HAND.</_ScriptsVersionContent>
+      <_ScriptsVersionContent>$(_ScriptsVersionContent)%0Anamespace Scripts.Core%3B</_ScriptsVersionContent>
+      <_ScriptsVersionContent>$(_ScriptsVersionContent)%0A%0Apublic static partial class LanguageReference</_ScriptsVersionContent>
+      <_ScriptsVersionContent>$(_ScriptsVersionContent)%0A{%0A    public const string Version = &quot;$(_ScriptsVersionForSource)&quot;%3B%0A}</_ScriptsVersionContent>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(ScriptsGeneratedVersionFile)"
+                      Lines="$(_ScriptsVersionContent)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true"
+                      Encoding="utf-8" />
+    <ItemGroup>
+      <FileWrites Include="$(ScriptsGeneratedVersionFile)" />
+    </ItemGroup>
+    <Message Importance="normal" Text="[version] $(_ScriptsVersionForSource) -> $(ScriptsGeneratedVersionFile)" />
+  </Target>
+</Project>

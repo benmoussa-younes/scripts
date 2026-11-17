@@ -1,0 +1,2 @@
+let local = time.to_local_iso8601(0)?
+io.write_standard_output_line("{local.length() >= 20} {local.contains("T")}")

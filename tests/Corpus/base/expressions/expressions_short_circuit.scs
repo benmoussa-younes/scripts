@@ -1,0 +1,13 @@
+function side_effect(label: string) -> boolean {
+    io.write_standard_output_line("called {label}")
+    return true
+}
+io.write_standard_output_line("--- and short-circuit ---")
+let r1 = false and side_effect("right")
+io.write_standard_output_line("r1={r1}")
+io.write_standard_output_line("--- or short-circuit ---")
+let r2 = true or side_effect("right2")
+io.write_standard_output_line("r2={r2}")
+io.write_standard_output_line("--- not ---")
+io.write_standard_output_line("not_true={not true}")
+io.write_standard_output_line("not_false={not false}")

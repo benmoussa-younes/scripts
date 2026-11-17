@@ -1,0 +1,2 @@
+io.write_standard_output_line("H\u{C9}LLO".lowercased())
+io.write_standard_output_line("ABC".lowercased())

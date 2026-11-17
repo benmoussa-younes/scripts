@@ -1,0 +1,5 @@
+stdout:
+lines=first/second/third
+empty_lines=0
+empty_split=1
+exit: 0

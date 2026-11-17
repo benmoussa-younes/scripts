@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Scripts.Core</RootNamespace>
+    <AssemblyName>Scripts.Core</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <!-- Version générée au build (Directory.Build.targets) : membre partiel LanguageReference.Version. -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)obj/Generated/BuildVersion.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

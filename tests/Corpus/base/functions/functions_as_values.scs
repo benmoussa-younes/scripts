@@ -1,0 +1,13 @@
+function is_even(n: integer) -> boolean {
+    return n % 2 == 0
+}
+function double(x: integer) -> integer {
+    return x * 2
+}
+let numbers = [1, 2, 3, 4, 5, 6]
+let evens = numbers.filter(is_even)
+io.write_standard_output_line("evens={evens.length()}")
+let doubled = numbers.transform(double)
+io.write_standard_output_line("doubled0={doubled[0]} last={doubled[doubled.length() - 1]}")
+let total = numbers.fold(0, (acc: integer, x: integer) => acc + x)
+io.write_standard_output_line("total={total}")

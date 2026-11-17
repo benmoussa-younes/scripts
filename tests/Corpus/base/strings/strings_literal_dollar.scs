@@ -1,0 +1,7 @@
+let name = "x"
+let dollar = "cost $5 and $name"
+io.write_standard_output_line(dollar)
+let brace = "value: ${name}"
+io.write_standard_output_line(brace)
+let empty = ""
+io.write_standard_output_line("empty_len={empty.length()}")

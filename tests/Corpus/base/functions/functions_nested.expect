@@ -1,0 +1,4 @@
+stdout:
+outer=15
+compute=25
+exit: 0

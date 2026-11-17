@@ -1,0 +1,15 @@
+exit: 0
+stream: stdout
+json-last
+# BLOCKER 1: json.encode(v) must be identical to the `result` field of --json-out,
+# byte for byte, for the same value.
+check: raw.count('café') == 3
+check: '\\u00E9' not in raw
+check: '\\u00e9' not in raw
+check: '\\u0022' not in raw
+check: '"\\t"' not in raw
+check: '\\u0009' in raw
+check: 'del:\\u007f' in raw
+check: 'ls:\\u2028 ps:\\u2029' in raw
+check: '😀🎉' in raw
+check: (lambda m: m is not None and m.group(1) == doc["stdout"].splitlines()[0] == doc["stdout"].splitlines()[1])(__import__("re").search(r'"result":(.*?),"errors":', raw, __import__("re").S))

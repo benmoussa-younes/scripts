@@ -1,0 +1,4 @@
+stdout:
+base=20
+c=70
+exit: 0

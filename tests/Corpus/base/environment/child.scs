@@ -1,0 +1,4 @@
+environment.set_variable("SCRIPTS_CORPUS_INHERITEE", "transmise")?
+let outcome = process.run(process.request("env", []))?
+let expected = "SCRIPTS_CORPUS_INHERITEE=transmise"
+io.write_standard_output_line("{outcome.standard_output.contains(expected)}")

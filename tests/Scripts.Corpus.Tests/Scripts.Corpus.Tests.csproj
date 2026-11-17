@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Scripts.Corpus.Tests</RootNamespace>
+  </PropertyGroup>
+</Project>

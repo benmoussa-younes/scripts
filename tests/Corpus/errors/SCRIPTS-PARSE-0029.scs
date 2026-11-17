@@ -1,0 +1,7 @@
+# expect: SCRIPTS-PARSE-0029 4:7
+if true {
+    io.write_standard_output_line("a")
+} else
+if false {
+    io.write_standard_output_line("b")
+}

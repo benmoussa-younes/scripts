@@ -1,0 +1,12 @@
+let parsed = "42".parse_integer().value_or_fail()
+io.write_standard_output_line("{parsed}")
+let negative = "-7".parse_integer().value_or_fail()
+io.write_standard_output_line("{negative}")
+match "4x2".parse_integer() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "9223372036854775808".parse_integer() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

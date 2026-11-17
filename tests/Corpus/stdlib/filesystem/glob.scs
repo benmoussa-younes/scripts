@@ -1,0 +1,24 @@
+let root = filesystem.make_temporary_directory("scripts-glob-")?
+filesystem.make_directory(root / "sub")?
+filesystem.write_file_overwrite("", root / "a.txt")?
+filesystem.write_file_overwrite("", root / "😀.txt")?
+filesystem.write_file_overwrite("", root / "sub" / "b.txt")?
+filesystem.write_file_overwrite("", root / "sub" / "c.md")?
+let recursive = filesystem.glob(root, "**/*.txt")?
+io.write_standard_output_line(recursive.transform(m => m.base_name()).join(","))
+let direct = filesystem.glob(root, "*.txt")?
+io.write_standard_output_line(direct.transform(m => m.base_name()).join(","))
+let scalars = filesystem.glob(root, "?.txt")?
+io.write_standard_output_line("{scalars.length()}")
+let order = filesystem.glob(root, "**")?
+io.write_standard_output_line(order.transform(m => m.base_name()).join(","))
+match filesystem.glob(root, "a[") {
+    ok(_) => io.write_standard_output_line("matched")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+let fifo_path = root / "pipe"
+let made = process.run(process.request("mkfifo", [fifo_path.to_string()]))?
+let visible = filesystem.glob(root, "*")?
+io.write_standard_output_line("fifo={made.exit_code} listed={visible.length()}")
+filesystem.remove_file(fifo_path)?
+filesystem.remove_directory_tree(root)?

@@ -1,0 +1,7 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  declares the function `carre` (`x`, returns a value):
+    returns `x` * `x`
+  declares the constant `r` = calls the function `carre`(4)
+  displays the string "{`r`}" on the standard output

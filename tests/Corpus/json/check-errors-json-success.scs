@@ -1,0 +1,3 @@
+#!/usr/bin/scripts run
+let value = 40 + 2
+io.write_standard_output_line("{value}")

@@ -1,0 +1,5 @@
+function carre(x: integer) -> integer {
+    return x * x
+}
+let r = carre(4)
+io.write_standard_output_line("{r}")

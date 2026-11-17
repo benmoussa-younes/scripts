@@ -1,0 +1,45 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let file_path = work_directory / "note.txt"
+filesystem.write_file_overwrite("bonjour", file_path)?
+
+# Under the bound: the whole file is returned.
+match filesystem.read_file_bounded(file_path, 10) {
+    ok(content) => io.write_standard_output_line("under {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Exactly at the bound: the file fills it, no overflow byte to read.
+match filesystem.read_file_bounded(file_path, 7) {
+    ok(content) => io.write_standard_output_line("at {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Over the bound: too_large without reading the rest.
+match filesystem.read_file_bounded(file_path, 6) {
+    ok(content) => io.write_standard_output_line("over {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Missing file and directory behave like filesystem.read_file.
+match filesystem.read_file_bounded(work_directory / "absent.txt", 10) {
+    ok(content) => io.write_standard_output_line("missing {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.read_file_bounded(work_directory, 10) {
+    ok(content) => io.write_standard_output_line("directory {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A negative bound is invalid_argument.
+match filesystem.read_file_bounded(file_path, -1) {
+    ok(content) => io.write_standard_output_line("negative {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# Invalid UTF-8 is rejected like filesystem.read_file (fixture from read_file_bounded.files/).
+match filesystem.read_file_bounded(p"bad.bin", 8) {
+    ok(content) => io.write_standard_output_line("bytes {content}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+filesystem.remove_directory_tree(work_directory)?

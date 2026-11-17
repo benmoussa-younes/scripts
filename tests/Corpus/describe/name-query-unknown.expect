@@ -1,0 +1,5 @@
+exit: 0
+stream: stdout
+deterministic: 2
+check: doc["query"] == "not_a_name"
+check: doc["functions"] == []

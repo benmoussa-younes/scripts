@@ -1,0 +1,4 @@
+stdout:
+true
+script_path.scs
+exit: 0

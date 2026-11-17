@@ -1,0 +1,8 @@
+stdout:
+hello
+say "hi"
+line1
+line2
+a	b
+c:\dir
+exit: 0

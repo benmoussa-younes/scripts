@@ -1,0 +1,11 @@
+# Repository root from the entry script path. A binary is four parents below
+# the root; the caller passes `process.script_path()` so the module holds no
+# path of its own.
+
+public function root_path_from(script: path) -> path {
+    return script.parent().parent().parent().parent()
+}
+
+public function root_from(script: path) -> string {
+    return root_path_from(script).to_string()
+}

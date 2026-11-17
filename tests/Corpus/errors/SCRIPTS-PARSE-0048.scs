@@ -1,0 +1,4 @@
+# expect: SCRIPTS-PARSE-0048 4:2
+match 1 {
+    _ => io.write_standard_output_line("a")
+}.length()

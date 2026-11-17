@@ -1,0 +1,10 @@
+somme: 10
+division: 2
+reste: 1
+negatif division: -3
+negatif reste: -1
+7 > 3
+total: 10
+compteur: 3
+analyse: 43
+erreur: invalid_integer

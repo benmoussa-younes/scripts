@@ -1,0 +1,9 @@
+let root_directory = filesystem.make_temporary_directory("scripts-exclusive-")?
+let target_path = root_directory / "a.txt"
+filesystem.write_file_exclusive("first", target_path)?
+match filesystem.write_file_exclusive("second", target_path) {
+    ok(_) => io.write_standard_output_line("overwritten")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line(filesystem.read_file(target_path)?)
+filesystem.remove_directory_tree(root_directory)?

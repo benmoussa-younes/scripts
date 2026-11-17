@@ -1,0 +1,7 @@
+stdout:
+read failure end_of_file
+without newline or terminator
+after print
+remaining 0 characters
+again end_of_file
+exit: 0

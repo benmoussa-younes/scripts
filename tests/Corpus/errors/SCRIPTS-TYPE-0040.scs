@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0040 4:1
+function f() {
+}
+f = 1

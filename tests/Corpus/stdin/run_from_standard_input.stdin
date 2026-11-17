@@ -1,0 +1,9 @@
+io.write_standard_output_line("from stdin")
+io.write_standard_output_line("script_path={process.script_path()}")
+match io.read_standard_input() {
+    ok(text) => io.write_standard_output_line("stdin=<{text}>")
+    error(e) => io.write_standard_output_line("stdin error {e.kind}")
+}
+for argument in process.arguments() {
+    io.write_standard_output_line("argument={argument}")
+}

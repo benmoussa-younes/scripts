@@ -1,0 +1,43 @@
+io.write_standard_output_line(json.null_value().kind())
+io.write_standard_output_line(json.encode(json.null_value())?)
+io.write_standard_output_line(json.encode(json.from_string(""))?)
+io.write_standard_output_line(json.encode(json.from_string("a\"b"))?)
+io.write_standard_output_line(json.encode(json.from_string("back\\slash"))?)
+io.write_standard_output_line(json.encode(json.from_string("line\nbreak\ttab"))?)
+io.write_standard_output_line(json.encode(json.from_string("a\"b\\c\nd"))?)
+io.write_standard_output_line(json.encode(json.from_integer(0))?)
+io.write_standard_output_line(json.encode(json.from_integer(42))?)
+io.write_standard_output_line(json.encode(json.from_integer(-9223372036854775807 - 1))?)
+io.write_standard_output_line(json.encode(json.from_integer(9223372036854775807))?)
+io.write_standard_output_line(json.encode(json.from_float(-0.0))?)
+io.write_standard_output_line(json.encode(json.from_float(3.0))?)
+io.write_standard_output_line(json.encode(json.from_float(1.0E+20))?)
+io.write_standard_output_line(json.encode(json.from_boolean(true))?)
+io.write_standard_output_line(json.encode(json.from_boolean(false))?)
+io.write_standard_output_line(json.encode(json.array([]))?)
+io.write_standard_output_line(json.encode(json.array([json.from_integer(1), json.from_string("x")]))?)
+io.write_standard_output_line(json.encode(json.object({}))?)
+io.write_standard_output_line(json.encode(json.object({"a": json.from_integer(1), "b": json.from_boolean(false)}))?)
+io.write_standard_output_line(json.encode(json.object({"a\"b": json.from_string("c\\d")}))?)
+
+# depth: decode 1000 nested arrays, then wrap them once: encoding 1001 levels is rejected.
+let mutable text = ""
+let mutable level = 0
+while level < 1000 {
+    text += "["
+    level += 1
+}
+level = 0
+while level < 1000 {
+    text += "]"
+    level += 1
+}
+let decoded = json.decode(text)?
+match json.encode(decoded) {
+    ok(encoded) => io.write_standard_output_line("depth base ok {encoded.length()}")
+    error(failure) => io.write_standard_output_line("depth base {failure.kind}")
+}
+match json.encode(json.array([decoded])) {
+    ok(encoded) => io.write_standard_output_line("depth wrapped ok {encoded.length()}")
+    error(failure) => io.write_standard_output_line("depth wrapped {failure.kind}")
+}

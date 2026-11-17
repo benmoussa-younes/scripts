@@ -1,0 +1,7 @@
+let base = p"/home/user"
+io.write_standard_output_line("join1={base / "docs"}")
+io.write_standard_output_line("join2={base / p"docs/readme"}")
+let trailing = p"/home/user/"
+io.write_standard_output_line("join3={trailing / "file"}")
+let empty = p""
+io.write_standard_output_line("join4={empty / "x"}")

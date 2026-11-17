@@ -1,0 +1,8 @@
+stdout:
+fils
+invalid_argument
+timed_out subject=sleep
+invalid_argument
+fils
+echo
+exit: 0

@@ -1,0 +1,4 @@
+io.write_standard_output_line((p"/a/b".parent()).to_string())
+io.write_standard_output_line((p"a/b/".parent()).to_string())
+io.write_standard_output_line((p"/".parent()).to_string())
+io.write_standard_output_line((p"a".parent()).to_string())

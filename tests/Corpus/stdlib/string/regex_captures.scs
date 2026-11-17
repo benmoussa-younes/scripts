@@ -1,0 +1,16 @@
+let whole = "a1b22".capture_groups("([a-z])(\\d+)")?
+io.write_standard_output_line(whole.join(","))
+let groups = "ab".capture_groups("(a)(b)")?
+io.write_standard_output_line(groups.join(","))
+let unmatched = "ab".capture_groups("a(b)?(c)?")?
+io.write_standard_output_line(unmatched.join(","))
+let repeated = "aaa".capture_groups("(a)+")?
+io.write_standard_output_line(repeated.join(","))
+match "abc".capture_groups("\\d+") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".capture_groups("(") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

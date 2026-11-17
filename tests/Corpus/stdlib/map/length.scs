@@ -1,0 +1,4 @@
+let ages = {"alice": 30, "bob": 25}
+io.write_standard_output_line("{ages.length()}")
+let empty_map: map<string, integer> = {}
+io.write_standard_output_line("{empty_map.length()}")

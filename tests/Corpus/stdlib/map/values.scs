@@ -1,0 +1,4 @@
+let ages = {"alice": 30, "bob": 25}
+for age in ages.values() {
+    io.write_standard_output_line("{age}")
+}

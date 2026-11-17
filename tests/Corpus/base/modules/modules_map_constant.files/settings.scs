@@ -1,0 +1,5 @@
+public let CONFIG = {"host": "localhost"}
+public let TIMEOUT = 30
+public function describe() -> string {
+    return "host=" + CONFIG["host"] + " timeout={TIMEOUT}"
+}

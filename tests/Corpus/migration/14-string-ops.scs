@@ -1,0 +1,39 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 14: string manipulation (${var%.txt}, ${#var}, cut, tr, sed)
+
+function strip_suffix(text_value: string, suffix_text: string) -> string {
+    if suffix_text == "" or not text_value.ends_with(suffix_text) {
+        return text_value
+    }
+    let pieces = text_value.split(suffix_text)
+    let mutable kept_pieces: list<string> = []
+    let mutable piece_index = 0
+    for piece in pieces {
+        piece_index += 1
+        if piece_index < pieces.length() {
+            kept_pieces.append(piece)
+        }
+    }
+    return kept_pieces.join(suffix_text)
+}
+
+let file_name = "rapport.final.txt"
+let stem = strip_suffix(file_name, ".txt")
+io.write_standard_output_line("sans suffixe: {stem}")
+let extension_text = (file_name.to_path()).extension()
+io.write_standard_output_line("extension: {extension_text}")
+io.write_standard_output_line("longueur: {file_name.length()}")
+let renamed = file_name.replace("final", "v2")
+io.write_standard_output_line("remplace: {renamed}")
+let shouted = file_name.uppercased()
+io.write_standard_output_line("majuscules: {shouted}")
+
+let record_line = "a:b:c"
+let fields = record_line.split(":")
+io.write_standard_output_line("champ 2: {fields[1]}")
+let spaced = "a b c"
+let compact = spaced.replace(" ", "")
+io.write_standard_output_line("tr -d: {compact}")
+let dotted = "x.y.z"
+let dashed = dotted.replace(".", "-")
+io.write_standard_output_line("sed g: {dashed}")

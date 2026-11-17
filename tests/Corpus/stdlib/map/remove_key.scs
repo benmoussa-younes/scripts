@@ -1,0 +1,5 @@
+let mutable ages = {"alice": 30, "bob": 25}
+let removed = ages.remove_key("alice")
+let missing = ages.remove_key("carol")
+io.write_standard_output_line("{removed} {missing} {ages.length()}")
+io.write_standard_output_line(ages.keys().join(","))

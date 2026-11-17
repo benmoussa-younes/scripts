@@ -1,0 +1,7 @@
+stdout:
+count=42
+ratio=1.5
+label=ready
+enabled=true
+location=/var/log
+exit: 0

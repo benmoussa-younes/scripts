@@ -1,0 +1,19 @@
+let parts = "a1b22c".split_regex("\\d+")?
+io.write_standard_output_line(parts.join("|"))
+let edges = ",a,,b,".split_regex(",")?
+io.write_standard_output_line(edges.join("|"))
+let absent = "abc".split_regex("\\d+")?
+io.write_standard_output_line("{absent.length()}")
+let empty_pattern = ""
+match "abc".split_regex(empty_pattern) {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".split_regex("z*") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".split_regex("(") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,4 @@
+io.write_standard_output_line(p"a/b.tar.gz".file_stem())
+io.write_standard_output_line(p"a/.bashrc".file_stem())
+io.write_standard_output_line(p"a/b.".file_stem())
+io.write_standard_output_line(p"a/b".file_stem())

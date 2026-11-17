@@ -1,0 +1,16 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 06: while read line (line-by-line reading)
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-06")?
+let input_file = temporary_directory / "input.txt"
+filesystem.write_file_overwrite("alpha\nbeta gamma\n\ndelta\n", input_file)?
+
+let input_lines = filesystem.read_file(input_file)?.lines()
+let mutable line_number = 0
+for current_line in input_lines {
+    line_number += 1
+    io.write_standard_output_line("{line_number}: [{current_line}]")
+}
+let non_empty_lines = input_lines.filter(text_line => text_line.length() > 0)
+io.write_standard_output_line("non vides: {non_empty_lines.length()}")
+
+filesystem.remove_directory_tree(temporary_directory)?

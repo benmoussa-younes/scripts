@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0024 2:7
+match 1.5 {
+    _ => io.write_standard_output_line("a")
+}

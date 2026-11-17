@@ -1,0 +1,12 @@
+stdout:
+basic=2 printf/grep
+stdout=0/0
+file=b
+middle=0,1,0 bytes=0
+bytes=00 ff
+atomic=nouveau
+scratch=0
+stderr=true code=2 file=0
+missing=spawn_failed scripts-spec-inexistant-program false
+empty=invalid_argument false
+exit: 0

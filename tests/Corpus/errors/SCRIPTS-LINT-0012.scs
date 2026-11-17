@@ -1,0 +1,6 @@
+# expect-warning: SCRIPTS-LINT-0012 4:5
+let mutable s = ""
+for item in ["a", "b"] {
+    s = s + item
+}
+io.write_standard_output_line(s)

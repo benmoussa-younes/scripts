@@ -1,0 +1,8 @@
+stdout:
+a|b|c
+|a||b|
+1
+invalid_argument
+invalid_argument
+invalid_regex
+exit: 0

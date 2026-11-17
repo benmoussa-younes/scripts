@@ -1,0 +1,3 @@
+public function doubler(n: integer) -> string {
+    return "double de {n}"
+}

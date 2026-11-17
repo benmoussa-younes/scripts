@@ -1,0 +1,9 @@
+io.write_standard_output_line("{"a😀b".index_of("b")?}")
+match "abc".index_of("z") {
+    ok(index) => io.write_standard_output_line("{index}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "abc".index_of("") {
+    ok(index) => io.write_standard_output_line("{index}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

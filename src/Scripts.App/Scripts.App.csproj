@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Scripts.App</RootNamespace>
+    <AssemblyName>scripts</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishAot>true</PublishAot>
+    <StripSymbols>true</StripSymbols>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scripts.Core\Scripts.Core.csproj" />
+    <ProjectReference Include="..\Scripts.Syntax\Scripts.Syntax.csproj" />
+    <ProjectReference Include="..\Scripts.Checker\Scripts.Checker.csproj" />
+    <ProjectReference Include="..\Scripts.Runtime\Scripts.Runtime.csproj" />
+    <ProjectReference Include="..\Scripts.Cli\Scripts.Cli.csproj" />
+  </ItemGroup>
+</Project>

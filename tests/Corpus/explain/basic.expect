@@ -1,0 +1,10 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  declares the constant `n` = 3
+  declares the mutable variable `total` = 0
+  adds `n` to `total`
+  if `total` > 2:
+    displays the string "grand" on the standard output
+  else:
+    displays the string "petit" on the standard output

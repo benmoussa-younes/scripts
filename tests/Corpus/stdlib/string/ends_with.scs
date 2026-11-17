@@ -1,0 +1,4 @@
+let yes = "fichier.txt".ends_with(".txt")
+let no = "fichier.txt".ends_with("fichier")
+let empty = "abc".ends_with("")
+io.write_standard_output_line("{yes} {no} {empty}")

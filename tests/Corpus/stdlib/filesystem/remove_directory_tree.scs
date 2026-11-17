@@ -1,0 +1,14 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+filesystem.make_directory_tree(work_directory / "a" / "b")?
+filesystem.write_file_overwrite("x", work_directory / "a" / "b" / "f.txt")?
+filesystem.remove_directory_tree(work_directory / "a")?
+io.write_standard_output_line("{filesystem.path_exists(work_directory / "a")}")
+match filesystem.remove_directory_tree(p"") {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.remove_directory_tree(p"/") {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

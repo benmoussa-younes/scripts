@@ -1,0 +1,9 @@
+let xs = [1, 2]
+let ys = [3, 4]
+let joined = xs + ys
+io.write_standard_output_line("joined_len={joined.length()}")
+io.write_standard_output_line("joined0={joined[0]}")
+io.write_standard_output_line("joined2={joined[2]}")
+let s = "abc" + "def"
+io.write_standard_output_line("s={s}")
+io.write_standard_output_line("streq={"ab" + "cd" == "abcd"}")

@@ -1,0 +1,5 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  declares the constant `value` = converts the string "42" to an integer
+  evaluates a `match` on `value`

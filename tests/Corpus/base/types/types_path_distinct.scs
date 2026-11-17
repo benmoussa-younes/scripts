@@ -1,0 +1,8 @@
+let as_path = "/tmp/data".to_path()
+let as_text = "/tmp/data"
+io.write_standard_output_line("path={as_path}")
+io.write_standard_output_line("text={as_text}")
+io.write_standard_output_line("same={as_path == "/tmp/data".to_path()}")
+let base = (as_path).base_name()
+io.write_standard_output_line("base={base}")
+io.write_standard_output_line("joined={as_path / "sub"}")

@@ -1,0 +1,21 @@
+let zero = 0.0
+io.write_standard_output_line(zero.to_fixed(2)?)
+let negative_zero = -0.0
+io.write_standard_output_line(negative_zero.to_fixed(2)?)
+let value = 1.5
+io.write_standard_output_line(value.to_fixed(2)?)
+io.write_standard_output_line((1.0 / 3.0).to_fixed(2)?)
+io.write_standard_output_line((1.0 / 3.0).to_fixed(10)?)
+let large = 1e20
+io.write_standard_output_line(large.to_fixed(2)?)
+let small = 1e-10
+io.write_standard_output_line(small.to_fixed(2)?)
+io.write_standard_output_line(123.0.to_fixed(0)?)
+match value.to_fixed(100) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match value.to_fixed(-1) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

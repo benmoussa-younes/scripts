@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0035 2:24
+let c = true and false or true

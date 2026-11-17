@@ -1,0 +1,4 @@
+io.write_standard_output_line((p"/srv" / "root").to_string())
+io.write_standard_output_line((p"/srv/" / "root").to_string())
+io.write_standard_output_line((p"" / "x").to_string())
+io.write_standard_output_line((p"/srv" / p"root").to_string())

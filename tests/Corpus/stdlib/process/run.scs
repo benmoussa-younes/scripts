@@ -1,0 +1,9 @@
+let outcome = process.run(process.request("echo", ["bonjour"]))?
+io.write_standard_output_line(outcome.standard_output.trim_whitespace())
+io.write_standard_output_line("{outcome.exit_code}")
+let failing = process.run(process.request("false", []))?
+io.write_standard_output_line("{failing.exit_code}")
+match process.run(process.request("scripts-spec-inexistant-program", [])) {
+    ok(result) => io.write_standard_output_line("{result.exit_code}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

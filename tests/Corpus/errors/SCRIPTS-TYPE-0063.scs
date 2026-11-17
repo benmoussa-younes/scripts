@@ -1,0 +1,5 @@
+# expect: SCRIPTS-TYPE-0063 4:57
+let root = filesystem.make_temporary_directory("scripts-type-0063")?
+let mutable seen: list<path> = []
+let _walked = parallel.walk_directory(root, 4, entry => seen.append(entry))?
+filesystem.remove_directory_tree(root)?

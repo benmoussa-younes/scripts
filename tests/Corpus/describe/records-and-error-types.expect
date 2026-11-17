@@ -1,0 +1,35 @@
+exit: 0
+stream: stdout
+# Records and the error type share one `types` array with a `category` (DESIGN §3.4/§3.5/§10).
+check: all({"name", "syntax", "category", "description", "fields", "kinds"} <= set(t.keys()) for t in doc["types"] if "fields" in t)
+check: {t["name"] for t in doc["types"] if "fields" in t} == {"process_result", "pipeline_result", "process_handle", "path_status", "file_system_status", "system_information", "directory_entry", "walk_report", "walk_skip", "run_request", "error", "json_value", "file_lock"}
+check: all(t["category"] == "record" for t in doc["types"] if "fields" in t and t["name"] not in ("error", "json_value", "file_lock"))
+check: next(t for t in doc["types"] if t["name"] == "error")["category"] == "error"
+# run_request: the execution request of process.run, parallel.run_all and the pipeline (DESIGN §3.4/§7.3/§7.10.1).
+check: next(t for t in doc["types"] if t["name"] == "run_request")["fields"] == [{"name": "program", "type": "string"}, {"name": "arguments", "type": "list<string>"}, {"name": "standard_input", "type": "string"}, {"name": "working_directory", "type": "path"}, {"name": "environment_overlay", "type": "map<string, string>"}, {"name": "timeout_milliseconds", "type": "integer"}, {"name": "standard_input_file", "type": "path"}]
+# file_system_status: the statvfs(3) view of the file system containing a path.
+check: next(t for t in doc["types"] if t["name"] == "file_system_status")["fields"] == [{"name": "block_size", "type": "integer"}, {"name": "fragment_size", "type": "integer"}, {"name": "blocks", "type": "integer"}, {"name": "free_blocks", "type": "integer"}, {"name": "available_blocks", "type": "integer"}, {"name": "total_inodes", "type": "integer"}, {"name": "free_inodes", "type": "integer"}, {"name": "available_inodes", "type": "integer"}, {"name": "file_system_identifier", "type": "integer"}, {"name": "maximum_name_length", "type": "integer"}]
+# directory_entry: a record (path + kind), the same closed set as path_status.kind (DESIGN §7.10a).
+check: next(t for t in doc["types"] if t["name"] == "directory_entry")["fields"] == [{"name": "path", "type": "path"}, {"name": "kind", "type": "string"}]
+check: next(t for t in doc["types"] if t["name"] == "directory_entry")["kinds"] == ["file", "directory", "symlink", "other"]
+# walk_report/walk_skip: the partial result of filesystem.walk_directory (DESIGN §3.4/§7.10a).
+check: next(t for t in doc["types"] if t["name"] == "walk_report")["fields"] == [{"name": "entries", "type": "list<directory_entry>"}, {"name": "skipped_paths", "type": "list<walk_skip>"}]
+check: next(t for t in doc["types"] if t["name"] == "walk_skip")["fields"] == [{"name": "path_text", "type": "string"}, {"name": "kind", "type": "string"}]
+check: next(t for t in doc["types"] if t["name"] == "walk_skip")["kinds"] == ["permission_denied", "invalid_encoding", "other"]
+# json_value is opaque: methods but no fields (DESIGN §3.1/§10).
+check: next(t for t in doc["types"] if t["name"] == "json_value")["category"] == "opaque"
+check: next(t for t in doc["types"] if t["name"] == "json_value")["fields"] == []
+# file_lock is opaque too: methods but no fields (DESIGN §3.1/§10).
+check: next(t for t in doc["types"] if t["name"] == "file_lock")["category"] == "opaque"
+check: next(t for t in doc["types"] if t["name"] == "file_lock")["fields"] == []
+check: next(t for t in doc["types"] if t["name"] == "process_result")["fields"] == [{"name": "exit_code", "type": "integer"}, {"name": "standard_output", "type": "string"}, {"name": "standard_error", "type": "string"}, {"name": "program", "type": "string"}]
+check: next(t for t in doc["types"] if t["name"] == "process_handle")["fields"] == [{"name": "process_identifier", "type": "integer"}]
+check: next(t for t in doc["types"] if t["name"] == "pipeline_result")["fields"] == [{"name": "stage_results", "type": "list<process_result>"}, {"name": "standard_output", "type": "string"}]
+check: next(t for t in doc["types"] if t["name"] == "path_status")["fields"] == [{"name": "kind", "type": "string"}, {"name": "size_bytes", "type": "integer"}, {"name": "modified_unix_seconds", "type": "integer"}, {"name": "permissions", "type": "integer"}, {"name": "owner_user_id", "type": "integer"}, {"name": "owner_group_id", "type": "integer"}, {"name": "device_major", "type": "integer"}, {"name": "device_minor", "type": "integer"}, {"name": "inode", "type": "integer"}, {"name": "link_count", "type": "integer"}, {"name": "accessed_unix_seconds", "type": "integer"}, {"name": "changed_unix_seconds", "type": "integer"}]
+check: "file" in next(t for t in doc["types"] if t["name"] == "path_status")["kinds"]
+# One unified error type with a single closed `kind` set (union of the former four).
+check: next(t for t in doc["types"] if t["name"] == "error")["fields"] == [{"name": "kind", "type": "string"}, {"name": "message", "type": "string"}, {"name": "subject", "type": "string"}]
+check: {"not_found", "permission_denied", "invalid_argument", "timed_out", "invalid_integer", "invalid_regex", "out_of_range", "other"} <= set(next(t for t in doc["types"] if t["name"] == "error")["kinds"])
+# parallel: three added `kind` values (no `aborted`, no `ParallelError` type) (DESIGN §3.5/§7.10.1).
+check: {"invalid_worker_count", "transform_failed", "spawn_failed"} <= set(next(t for t in doc["types"] if t["name"] == "error")["kinds"])
+check: "aborted" not in next(t for t in doc["types"] if t["name"] == "error")["kinds"]

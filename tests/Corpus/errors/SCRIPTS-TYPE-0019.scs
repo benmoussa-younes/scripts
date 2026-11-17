@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0019 2:14
+let r = true < false

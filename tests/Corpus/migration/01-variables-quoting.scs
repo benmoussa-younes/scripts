@@ -1,0 +1,22 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 01: variables and quoting (values with spaces)
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-01")?
+let file_name = "mon fichier.txt"
+let greeting = "bonjour le monde"
+let target_file = temporary_directory / file_name
+
+io.write_standard_output_line("nom=[{file_name}]")
+io.write_standard_output_line("salutation: {greeting}")
+io.write_standard_output_line("prix: 5$ \{a\}")
+
+let shown = process.run(process.request("printf", ["[%s]\n", file_name, "x"]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())
+
+filesystem.write_file_overwrite("contenu\n", target_file)?
+if filesystem.path_exists(target_file) {
+    io.write_standard_output_line("existe: {(target_file).base_name()}")
+}
+let content = filesystem.read_file(target_file)?
+io.write_standard_output_line("lu: {content.trim_whitespace()}")
+
+filesystem.remove_directory_tree(temporary_directory)?

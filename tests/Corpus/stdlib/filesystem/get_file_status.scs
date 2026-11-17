@@ -1,0 +1,20 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let file_path = work_directory / "cinq.txt"
+filesystem.write_file_overwrite("cinq!", file_path)?
+let status = filesystem.get_path_status(file_path)?
+let user_id = system.effective_user_id()
+let group_id = system.effective_group_id()
+io.write_standard_output_line(status.kind)
+io.write_standard_output_line("{status.size_bytes}")
+io.write_standard_output_line("{status.owner_user_id == user_id}")
+io.write_standard_output_line("{status.owner_group_id == group_id}")
+io.write_standard_output_line("{status.link_count >= 1}")
+io.write_standard_output_line("{status.inode > 0}")
+let directory_status = filesystem.get_path_status(work_directory)?
+io.write_standard_output_line(directory_status.kind)
+io.write_standard_output_line("{status.device_major == directory_status.device_major and status.device_minor == directory_status.device_minor}")
+match filesystem.get_path_status(work_directory / "absent") {
+    ok(missing) => io.write_standard_output_line(missing.kind)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

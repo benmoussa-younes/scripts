@@ -1,0 +1,22 @@
+let root_directory = filesystem.make_temporary_directory("scripts-stdlib-set-owner-")?
+let target_path = root_directory / "owned.txt"
+let link_path = root_directory / "link.txt"
+filesystem.write_file_overwrite("", target_path)?
+filesystem.make_symbolic_link(target_path, link_path)?
+let user_id = system.effective_user_id()
+let group_id = system.effective_group_id()
+filesystem.set_owner(target_path, user_id, group_id)?
+filesystem.set_owner_no_follow(link_path, user_id, group_id)?
+let target_status = filesystem.get_path_status(target_path)?
+let link_status = filesystem.get_path_status(link_path)?
+io.write_standard_output_line("{target_status.owner_user_id == user_id and target_status.owner_group_id == group_id}")
+io.write_standard_output_line("{link_status.kind} {link_status.owner_user_id == user_id and link_status.owner_group_id == group_id}")
+match filesystem.set_owner(target_path, -1, group_id) {
+    ok(_) => io.write_standard_output_line("unexpected")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.set_owner_no_follow(link_path, user_id, 4294967296) {
+    ok(_) => io.write_standard_output_line("unexpected")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

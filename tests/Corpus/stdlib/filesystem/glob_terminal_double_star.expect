@@ -1,0 +1,8 @@
+stdout:
+dir,f
+file
+dir,f,file
+true
+dir,f
+file
+exit: 0

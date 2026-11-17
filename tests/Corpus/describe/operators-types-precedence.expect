@@ -1,0 +1,14 @@
+exit: 0
+stream: stdout
+check: all(list(o.keys()) == ["symbol", "category", "description"] for o in doc["operators"])
+check: {o["symbol"] for o in doc["operators"]} >= {"+", "-", "*", "/", "%", "==", "!=", "<", "<=", ">", ">=", "and", "or", "not"}
+check: all(list(t.keys()) == ["name", "syntax", "category", "description"] for t in doc["types"] if "fields" not in t)
+check: {t["name"] for t in doc["types"] if "fields" not in t} == {"string", "integer", "float", "boolean", "path", "unit", "never", "list", "map", "result", "function"}
+check: next(t for t in doc["types"] if t["name"] == "list")["category"] == "generic"
+check: next(t for t in doc["types"] if t["name"] == "string")["category"] == "primitive"
+check: all(list(p.keys()) == ["level", "operators", "associativity"] for p in doc["precedence"])
+check: all(p["associativity"] in ("left", "right", "none", "prefix") for p in doc["precedence"])
+check: [p["level"] for p in doc["precedence"]] == sorted(p["level"] for p in doc["precedence"])
+check: next(p for p in doc["precedence"] if p["level"] == 1)["operators"] == ["=>"]
+check: len(doc["precedence"]) == 9
+check: "|>" not in {o["symbol"] for o in doc["operators"]}

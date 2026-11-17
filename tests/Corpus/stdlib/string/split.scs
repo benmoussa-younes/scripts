@@ -1,0 +1,8 @@
+let parts = "a,b,,c".split(",")
+io.write_standard_output_line(parts.join("|"))
+let single = "".split(",")
+io.write_standard_output_line("{single.length()}")
+let absent = "abc".split(",")
+io.write_standard_output_line("{absent.length()}")
+let overlap = "aaa".split("aa")
+io.write_standard_output_line(overlap.join("|"))

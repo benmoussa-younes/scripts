@@ -1,0 +1,4 @@
+# file: lib.scs
+public function known() -> integer {
+    return 1
+}

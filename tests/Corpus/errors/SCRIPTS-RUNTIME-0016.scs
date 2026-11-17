@@ -1,0 +1,2 @@
+# expect: SCRIPTS-RUNTIME-0016 2:1 exit=253
+process.exit_with_code(256)

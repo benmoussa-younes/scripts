@@ -1,0 +1,7 @@
+stdout:
+zero
+value
+valid=true
+invalid=false
+count=2
+exit: 0

@@ -1,0 +1,21 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 10: environment variables (${VAR:-default}, export)
+let fallback_value = environment.get_variable("SCRIPTS_DEMO_UNSET").value_or("valeur par defaut")
+io.write_standard_output_line("defaut: {fallback_value}")
+
+environment.set_variable("SCRIPTS_DEMO_NAME", "craft shell")?
+let child_view = process.run(process.request("printenv", ["SCRIPTS_DEMO_NAME"]))?
+io.write_standard_output_line("dans le fils: {child_view.standard_output.trim_whitespace()}")
+environment.remove_variable("SCRIPTS_DEMO_NAME")?
+let after_removal = process.run(process.request("printenv", ["SCRIPTS_DEMO_NAME"]))?
+io.write_standard_output_line("apres remove: code {after_removal.exit_code}")
+let is_absent = not environment.get_variable("SCRIPTS_DEMO_NAME").is_ok()
+io.write_standard_output_line("est absente: {is_absent}")
+
+environment.set_variable("SCRIPTS_DEMO_EMPTY", "")?
+let mutable empty_effective = environment.get_variable("SCRIPTS_DEMO_EMPTY").value_or("")
+if empty_effective == "" {
+    empty_effective = "valeur par defaut"
+}
+io.write_standard_output_line("vide: {empty_effective}")
+environment.remove_variable("SCRIPTS_DEMO_EMPTY")?

@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Scripts.Cli/Scripts.Cli.csproj" />
+    <Project Path="src/Scripts.Core/Scripts.Core.csproj" />
+    <Project Path="src/Scripts.Syntax/Scripts.Syntax.csproj" />
+    <Project Path="src/Scripts.Checker/Scripts.Checker.csproj" />
+    <Project Path="src/Scripts.Runtime/Scripts.Runtime.csproj" />
+    <Project Path="src/Scripts.App/Scripts.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Scripts.Syntax.Tests/Scripts.Syntax.Tests.csproj" />
+    <Project Path="tests/Scripts.Checker.Tests/Scripts.Checker.Tests.csproj" />
+    <Project Path="tests/Scripts.Runtime.Tests/Scripts.Runtime.Tests.csproj" />
+    <Project Path="tests/Scripts.Cli.Tests/Scripts.Cli.Tests.csproj" />
+    <Project Path="tests/Scripts.EndToEnd.Tests/Scripts.EndToEnd.Tests.csproj" />
+    <Project Path="tests/Scripts.Corpus.Tests/Scripts.Corpus.Tests.csproj" />
+  </Folder>
+</Solution>

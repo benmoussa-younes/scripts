@@ -1,0 +1,4 @@
+io.write_standard_output_line(p"a//b/../c".normalized().to_string())
+io.write_standard_output_line(p"../a".normalized().to_string())
+io.write_standard_output_line(p"a/..".normalized().to_string())
+io.write_standard_output_line("[{p"".normalized().to_string()}]")

@@ -1,0 +1,5 @@
+stdout:
+name=core
+version=2
+text=core v2
+exit: 0

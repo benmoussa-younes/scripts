@@ -1,0 +1,10 @@
+stdout:
+b 2
+stage=printf code=0 stdout=0
+stage=grep code=0 stdout=0
+captured=2
+stderr=true code=2 stdout=0
+codes=0,1,0 stdout=0
+binary=invalid_encoding cat
+empty=invalid_argument
+exit: 0

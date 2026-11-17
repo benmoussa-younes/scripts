@@ -1,0 +1,10 @@
+let temporary_path = filesystem.make_temporary_file("scripts-", ".tmp")?
+let status = filesystem.get_path_status(temporary_path)?
+io.write_standard_output_line("{status.kind} {status.permissions == 0o600}")
+let content = filesystem.read_file(temporary_path)?
+io.write_standard_output_line("{content.length() == 0}")
+match filesystem.make_temporary_file("a/b", "") {
+    ok(_) => io.write_standard_output_line("created")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_file(temporary_path)?

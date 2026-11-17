@@ -1,0 +1,9 @@
+exit: 251
+stream: stdout
+json-last
+check: doc["schema_version"] == 1
+check: doc["success"] is False
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-TYPE-0001"
+check: doc["errors"][0]["fix"]["description"] == "rename to `total`"
+check: doc["errors"][0]["fix"]["edits"] == [{"line": 2, "column": 33, "end_line": 2, "end_column": 37, "replacement": "total"}]

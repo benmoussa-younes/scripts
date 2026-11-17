@@ -1,0 +1,4 @@
+stdout:
+inner_copy=2
+outer=3
+exit: 0

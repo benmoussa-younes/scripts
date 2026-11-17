@@ -1,0 +1,12 @@
+match system.user_id("scripts-definitely-not-a-user") {
+    ok(_) => io.write_standard_output_line("unknown user accepted")
+    error(failure) => io.write_standard_output_line("unknown user {failure.kind}")
+}
+match system.group_id("scripts-definitely-not-a-group") {
+    ok(_) => io.write_standard_output_line("unknown group accepted")
+    error(failure) => io.write_standard_output_line("unknown group {failure.kind}")
+}
+match system.user_id("a\0b") {
+    ok(_) => io.write_standard_output_line("nul accepted")
+    error(failure) => io.write_standard_output_line("nul {failure.kind}")
+}

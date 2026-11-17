@@ -1,0 +1,20 @@
+Package: scripts
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.34)
+Maintainer: Younes BENMOUSSA <younes.benmoussa@pm.me>
+Homepage: https://github.com/benmoussa-younes/scripts
+Description: typed scripting language in one native binary
+ scripts is a statically typed scripting language, compiled
+ into a single native binary (Native AOT, .NET 10) with no dependency
+ on a .NET runtime.
+ .
+ It provides a static checker, a frozen standard library
+ (filesystem, processes, environment), typed errors
+ (result<T,E>) and a machine description (scripts describe --format json).
+ .
+ This package installs the /usr/bin/scripts executable (amd64 architecture).
+ .
+ License: GPL-3.0-or-later (see /usr/share/common-licenses/GPL-3).

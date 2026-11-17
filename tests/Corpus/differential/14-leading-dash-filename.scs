@@ -1,0 +1,15 @@
+#!/usr/bin/scripts run
+# scripts → a file name starting with "-" is path data:
+# no layer re-reads it as an option.
+let temporary_directory = filesystem.make_temporary_directory("scripts-differential-14")?
+let dash_file = temporary_directory / "-rf"
+filesystem.write_file_overwrite("donnee\n", dash_file)?
+
+io.write_standard_output_line("lu: {filesystem.read_file(dash_file)?.trim_whitespace()}")
+
+let entries = filesystem.list_directory(temporary_directory)?.transform(entry => entry.path)
+for entry in entries {
+    io.write_standard_output_line("entree: {(entry).base_name()}")
+}
+
+filesystem.remove_directory_tree(temporary_directory)?

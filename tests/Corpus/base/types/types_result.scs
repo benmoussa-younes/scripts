@@ -1,0 +1,10 @@
+let good: result<integer, string> = ok(3)
+let bad: result<integer, string> = error("boom")
+io.write_standard_output_line("good_ok={good.is_ok()}")
+io.write_standard_output_line("bad_err={not bad.is_ok()}")
+io.write_standard_output_line("fallback={bad.value_or(0)}")
+let mapped = bad.transform_error(e => "wrapped: " + e)
+match mapped {
+    ok(v) => io.write_standard_output_line("mapped ok {v}")
+    error(e) => io.write_standard_output_line("{e}")
+}

@@ -1,0 +1,15 @@
+# Shared by the binaries: one verdict format, one exit code.
+
+public function line(success: boolean) -> string {
+    if success {
+        return "VERDICT: PASS"
+    }
+    return "VERDICT: FAIL"
+}
+
+public function code(success: boolean) -> integer {
+    if success {
+        return 0
+    }
+    return 1
+}

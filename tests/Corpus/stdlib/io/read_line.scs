@@ -1,0 +1,12 @@
+# Empty standard input: read_line reports end_of_file, write adds no newline,
+# and a second read_line stays at end_of_file.
+match io.read_standard_input_line() {
+    ok(line) => io.write_standard_output_line("line {line.length()} characters")
+    error(e) => io.write_standard_output_line(e.kind)
+}
+io.write_standard_output("no newline")
+io.write_standard_output_line("")
+match io.read_standard_input_line() {
+    ok(line) => io.write_standard_output_line("line {line.length()} characters")
+    error(e) => io.write_standard_output_line("again {e.kind}")
+}

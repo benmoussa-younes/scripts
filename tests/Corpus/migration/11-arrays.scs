@@ -1,0 +1,18 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 11: indexed arrays
+let mutable fruits = ["pomme", "poire avec espace", "cerise"]
+fruits.append("kiwi")
+io.write_standard_output_line("nombre: {fruits.length()}")
+io.write_standard_output_line("premier: {fruits[0]}")
+let tenth_fruit = fruits.get_at_index(10).value_or("aucun")
+io.write_standard_output_line("dixieme: {tenth_fruit}")
+for fruit in fruits {
+    io.write_standard_output_line("- {fruit}")
+}
+let joined_fruits = fruits.join(",")
+io.write_standard_output_line("joint: {joined_fruits}")
+let sorted_fruits = fruits.sorted().join("|")
+io.write_standard_output_line("tri: {sorted_fruits}")
+let snapshot = fruits
+fruits.append("fig")
+io.write_standard_output_line("snapshot: {snapshot.length()} / fruits: {fruits.length()}")

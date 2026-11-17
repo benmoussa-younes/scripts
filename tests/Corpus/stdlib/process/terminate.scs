@@ -1,0 +1,10 @@
+let handle = process.spawn("sleep", ["5"])?
+process.terminate(handle)?
+match process.terminate(handle) {
+    ok(_) => io.write_standard_output_line("encore actif")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match process.wait_for_process(handle, 0) {
+    ok(outcome) => io.write_standard_output_line(outcome.standard_output)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

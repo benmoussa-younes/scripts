@@ -1,0 +1,8 @@
+sans suffixe: rapport.final
+extension: txt
+longueur: 17
+remplace: rapport.v2.txt
+majuscules: RAPPORT.FINAL.TXT
+champ 2: b
+tr -d: abc
+sed g: x-y-z

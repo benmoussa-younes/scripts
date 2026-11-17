@@ -1,0 +1,4 @@
+stdout:
+items=a!,b!
+grid=5
+exit: 0

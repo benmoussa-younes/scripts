@@ -1,0 +1,10 @@
+stdout:
+a[b]c
+a[1]b[22]
+{x}
+{a}
+$1
+invalid_format
+invalid_format
+invalid_regex
+exit: 0

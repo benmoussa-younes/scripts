@@ -1,0 +1,10 @@
+let s = "Hello"
+io.write_standard_output_line("len={s.length()}")
+io.write_standard_output_line("upper={s.uppercased()}")
+io.write_standard_output_line("lower={s.lowercased()}")
+io.write_standard_output_line("trim={"  pad  ".trim_whitespace()}|")
+io.write_standard_output_line("contains={s.contains("ell")}")
+io.write_standard_output_line("starts={s.starts_with("He")}")
+io.write_standard_output_line("ends={s.ends_with("lo")}")
+io.write_standard_output_line("replace={s.replace("l", "L")}")
+io.write_standard_output_line("split={s.split("l").join("-")}")

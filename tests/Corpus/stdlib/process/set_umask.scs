@@ -1,0 +1,17 @@
+let original = process.set_umask(0o077)?
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-umask-")?
+let created_directory = work_directory / "created"
+filesystem.make_directory(created_directory)?
+let status = filesystem.get_path_status(created_directory)?
+io.write_standard_output_line("{status.permissions == 0o700}")
+let previous = process.set_umask(original)?
+io.write_standard_output_line("{previous == 0o077}")
+match process.set_umask(-1) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match process.set_umask(0o1000) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

@@ -1,0 +1,6 @@
+stdout:
+42
+-7
+invalid_integer
+out_of_range
+exit: 0

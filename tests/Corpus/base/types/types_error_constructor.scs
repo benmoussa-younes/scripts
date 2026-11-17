@@ -1,0 +1,21 @@
+function lire_code(texte: string) -> result<integer, error> {
+    if texte.starts_with("E") {
+        return error("invalid_format", "préfixe E non supporté", texte)
+    }
+    return texte.parse_integer()
+}
+
+# A caller observes its own error through a `match`.
+match lire_code("E42") {
+    ok(n) => io.write_standard_output_line("ok {n}")
+    error(failure) => {
+        io.write_standard_output_line("kind={failure.kind}")
+        io.write_standard_output_line("subject={failure.subject}")
+        io.write_standard_output_line("message={failure.message}")
+    }
+}
+
+# A standalone error value (no expected result) has type `error`.
+let bare: error = error("not_found", "sans contexte", "")
+io.write_standard_output_line("bare_kind={bare.kind}")
+io.write_standard_output_line("bare_subject_len={bare.subject.length()}")

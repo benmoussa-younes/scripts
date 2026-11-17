@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0051 3:5
+function f() -> integer {
+    return
+}

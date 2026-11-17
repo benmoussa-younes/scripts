@@ -1,0 +1,5 @@
+let p = p"a.tar.gz"
+io.write_standard_output_line(p.extension())
+io.write_standard_output_line(p"a.txt".extension())
+io.write_standard_output_line(p"data/.bashrc".extension())
+io.write_standard_output_line("[{p"a.".extension()}]")

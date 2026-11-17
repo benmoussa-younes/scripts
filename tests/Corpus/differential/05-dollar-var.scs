@@ -1,0 +1,6 @@
+#!/usr/bin/scripts run
+# scripts → "$" is an ordinary character: the text is kept as is.
+# Explicit interpolation uses braces {expression}.
+let name = "monde"
+io.write_standard_output_line("msg: cout $5 pour $name")
+io.write_standard_output_line("msg: cout {name} pour {name}")

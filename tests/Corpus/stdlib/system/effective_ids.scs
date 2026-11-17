@@ -1,0 +1,3 @@
+let user_id = system.effective_user_id()
+let group_id = system.effective_group_id()
+io.write_standard_output_line("{user_id >= 0} {group_id >= 0}")

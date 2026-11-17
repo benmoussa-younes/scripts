@@ -1,0 +1,11 @@
+let mutable xs = [1, 2, 3]
+let mutable snapshot = xs
+xs.append(4)
+xs[0] = 99
+io.write_standard_output_line("snapshot0={snapshot[0]}")
+io.write_standard_output_line("snapshot_len={snapshot.length()}")
+let sorted = snapshot.sorted()
+let reversed = sorted.reversed()
+io.write_standard_output_line("sorted0={sorted[0]}")
+io.write_standard_output_line("reversed0={reversed[0]}")
+io.write_standard_output_line("reversed_len={reversed.length()}")

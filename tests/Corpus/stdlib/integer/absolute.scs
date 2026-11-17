@@ -1,0 +1,9 @@
+io.write_standard_output_line("{0.absolute()?}")
+io.write_standard_output_line("{5.absolute()?}")
+io.write_standard_output_line("{(-5).absolute()?}")
+io.write_standard_output_line("{9223372036854775807.absolute()?}")
+let minimum = "-9223372036854775808".parse_integer()?
+match minimum.absolute() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

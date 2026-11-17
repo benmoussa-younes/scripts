@@ -1,0 +1,4 @@
+stdout:
+alice,Bob,Charlie
+a,bb,dd,ccc
+exit: 0

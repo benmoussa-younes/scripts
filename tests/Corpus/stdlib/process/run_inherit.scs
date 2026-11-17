@@ -1,0 +1,8 @@
+let exit_status = process.run_inherit(process.request("echo", ["direct"]))?
+io.write_standard_output_line("{exit_status}")
+let failing_status = process.run_inherit(process.request("false", []))?
+io.write_standard_output_line("{failing_status}")
+match process.run_inherit(process.request("scripts-spec-inexistant-program", [])) {
+    ok(status) => io.write_standard_output_line("{status}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

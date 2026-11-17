@@ -1,0 +1,5 @@
+# expect: SCRIPTS-TYPE-0028 4:10
+let r = match 1 {
+    1 => "a"
+    _ => 2
+}

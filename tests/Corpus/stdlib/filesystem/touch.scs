@@ -1,0 +1,13 @@
+let root_directory = filesystem.make_temporary_directory("scripts-touch-")?
+let target_path = root_directory / "a.txt"
+filesystem.touch(target_path)?
+let created = filesystem.read_file(target_path)?
+io.write_standard_output_line("{created.length() == 0}")
+filesystem.write_file_overwrite("content", target_path)?
+filesystem.touch(target_path)?
+io.write_standard_output_line(filesystem.read_file(target_path)?)
+match filesystem.touch(target_path / "below") {
+    ok(_) => io.write_standard_output_line("touched")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

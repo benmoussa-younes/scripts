@@ -1,0 +1,44 @@
+let hexadecimal = "ff".parse_integer_radix(16)?
+io.write_standard_output_line("{hexadecimal}")
+let uppercase = "FF".parse_integer_radix(16)?
+io.write_standard_output_line("{uppercase}")
+let negative = "-ff".parse_integer_radix(16)?
+io.write_standard_output_line("{negative}")
+let base_thirty_six = "z".parse_integer_radix(36)?
+io.write_standard_output_line("{base_thirty_six}")
+let maximum = "9223372036854775807".parse_integer_radix(10)?
+io.write_standard_output_line("{maximum}")
+let minimum = "-9223372036854775808".parse_integer_radix(10)?
+io.write_standard_output_line("{minimum}")
+match "".parse_integer_radix(10) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "0x10".parse_integer_radix(16) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match " 1".parse_integer_radix(10) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "1_0".parse_integer_radix(10) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "2".parse_integer_radix(2) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "9223372036854775808".parse_integer_radix(10) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "1".parse_integer_radix(1) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "1".parse_integer_radix(37) {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

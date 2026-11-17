@@ -1,0 +1,11 @@
+exit: 143
+stream: stdout
+signal: SIGTERM 400
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 143
+check: doc["success"] is False
+check: doc["termination"] == "signal"
+check: doc["stdout"] == "debut\n"
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-RUNTIME-0018"
+check: doc["errors"][0]["severity"] == "error"

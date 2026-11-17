@@ -1,0 +1,21 @@
+exit: 0
+stream: stdout
+deterministic: 2
+check: list(doc.keys()) == ["language", "version", "schema_version", "keywords", "reserved_identifiers", "future_reserved", "operators", "precedence", "types", "functions", "groups", "error_codes", "exit_codes", "limits", "grammar_ebnf"]
+check: doc["language"] == "scripts"
+check: doc["version"] == version
+check: doc["schema_version"] == 1
+check: isinstance(doc["keywords"], list)
+check: isinstance(doc["reserved_identifiers"], list)
+check: isinstance(doc["future_reserved"], list)
+check: isinstance(doc["operators"], list)
+check: isinstance(doc["precedence"], list)
+check: isinstance(doc["types"], list)
+check: isinstance(doc["functions"], list)
+check: isinstance(doc["error_codes"], list)
+check: isinstance(doc["exit_codes"], list)
+check: isinstance(doc["limits"], dict)
+check: isinstance(doc["grammar_ebnf"], str)
+check: len(doc["grammar_ebnf"]) > 0
+check: "program" in doc["grammar_ebnf"]
+check: "statement" in doc["grammar_ebnf"]

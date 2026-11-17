@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0036 2:8
+let x: number = 1

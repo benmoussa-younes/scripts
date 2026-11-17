@@ -1,0 +1,5 @@
+let outcome = process.run(process.request("echo", ["bonjour"]))?
+io.write_standard_output_line(outcome.standard_output.trim_whitespace())
+io.write_standard_output_line("{outcome.exit_code}")
+let failing = process.run(process.request("false", []))?
+io.write_standard_output_line("{failing.exit_code}")

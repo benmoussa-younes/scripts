@@ -1,0 +1,4 @@
+import "outer.scs" as outer
+import "util/strings.scs" as strings
+io.write_standard_output_line("shout={outer.shout("hi")}")
+io.write_standard_output_line("upper={strings.upper("abc")}")

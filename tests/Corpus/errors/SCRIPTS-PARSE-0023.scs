@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0023 2:9
+let x = )

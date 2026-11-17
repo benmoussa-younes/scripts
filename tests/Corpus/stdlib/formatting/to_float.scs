@@ -1,0 +1,6 @@
+let converted = to_float(7)
+io.write_standard_output_line("{converted}")
+let rounded = to_float(9007199254740993)
+io.write_standard_output_line("{rounded}")
+let negative = to_float(-3)
+io.write_standard_output_line("{negative}")

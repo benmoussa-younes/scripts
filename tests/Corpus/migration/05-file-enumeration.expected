@@ -1,0 +1,9 @@
+--glob--
+txt: a.txt
+txt: b.txt
+--find--
+trouve: .hidden.txt
+trouve: a.txt
+trouve: b.txt
+trouve: d.txt
+trouve: e.txt

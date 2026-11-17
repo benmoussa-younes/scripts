@@ -1,0 +1,5 @@
+# file: a.scs
+import "b.scs" as second
+public function one() -> integer {
+    return 1
+}

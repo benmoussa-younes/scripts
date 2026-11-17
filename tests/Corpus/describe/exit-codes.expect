@@ -1,0 +1,10 @@
+exit: 0
+stream: stdout
+check: all(list(e.keys()) == ["code", "last_code", "name", "meaning"] for e in doc["exit_codes"])
+check: {e["code"] for e in doc["exit_codes"]} == {0, 1, 250, 251, 252, 253, 254, 129, 130, 141, 143}
+check: next(e for e in doc["exit_codes"] if e["code"] == 0)["name"] == "success"
+check: next(e for e in doc["exit_codes"] if e["code"] == 1)["last_code"] == 255
+check: next(e for e in doc["exit_codes"] if e["code"] == 251)["name"] == "static_error"
+check: next(e for e in doc["exit_codes"] if e["code"] == 253)["name"] == "runtime_failure"
+check: next(e for e in doc["exit_codes"] if e["code"] == 130)["name"] == "interrupted"
+check: next(e for e in doc["exit_codes"] if e["code"] == 143)["name"] == "terminated"

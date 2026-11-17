@@ -1,0 +1,4 @@
+let doubler: function(integer) -> integer = (x: integer) => x * 2
+let applier = (f: function(integer) -> integer, v: integer) => f(v)
+io.write_standard_output_line("d={doubler(5)}")
+io.write_standard_output_line("a={applier(doubler, 10)}")

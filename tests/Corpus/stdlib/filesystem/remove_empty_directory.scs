@@ -1,0 +1,17 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let empty_directory = work_directory / "vide"
+filesystem.make_directory(empty_directory)?
+filesystem.remove_empty_directory(empty_directory)?
+io.write_standard_output_line("{filesystem.path_exists(empty_directory)}")
+let sub_directory = work_directory / "sub"
+filesystem.make_directory(sub_directory)?
+filesystem.write_file_overwrite("x", sub_directory / "f.txt")?
+match filesystem.remove_empty_directory(sub_directory) {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.remove_empty_directory(work_directory / "absent") {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

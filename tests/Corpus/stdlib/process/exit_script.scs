@@ -1,0 +1,2 @@
+io.write_standard_output_line("avant")
+process.exit_with_code(3)

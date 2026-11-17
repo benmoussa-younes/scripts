@@ -1,0 +1,9 @@
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "valeur")?
+let variables = environment.all_variables()
+io.write_standard_output_line(variables.get_value("SCRIPTS_STDLIB_VARIABLE").value_or_fail())
+let has_absent = variables.contains_key("SCRIPTS_STDLIB_ABSENTE")
+io.write_standard_output_line("{has_absent}")
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "changement")?
+io.write_standard_output_line(variables.get_value("SCRIPTS_STDLIB_VARIABLE").value_or_fail())
+let positive = variables.length() > 0
+io.write_standard_output_line("{positive}")

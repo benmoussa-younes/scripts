@@ -1,0 +1,13 @@
+function sign(n: integer) -> string {
+    return match n {
+        0 => "zero"
+        other => "nonzero:{other}"
+    }
+}
+io.write_standard_output_line(sign(0))
+io.write_standard_output_line(sign(7))
+let b = true
+match b {
+    true => io.write_standard_output_line("yes")
+    false => io.write_standard_output_line("no")
+}

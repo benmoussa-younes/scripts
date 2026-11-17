@@ -1,0 +1,4 @@
+public let BASE = 10
+public function scaled(n: integer) -> integer {
+    return n * BASE
+}

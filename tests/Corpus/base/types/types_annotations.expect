@@ -1,0 +1,5 @@
+stdout:
+a=10 b=2.5 c=text d=false
+e=/etc/hosts flen=3 glen=1
+h=7
+exit: 0

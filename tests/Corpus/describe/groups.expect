@@ -1,0 +1,11 @@
+exit: 0
+stream: stdout
+check: {g["name"] for g in doc["groups"] if g["kind"] == "module"} >= {"filesystem", "process", "environment", "system", "io", "json", "parallel", "encoding", "random"}
+check: {g["name"] for g in doc["groups"] if g["kind"] == "type"} >= {"path", "string", "list", "map", "json_value", "file_lock", "process_result"}
+check: all(g["notes"] != "" for g in doc["groups"])
+check: next(g for g in doc["groups"] if g["name"] == "filesystem" and g["kind"] == "module")["notes"].startswith("Common rules")
+check: next(g for g in doc["groups"] if g["name"] == "process")["notes"].find("posix_spawn") >= 0
+check: next(g for g in doc["groups"] if g["name"] == "system")["notes"].startswith("Common rules: these functions read kernel")
+check: next(g for g in doc["groups"] if g["name"] == "encoding")["notes"].startswith("The `encoding` namespace")
+check: next(g for g in doc["groups"] if g["name"] == "random")["notes"].startswith("The `random` namespace")
+check: next(g for g in doc["groups"] if g["name"] == "file_lock" and g["kind"] == "type")["notes"].startswith("A `file_lock` is")

@@ -1,0 +1,21 @@
+function fib(n: integer) -> integer {
+    if n < 2 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+function is_even(n: integer) -> boolean {
+    if n == 0 {
+        return true
+    }
+    return is_odd(n - 1)
+}
+function is_odd(n: integer) -> boolean {
+    if n == 0 {
+        return false
+    }
+    return is_even(n - 1)
+}
+io.write_standard_output_line("fib={fib(10)}")
+io.write_standard_output_line("even4={is_even(4)}")
+io.write_standard_output_line("odd7={is_odd(7)}")

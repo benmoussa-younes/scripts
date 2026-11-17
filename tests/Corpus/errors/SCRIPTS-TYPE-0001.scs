@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0001 2:31
+io.write_standard_output_line(missing_name)

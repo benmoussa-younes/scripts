@@ -1,0 +1,2 @@
+let letters = "a😀é".characters()
+io.write_standard_output_line("{letters.length()} {letters[1]} {letters[2]}")

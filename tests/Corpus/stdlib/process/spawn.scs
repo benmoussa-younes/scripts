@@ -1,0 +1,9 @@
+io.write_standard_output_line("{process.spawn("true", []).is_ok()}")
+match process.spawn("scripts-spec-inexistant-program", []) {
+    ok(handle) => io.write_standard_output_line("{handle.process_identifier}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match process.spawn("", []) {
+    ok(handle) => io.write_standard_output_line("{handle.process_identifier}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

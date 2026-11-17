@@ -1,0 +1,4 @@
+let found = "abcdef".contains("cd")
+let empty_found = "abc".contains("")
+let missing = "abc".contains("x")
+io.write_standard_output_line("{found} {empty_found} {missing}")

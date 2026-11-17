@@ -1,0 +1,20 @@
+function find_first_negative(values: list<integer>) -> integer {
+    for v in values {
+        if v < 0 {
+            return v
+        }
+    }
+    return 0
+}
+io.write_standard_output_line("found={find_first_negative([3, 5, -2, 7])}")
+io.write_standard_output_line("none={find_first_negative([1, 2, 3])}")
+let mutable outer = 0
+for a in [1, 2] {
+    for b in [10, 20] {
+        if b == 20 {
+            continue
+        }
+        outer += a * b
+    }
+}
+io.write_standard_output_line("outer={outer}")

@@ -1,0 +1,7 @@
+a.txt: file
+sub: directory
+absent: absent
+a.txt existe: true
+a.txt non vide
+chaine vide
+chaine non vide

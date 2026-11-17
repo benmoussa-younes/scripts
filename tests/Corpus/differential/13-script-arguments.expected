@@ -1,0 +1,5 @@
+nombre=3
+arg=[un]
+arg=[deux mots]
+arg=[-n]
+joint=un|deux mots|-n

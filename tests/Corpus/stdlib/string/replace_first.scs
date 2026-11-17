@@ -1,0 +1,3 @@
+io.write_standard_output_line("a-b-c".replace_first("-", "+"))
+io.write_standard_output_line("aaa".replace_first("aa", "b"))
+io.write_standard_output_line("xyz".replace_first("q", "z"))

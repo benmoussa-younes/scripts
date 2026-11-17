@@ -1,0 +1,12 @@
+exit: 0
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 0
+check: doc["success"] is True
+check: doc["termination"] == "normal"
+check: doc["stdout"] == "hello\n"
+check: doc["stderr"] == ""
+check: doc["result"] == "world"
+check: doc["errors"] == []
+check: doc["warnings"] == []
+check: list(doc.keys()) == ["schema_version", "exit_code", "success", "termination", "stdout", "stderr", "result", "errors", "warnings"]

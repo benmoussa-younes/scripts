@@ -1,0 +1,3 @@
+# expect: SCRIPTS-MODULE-0006 3:13
+import "lib.scs" as lib
+let n = lib.unknown()

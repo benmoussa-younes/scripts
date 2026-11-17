@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0013 2:21
+let n = to_float(1, 2)

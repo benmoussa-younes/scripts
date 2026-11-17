@@ -1,0 +1,5 @@
+stdout:
+end_of_file
+no newline
+again end_of_file
+exit: 0

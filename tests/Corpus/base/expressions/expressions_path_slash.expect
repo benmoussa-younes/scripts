@@ -1,0 +1,6 @@
+stdout:
+join1=/home/user/docs
+join2=/home/user/docs/readme
+join3=/home/user/file
+join4=x
+exit: 0

@@ -1,0 +1,9 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-statvfs-")?
+let status = filesystem.get_file_system_status(work_directory)?
+io.write_standard_output_line("{status.block_size > 0}")
+io.write_standard_output_line("{status.fragment_size > 0}")
+io.write_standard_output_line("{status.blocks >= status.free_blocks}")
+io.write_standard_output_line("{status.free_blocks >= status.available_blocks}")
+io.write_standard_output_line("{status.total_inodes >= status.free_inodes}")
+io.write_standard_output_line("{status.maximum_name_length > 0}")
+filesystem.remove_directory_tree(work_directory)?

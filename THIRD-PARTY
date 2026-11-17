@@ -1,0 +1,16 @@
+# Third-party components
+
+| Component | Version | Licence | Source | Files |
+|---|---|---|---|---|
+| Core subset (Results, Serialization.Values, Concurrency) | v0.1.1, commit 954aa50 | LGPL-3.0-or-later | https://github.com/benmoussa-younes/core | `src/Scripts.Core/Compatibility/Core/Results/**`, `src/Scripts.Core/Compatibility/Core/Serialization/Values/**`, `src/Scripts.Core/Compatibility/Core/Concurrency/**` |
+
+The subset is vendored by source, not as a binary. The v0.1.1 security fix
+(CWE-119/120/122/788) is in `Core.Platform.Linux.RawFileWalker`, which Scripts
+does not vendor; its directory walker reads entries with `readdir(3)`. The
+`Results`, `Serialization.Values` and `Concurrency` trees are identical between
+v0.1.0 and v0.1.1, apart from the deliberate `bcs`→`scripts` wording in one
+comment, so the pin moved without a source change. The JSON codecs used by the language live under
+`src/Scripts.Core/Compatibility/Core/Serialization/Codecs/Json/`: they are
+local adaptations of Core's JSON codecs by the same copyright holder,
+relicensed GPL-3.0-or-later; the three vendored trees above remain
+LGPL-3.0-or-later.

@@ -1,0 +1,7 @@
+let ages = {"alice": 30, "bob": 25}
+let alice_age = ages.get_value("alice").value_or_fail()
+io.write_standard_output_line("{alice_age}")
+match ages.get_value("carol") {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

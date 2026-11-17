@@ -1,0 +1,23 @@
+SCRIPTS-PARSE-0001	markers to substitute: <0xFF> ; generated entry: Generated: `<0xFF>` is replaced by the byte 0xFF.
+SCRIPTS-PARSE-0002	markers to substitute: <NUL> ; generated entry: Generated: `<NUL>` is replaced by the byte 0x00.
+SCRIPTS-PARSE-0003	markers to substitute: <CR> ; generated entry: Generated: `<CR>` is replaced by the byte 0x0D (with no `\n` after it).
+SCRIPTS-PARSE-0004	generated entry: Generated: this block followed by `# filling` lines until it exceeds 4 194 304 bytes.
+SCRIPTS-PARSE-0005	markers to substitute: <repeat 250 "["> <repeat 250 "]"> ; generated entry: Generated: 250 `[` then `1` then 250 `]`; the 199th `[` is the first node of depth 201.
+SCRIPTS-PARSE-0036	— reserved in v0.2.0: `|>` was removed
+SCRIPTS-PARSE-0037	— reserved in v0.2.0: `|>` was removed
+SCRIPTS-PARSE-0038	— reserved in v0.2.0: `|>` was removed
+SCRIPTS-TYPE-0060	— reserved in v0.2.0: `|>` was removed
+SCRIPTS-TYPE-0061	— reserved in v0.2.0: `|>` was removed
+SCRIPTS-MODULE-0003	generated entry: Generated: `m1.scs` … `m33.scs`; for K from 1 to 32, `mK.scs` contains `# file: mK.scs`, then `import "m<K+1>.scs" as chain` (line 2) and `public function value() -> integer { return K }`; `m33.scs` contains only the function. The main script is at depth 0, `m33.scs` at depth 33.
+SCRIPTS-RUNTIME-0012	unreachable guard rail in 0.1.0: no script can build 1000 levels
+SCRIPTS-RUNTIME-0015	depends on the available memory; manual test under ulimit -v
+SCRIPTS-RUNTIME-0018	specific harness: # signal: SIGINT 200 ms after startup
+SCRIPTS-RUNTIME-0019	specific harness: # run: scripts run script.scs > /dev/full
+SCRIPTS-LINT-0009	— retired: the rule is now the static `SCRIPTS-TYPE-0069` and the fatal `SCRIPTS-RUNTIME-0022`
+SCRIPTS-LINT-0008	— retired: the rule is now the static `SCRIPTS-TYPE-0070`
+SCRIPTS-CLI-0011	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-CLI-0012	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-CLI-0013	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-CLI-0014	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-CLI-0015	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-PARSE-0050	— retired: a module declaration without `public` is private; `private` is implicit

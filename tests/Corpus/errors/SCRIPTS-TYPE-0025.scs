@@ -1,0 +1,5 @@
+# expect: SCRIPTS-TYPE-0025 3:5
+match 1 {
+    "a" => io.write_standard_output_line("a")
+    _ => io.write_standard_output_line("b")
+}

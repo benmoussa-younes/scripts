@@ -1,0 +1,5 @@
+#!/usr/bin/scripts run
+# scripts → an argument is an argument: the argument list is never split.
+let value = "bonjour le monde"
+let shown = process.run(process.request("printf", ["[%s]\n", value, value]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

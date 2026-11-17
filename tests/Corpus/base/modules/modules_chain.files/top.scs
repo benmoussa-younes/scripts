@@ -1,0 +1,5 @@
+import "mid.scs" as mid
+public let DOUBLED_BASE = mid.BASE * 2
+public function compute(n: integer) -> integer {
+    return mid.scaled(n) + DOUBLED_BASE
+}

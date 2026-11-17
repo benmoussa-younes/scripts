@@ -1,0 +1,6 @@
+#!/usr/bin/scripts run
+# scripts → the locale is invariant; length() counts Unicode scalars.
+let accented = "été"
+let shown = process.run(process.request("printf", ["texte=[%s]\n", accented]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())
+io.write_standard_output_line("longueur={accented.length()}")

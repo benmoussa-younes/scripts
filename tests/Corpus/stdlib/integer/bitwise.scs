@@ -1,0 +1,16 @@
+let permissions = 0o755
+io.write_standard_output_line("{permissions.bit_and(0o070)}")
+io.write_standard_output_line("{permissions.bit_or(0o022)}")
+io.write_standard_output_line("{permissions.bit_xor(0o070)}")
+let zero = 0
+io.write_standard_output_line("{zero.bit_not()}")
+io.write_standard_output_line("{(-1).bit_not()}")
+io.write_standard_output_line("{(-1).bit_and(0o777)}")
+let left = 1.shift_left(4)?
+io.write_standard_output_line("{left}")
+let right = (-16).shift_right(2)?
+io.write_standard_output_line("{right}")
+match 1.shift_left(64) {
+    ok(_) => io.write_standard_output_line("shift accepted")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

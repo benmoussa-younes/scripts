@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0055 2:15
+let n = "a b" |> length()

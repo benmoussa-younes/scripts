@@ -1,0 +1,7 @@
+stdout:
+literal {brace}
+ABC
+unicode=é😀
+unicode_len=2
+end
+exit: 0

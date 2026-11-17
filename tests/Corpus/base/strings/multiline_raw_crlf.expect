@@ -1,0 +1,8 @@
+stdout:
+alpha
+  beta "quote" \n
+
+lines=2
+length=24
+false
+exit: 0

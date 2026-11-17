@@ -1,0 +1,5 @@
+# expect: SCRIPTS-RUNTIME-0014 4:5 exit=253
+let mutable items = range(0, 10000000)
+while true {
+    items = items + items
+}

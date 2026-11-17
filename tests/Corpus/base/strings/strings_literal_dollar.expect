@@ -1,0 +1,5 @@
+stdout:
+cost $5 and $name
+value: $x
+empty_len=0
+exit: 0

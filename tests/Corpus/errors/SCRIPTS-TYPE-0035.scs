@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0035 2:12
+let m: map<float, integer> = {}

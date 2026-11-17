@@ -1,0 +1,6 @@
+for index in range(0, 3) {
+    io.write_standard_output_line("{index}")
+}
+io.write_standard_output_line("{range(3, 3).length()}")
+io.write_standard_output_line("{range(0, 5).length()}")
+io.write_standard_output_line("{range(-2, 1).length()}")

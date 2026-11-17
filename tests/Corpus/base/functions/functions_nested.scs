@@ -1,0 +1,16 @@
+function outer(base: integer) -> integer {
+    function add_base(x: integer) -> integer {
+        return base + x
+    }
+    return add_base(10)
+}
+io.write_standard_output_line("outer={outer(5)}")
+function compute() -> integer {
+    function square(x: integer) -> integer {
+        return x * x
+    }
+    let a = square(3)
+    let b = square(4)
+    return a + b
+}
+io.write_standard_output_line("compute={compute()}")

@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0018 2:32
+io.write_standard_output_line("\u{110000}")

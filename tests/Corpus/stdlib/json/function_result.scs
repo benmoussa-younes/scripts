@@ -1,0 +1,14 @@
+let f = () => 1
+let r: result<function() -> integer, error> = ok(f)
+match json.encode(r) {
+    ok(text) => io.write_standard_output_line("encode ok {text}")
+    error(e) => io.write_standard_output_line("encode {e.kind}")
+}
+match json.encode_pretty(r) {
+    ok(text) => io.write_standard_output_line("pretty ok {text}")
+    error(e) => io.write_standard_output_line("pretty {e.kind}")
+}
+match json.encode([f]) {
+    ok(text) => io.write_standard_output_line("list ok {text}")
+    error(e) => io.write_standard_output_line("list {e.kind}")
+}

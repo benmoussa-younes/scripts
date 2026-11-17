@@ -1,0 +1,18 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 02: command substitution $(...) and stderr capture
+environment.set_variable("LC_ALL", "C")?
+
+let greeting = process.run(process.request("echo", ["bonjour"]))?.standard_output.trim_whitespace()
+io.write_standard_output_line("salutation: {greeting}")
+let shout = process.run(process.request("tr", ["a-z", "A-Z"]).with_standard_input("hello\n"))?.standard_output.trim_whitespace()
+io.write_standard_output_line("majuscules: {shout}")
+let line_count = process.run(process.request("wc", ["-l"]).with_standard_input("a\nb\nc\n"))?.standard_output.trim_whitespace().parse_integer()?
+io.write_standard_output_line("lignes: {line_count}")
+
+let missing = process.run(process.request("cat", ["/nonexistent-scripts-test/file"]))?
+io.write_standard_output_line("code={missing.exit_code}")
+let stdout_is_empty = missing.standard_output.length() == 0
+io.write_standard_output_line("stdout vide: {stdout_is_empty}")
+let merged_output = missing.standard_output + missing.standard_error
+let has_message = merged_output.contains("No such file or directory")
+io.write_standard_output_line("stderr fusionne: {has_message}")

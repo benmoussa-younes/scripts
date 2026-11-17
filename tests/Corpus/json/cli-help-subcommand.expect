@@ -1,0 +1,5 @@
+exit: 0
+stream: stdout
+text-contains: scripts @VERSION@
+text-contains: USAGE
+text-contains: scripts describe --format json

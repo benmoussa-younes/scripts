@@ -1,0 +1,10 @@
+start -> demarrage
+begin -> demarrage
+stop -> arret
+bogus -> inconnu
+0 -> succes
+2 -> avertissement
+127 -> erreur
+x.txt -> texte
+y.log -> journal
+z.bin -> autre

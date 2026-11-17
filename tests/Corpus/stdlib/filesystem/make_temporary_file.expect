@@ -1,0 +1,5 @@
+stdout:
+file true
+true
+invalid_argument
+exit: 0

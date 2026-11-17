@@ -1,0 +1,5 @@
+let raw = r"no \n escape {here}"
+io.write_standard_output_line(raw)
+io.write_standard_output_line(r"back\slash")
+let reg = r"\d+\.\d+"
+io.write_standard_output_line("regex={reg}")

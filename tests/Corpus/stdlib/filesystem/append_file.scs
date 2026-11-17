@@ -1,0 +1,12 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let log_path = work_directory / "journal.log"
+filesystem.append_file("a\n", log_path)?
+filesystem.append_file("b\n", log_path)?
+let content = filesystem.read_file(log_path)?
+io.write_standard_output_line("{content.lines().length()}")
+io.write_standard_output_line(content)
+match filesystem.append_file("x", work_directory) {
+    ok(_) => io.write_standard_output_line("ajoute")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

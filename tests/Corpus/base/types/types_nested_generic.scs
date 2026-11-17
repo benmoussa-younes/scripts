@@ -1,0 +1,7 @@
+let table: map<string, list<integer>> = {"a": [1, 2], "b": [3]}
+let rows = table.get_value("a").value_or([])
+io.write_standard_output_line("rows={rows.length()}")
+let missing = table.get_value("z").value_or([9])
+io.write_standard_output_line("missing={missing[0]}")
+let total = rows.fold(0, (acc: integer, v: integer) => acc + v)
+io.write_standard_output_line("total={total}")

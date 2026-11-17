@@ -1,0 +1,6 @@
+let part = [1, 2, 3, 4].slice(1, 2)?
+io.write_standard_output_line("{part.length()} {part[0]} {part[1]}")
+match [1, 2].slice(1, 5) {
+    ok(_) => io.write_standard_output_line("slice")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,2 @@
+let seconds = time.unix_seconds()
+io.write_standard_output_line("{seconds > 0}")

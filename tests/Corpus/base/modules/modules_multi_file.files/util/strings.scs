@@ -1,0 +1,3 @@
+public function upper(text: string) -> string {
+    return text.uppercased()
+}

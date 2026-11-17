@@ -1,0 +1,10 @@
+let mutable a = [1, 2, 3]
+let b = a
+a.append(4)
+io.write_standard_output_line("a={a.length()}")
+io.write_standard_output_line("b={b.length()}")
+let mutable m = {"k": 1}
+let m2 = m
+m["k"] = 99
+io.write_standard_output_line("m={m["k"]}")
+io.write_standard_output_line("m2={m2["k"]}")

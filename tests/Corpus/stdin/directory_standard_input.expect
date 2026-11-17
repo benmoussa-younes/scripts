@@ -1,0 +1,5 @@
+stderr:
+error[SCRIPTS-CLI-0010]: cannot read the script from standard input (the standard input is a directory)
+   = cause: the script path is `-` (`scripts run -`, `scripts check -`) and that input cannot be read (for example it is a directory, or a read fails); a closed standard input is not this error, it is an empty script. Exit code 252 (and not 250)
+   = suggestion: pipe a script into scripts (`scripts run - < script.scs`) or pass the script path instead of `-`
+exit: 252

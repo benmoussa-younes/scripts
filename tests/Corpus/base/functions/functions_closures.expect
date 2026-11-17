@@ -1,0 +1,7 @@
+stdout:
+a=11
+b=101
+bump1=1
+bump2=2
+bump3=3
+exit: 0

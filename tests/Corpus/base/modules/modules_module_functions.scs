@@ -1,0 +1,4 @@
+import "math.scs" as math
+io.write_standard_output_line("sq={math.square(5)}")
+io.write_standard_output_line("cb={math.cube(3)}")
+io.write_standard_output_line("ss={math.sum_of_squares([1, 2, 3])}")

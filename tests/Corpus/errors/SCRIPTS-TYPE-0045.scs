@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0045 2:10
+let x = 5?

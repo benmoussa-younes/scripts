@@ -1,0 +1,5 @@
+stdout:
+twice=7
+double_twice=12
+noop=0
+exit: 0

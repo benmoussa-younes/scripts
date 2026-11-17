@@ -1,0 +1,9 @@
+io.write_standard_output_line("ab".repeat(3)?)
+match "a".repeat(-1) {
+    ok(_) => io.write_standard_output_line("repeated")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "ab".repeat(9223372036854775807) {
+    ok(_) => io.write_standard_output_line("repeated")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

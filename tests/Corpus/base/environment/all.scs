@@ -1,0 +1,5 @@
+environment.set_variable("SCRIPTS_CORPUS_VARIABLE", "valeur")?
+let variables = environment.all_variables()
+io.write_standard_output_line(variables.get_value("SCRIPTS_CORPUS_VARIABLE").value_or("absente"))
+let positive = variables.length() > 0
+io.write_standard_output_line("{positive}")

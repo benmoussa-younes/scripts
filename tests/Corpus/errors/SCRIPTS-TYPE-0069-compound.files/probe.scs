@@ -1,0 +1,3 @@
+let mutable base = p"/srv"
+base /= "/etc"
+io.write_standard_output_line(base.to_string())

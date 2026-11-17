@@ -1,0 +1,14 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let file_path = work_directory / "note.txt"
+filesystem.write_file_overwrite("bonjour", file_path)?
+filesystem.write_file_overwrite("salut", file_path)?
+io.write_standard_output_line(filesystem.read_file(file_path)?)
+match filesystem.write_file_overwrite("x", work_directory) {
+    ok(_) => io.write_standard_output_line("écrit")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.write_file_overwrite("x", work_directory / "absent" / "f.txt") {
+    ok(_) => io.write_standard_output_line("écrit")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

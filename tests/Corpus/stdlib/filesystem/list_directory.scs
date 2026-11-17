@@ -1,0 +1,19 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+filesystem.write_file_overwrite("", work_directory / "b.txt")?
+filesystem.write_file_overwrite("", work_directory / "a.txt")?
+filesystem.make_directory(work_directory / "sub")?
+let entries = filesystem.list_directory(work_directory)?
+for entry in entries {
+    io.write_standard_output_line("{entry.path.base_name()} {entry.kind}")
+}
+let paths = entries.transform(entry => entry.path)
+io.write_standard_output_line(paths.transform(path_value => path_value.base_name()).join(","))
+match filesystem.list_directory(work_directory / "a.txt") {
+    ok(found) => io.write_standard_output_line("liste")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.list_directory(work_directory / "absent") {
+    ok(found) => io.write_standard_output_line("liste")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

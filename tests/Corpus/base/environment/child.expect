@@ -1,0 +1,11 @@
+stdout:
+true
+exit: 0
+stderr:
+warning[SCRIPTS-LINT-0001]: the program `env` is an interpreter or a launcher: it can bypass the "an argument is an argument" discipline
+  --> child.scs:2:43
+   |
+ 2 | let outcome = process.run(process.request("env", []))?
+   |                                           ^^^^^
+   = cause: `process.request` or `process.spawn` receives a literal program whose basename ∈ {`sh bash dash zsh csh scripts ksh tcsh env xargs busybox python python3 perl ruby node`}
+   = suggestion: call the program you meant directly, with its arguments: `process.run(process.request(program, […]))`

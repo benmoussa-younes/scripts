@@ -1,0 +1,4 @@
+let parsed = "12".parse_integer().value_or_fail()
+io.write_standard_output_line("{parsed}")
+let big = "9999999999".parse_integer().value_or_fail()
+io.write_standard_output_line("{big}")

@@ -1,0 +1,7 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+filesystem.make_directory(work_directory / "fixe")?
+filesystem.set_current_directory(work_directory / "fixe")?
+io.write_standard_output_line((filesystem.get_current_directory()?).base_name())
+filesystem.set_current_directory(p"/")?
+io.write_standard_output_line((filesystem.get_current_directory()?).to_string())
+filesystem.remove_directory_tree(work_directory)?

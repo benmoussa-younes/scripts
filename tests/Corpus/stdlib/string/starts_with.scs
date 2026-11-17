@@ -1,0 +1,5 @@
+let yes = "abc".starts_with("ab")
+let no = "abc".starts_with("b")
+let empty = "abc".starts_with("")
+let longer = "abc".starts_with("abcd")
+io.write_standard_output_line("{yes} {no} {empty} {longer}")

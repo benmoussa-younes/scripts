@@ -1,0 +1,5 @@
+stdout:
+no \n escape {here}
+back\slash
+regex=\d+\.\d+
+exit: 0

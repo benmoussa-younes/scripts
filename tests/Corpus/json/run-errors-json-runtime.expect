@@ -1,0 +1,8 @@
+exit: 253
+stream: stderr
+json-last
+check: doc["schema_version"] == 1
+check: doc["success"] is False
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-RUNTIME-0004"
+check: doc["errors"][0]["severity"] == "error"

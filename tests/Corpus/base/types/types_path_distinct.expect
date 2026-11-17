@@ -1,0 +1,7 @@
+stdout:
+path=/tmp/data
+text=/tmp/data
+same=true
+base=data
+joined=/tmp/data/sub
+exit: 0

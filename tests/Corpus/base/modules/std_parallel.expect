@@ -1,0 +1,22 @@
+stdout:
+map par=1,4,9,16,25,36
+map seq=1,4,9,16,25,36
+identique=true
+zero=invalid_worker_count
+trop=invalid_worker_count
+negatif=invalid_worker_count
+echec=transform_failed
+run 0 [premier]
+run 0 [deuxieme]
+run 1 []
+run_all seq=3
+walk identique=true
+walk tree/a
+walk tree/a/c
+walk tree/a/c/deep.txt
+walk tree/a/x.txt
+walk tree/b.txt
+walk tree/empty
+walk tree/link
+walk borne=invalid_worker_count
+exit: 0

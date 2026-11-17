@@ -1,0 +1,5 @@
+stdout:
+sum=7
+side effect 5
+hi
+exit: 0

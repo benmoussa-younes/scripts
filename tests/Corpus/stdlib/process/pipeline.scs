@@ -1,0 +1,45 @@
+# process.pipeline: the pipeline of pipeline_to_file_overwrite, with the last stage's stdout captured
+# in memory instead of written to a path, and decoded strictly as UTF-8.
+let requests = [
+    process.request("printf", ["a\nb\n"]),
+    process.request("grep", ["b"]),
+]
+let result = process.pipeline(requests)?
+io.write_standard_output_line("{result.standard_output.trim_whitespace()} {result.stage_results.length()}")
+for stage in result.stage_results {
+    io.write_standard_output_line("stage={stage.program} code={stage.exit_code} stdout={stage.standard_output.length()}")
+}
+io.write_standard_output_line("captured={result.standard_output.length()}")
+
+# stderr is captured per stage; a non-zero exit code is data.
+let noisy = [
+    process.request("grep", ["x", "scripts-spec-absent-file"]),
+    process.request("cat", []),
+]
+let noisy_result = process.pipeline(noisy)?
+io.write_standard_output_line("stderr={noisy_result.stage_results[0].standard_error.length() > 0} code={noisy_result.stage_results[0].exit_code} stdout={noisy_result.standard_output.length()}")
+
+# A failing middle stage lets every stage run: the codes are data.
+let failing = [
+    process.request("printf", ["x\n"]),
+    process.request("false", []),
+    process.request("cat", []),
+]
+let failing_result = process.pipeline(failing)?
+io.write_standard_output_line("codes={failing_result.stage_results[0].exit_code},{failing_result.stage_results[1].exit_code},{failing_result.stage_results[2].exit_code} stdout={failing_result.standard_output.length()}")
+
+# Bytes are never decoded on an intermediate link; the last stage's stdout is strict UTF-8.
+let binary = [
+    process.request("printf", ["\\377"]),
+    process.request("cat", []),
+]
+match process.pipeline(binary) {
+    ok(_) => io.write_standard_output_line("binary=ok")
+    error(failure) => io.write_standard_output_line("binary={failure.kind} {failure.subject}")
+}
+
+# An empty request list is invalid_argument.
+match process.pipeline([]) {
+    ok(_) => io.write_standard_output_line("empty=ok")
+    error(failure) => io.write_standard_output_line("empty={failure.kind}")
+}

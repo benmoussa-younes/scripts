@@ -1,0 +1,8 @@
+#!/usr/bin/scripts run
+# scripts → a single string form "…" (escapes + interpolation).
+# The apostrophe is an ordinary character; the double quote is written \".
+# A string containing quotes stays intact data.
+let value = "il dit \"bonjour\""
+let apostrophe = "c'est"
+let shown = process.run(process.request("printf", ["[%s]\n", value, apostrophe, value]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

@@ -1,0 +1,30 @@
+
+# encode: scalars, containers, canonical floats, path, result
+io.write_standard_output_line(json.encode({"a": 1, "b": 2})?)
+io.write_standard_output_line(json.encode([9223372036854775807, 9007199254740993])?)
+io.write_standard_output_line(json.encode([3.0, -0.0, 1.0E+20, 1.5E-7])?)
+io.write_standard_output_line(json.encode("/tmp/x".to_path())?)
+let payload: result<string, error> = ok("v")
+io.write_standard_output_line(json.encode(payload)?)
+io.write_standard_output_line(json.encode([1, 2])?)
+io.write_standard_output_line(json.encode("hi")?)
+io.write_standard_output_line(json.encode({"n": 1})?)
+
+# decode: heterogeneous, kind, re-encoding
+let value = json.decode("\{\"name\":\"alpha\",\"tags\":[\"a\",\"b\"],\"score\":3.0,\"ok\":true,\"none\":null\}")?
+io.write_standard_output_line(value.kind())
+io.write_standard_output_line(json.encode(value)?)
+
+# decode failures
+match json.decode("\{oops") {
+    ok(parsed) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("syntax: {e.kind}")
+}
+match json.decode("1e400") {
+    ok(parsed) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("range: {e.kind}")
+}
+match json.decode("9223372036854775808") {
+    ok(parsed) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("overflow: {e.kind}")
+}

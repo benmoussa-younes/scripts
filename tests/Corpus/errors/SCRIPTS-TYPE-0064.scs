@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0064 3:16
+let name = "Ada"
+let rendered = "{name}".format_template(["ignored"])
+let _ = rendered.value_or("")

@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0034 2:9
+let x = io.write_standard_output_line("a")

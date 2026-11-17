@@ -1,0 +1,9 @@
+stdout:
+add=5
+sub=6
+mul=42
+div=3
+mod=2
+neg=-8
+combined=13
+exit: 0

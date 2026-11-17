@@ -1,0 +1,15 @@
+function handle(r: result<integer, string>) -> string {
+    return match r {
+        ok(v) => "got {v}"
+        error(e) => "failed: {e}"
+    }
+}
+io.write_standard_output_line(handle(ok(42)))
+io.write_standard_output_line(handle(error("nope")))
+function wildcard(r: result<integer, string>) -> string {
+    return match r {
+        ok(v) => "value {v}"
+        _ => "other"
+    }
+}
+io.write_standard_output_line(wildcard(error("x")))

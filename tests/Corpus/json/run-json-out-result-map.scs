@@ -1,0 +1,2 @@
+#!/usr/bin/scripts run
+return {"alpha": 1, "beta": 2}

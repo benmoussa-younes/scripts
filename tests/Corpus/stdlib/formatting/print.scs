@@ -1,0 +1,4 @@
+io.write_standard_output_line("ligne 1")
+io.write_standard_output_line("caf\u{E9}")
+io.write_standard_output_line("")
+io.write_standard_output_line("avec\u{0}nul")

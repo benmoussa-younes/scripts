@@ -1,0 +1,5 @@
+stdout:
+[foo.scs]
+[lib/foo.scs]
+[abc]
+exit: 0

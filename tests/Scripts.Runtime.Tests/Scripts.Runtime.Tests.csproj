@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Scripts.Core\Scripts.Core.csproj" />
+    <ProjectReference Include="..\..\src\Scripts.Runtime\Scripts.Runtime.csproj" />
+    <ProjectReference Include="..\..\src\Scripts.Syntax\Scripts.Syntax.csproj" />
+  </ItemGroup>
+</Project>

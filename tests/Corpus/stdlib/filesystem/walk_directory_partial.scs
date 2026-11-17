@@ -1,0 +1,15 @@
+
+# Partial walk: an undecodable name in the fixture tree becomes an invalid_encoding
+# skip, while the readable entries are still returned. The permission_denied case is
+# covered by the root-guarded unit test (a mode-000 directory is readable as root).
+let root = "report-tree".to_path()
+let report = filesystem.walk_directory(root)?
+for entry in report.entries {
+    io.write_standard_output_line("{(entry.path).base_name()} {entry.kind}")
+}
+for skip in report.skipped_paths {
+    io.write_standard_output_line("skip {skip.kind}")
+}
+io.write_standard_output_line("counts {report.entries.length()} {report.skipped_paths.length()}")
+
+filesystem.remove_directory_tree(root)?

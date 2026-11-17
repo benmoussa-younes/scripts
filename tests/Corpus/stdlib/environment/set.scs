@@ -1,0 +1,11 @@
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "un")?
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "deux")?
+io.write_standard_output_line(environment.get_variable("SCRIPTS_STDLIB_VARIABLE")?)
+match environment.set_variable("A=B", "x") {
+    ok(_) => io.write_standard_output_line("accepté")
+    error(failure) => io.write_standard_output_line(failure.subject)
+}
+match environment.set_variable("", "x") {
+    ok(_) => io.write_standard_output_line("accepté")
+    error(failure) => io.write_standard_output_line("[{failure.subject}]")
+}

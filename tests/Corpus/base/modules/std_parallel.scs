@@ -1,0 +1,65 @@
+
+function ignore(target: path) -> unit {
+}
+
+# transform: input order, worker_count=1 identical to worker_count=8
+let items = [1, 2, 3, 4, 5, 6]
+let par = parallel.transform(items, 8, n => n * n)?
+let seq = parallel.transform(items, 1, n => n * n)?
+io.write_standard_output_line("map par={par.transform(n => "{n}").join(",")}")
+io.write_standard_output_line("map seq={seq.transform(n => "{n}").join(",")}")
+io.write_standard_output_line("identique={par == seq}")
+
+# out-of-range workers: rejected, never clamped
+match parallel.transform([1], 0, n => n) {
+    ok(values) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("zero={e.kind}")
+}
+match parallel.transform([1], 257, n => n) {
+    ok(values) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("trop={e.kind}")
+}
+match parallel.transform([1], -1, n => n) {
+    ok(values) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("negatif={e.kind}")
+}
+
+# first failure: a single error, no partial list
+function risky(n: integer) -> integer {
+    if n == 3 {
+        let values = [1]
+        return values[9]
+    }
+    return n
+}
+match parallel.transform([1, 2, 3, 4, 5], 4, risky) {
+    ok(values) => io.write_standard_output_line("ok {values.length()}")
+    error(e) => io.write_standard_output_line("echec={e.kind}")
+}
+
+# run_all: input order despite reversed completion order, a non-zero exit code = value
+let requests = [
+    process.request("sh", ["-c", "sleep 0.3; echo premier"]),
+    process.request("sh", ["-c", "echo deuxieme"]),
+    process.request("false", []),
+]
+let results = parallel.run_all(requests, 4)?
+for result in results {
+    io.write_standard_output_line("run {result.exit_code} [{result.standard_output.trim_whitespace()}]")
+}
+io.write_standard_output_line("run_all seq={parallel.run_all(requests, 1)?.length()}")
+
+# walk: pre-order lexicographic order, identical to filesystem.walk_directory's entries
+let root = "tree".to_path()
+let sequential = filesystem.walk_directory(root)?.entries.transform(entry => entry.path)
+let parallel_walk = parallel.walk_directory(root, 4, ignore)?
+io.write_standard_output_line("walk identique={sequential == parallel_walk}")
+for p in parallel_walk {
+    io.write_standard_output_line("walk {p.to_string()}")
+}
+
+# walk: rejected bounds
+match parallel.walk_directory(root, 0, ignore) {
+    ok(paths) => io.write_standard_output_line("ok")
+    error(e) => io.write_standard_output_line("walk borne={e.kind}")
+}

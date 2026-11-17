@@ -1,0 +1,4 @@
+# expect: SCRIPTS-RUNTIME-0022 3:1 exit=253
+let mutable segment = "/etc"
+let joined = p"/srv" / segment
+io.write_standard_output_line(joined.to_string())

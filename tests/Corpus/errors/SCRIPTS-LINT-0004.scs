@@ -1,0 +1,4 @@
+# expect-warning: SCRIPTS-LINT-0004 3:31
+let program = "ls"
+let request = process.request(program, [])
+let _ = process.run(request)?

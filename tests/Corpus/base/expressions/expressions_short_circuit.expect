@@ -1,0 +1,9 @@
+stdout:
+--- and short-circuit ---
+r1=false
+--- or short-circuit ---
+r2=true
+--- not ---
+not_true=false
+not_false=true
+exit: 0

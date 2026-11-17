@@ -1,0 +1,6 @@
+stdout:
+good_ok=true
+bad_err=true
+fallback=0
+wrapped: boom
+exit: 0

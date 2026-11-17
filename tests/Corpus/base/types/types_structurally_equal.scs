@@ -1,0 +1,8 @@
+let a: list<integer> = [1, 2, 3]
+let b: list<integer> = [1, 2, 3]
+let c: list<integer> = [1, 2, 4]
+io.write_standard_output_line("ab={a == b}")
+io.write_standard_output_line("ac={a == c}")
+let m1: map<string, integer> = {"x": 1, "y": 2}
+let m2: map<string, integer> = {"y": 2, "x": 1}
+io.write_standard_output_line("m12={m1 == m2}")

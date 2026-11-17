@@ -1,0 +1,5 @@
+stdout:
+fib=55
+even4=true
+odd7=true
+exit: 0

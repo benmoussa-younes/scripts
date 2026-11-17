@@ -1,0 +1,25 @@
+let success = process.pipeline([
+    process.request("true", []),
+    process.request("true", []),
+])?
+match success.require_success() {
+    ok(pipeline) => io.write_standard_output_line("success {pipeline.stage_results.length()}")
+    error(e) => io.write_standard_output_line("failure {e.kind}")
+}
+let middle = process.pipeline([
+    process.request("printf", ["a\n"]),
+    process.request("false", []),
+    process.request("cat", []),
+])?
+match middle.require_success() {
+    ok(pipeline) => io.write_standard_output_line("success {pipeline.stage_results.length()}")
+    error(e) => io.write_standard_output_line("{e.kind} subject={e.subject} message={e.message}")
+}
+let first = process.pipeline([
+    process.request("false", []),
+    process.request("cat", []),
+])?
+match first.require_success() {
+    ok(pipeline) => io.write_standard_output_line("success {pipeline.stage_results.length()}")
+    error(e) => io.write_standard_output_line("{e.kind} subject={e.subject} message={e.message}")
+}

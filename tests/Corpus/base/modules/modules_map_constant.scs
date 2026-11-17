@@ -1,0 +1,4 @@
+import "settings.scs" as settings
+io.write_standard_output_line("t={settings.TIMEOUT}")
+io.write_standard_output_line("h={settings.CONFIG["host"]}")
+io.write_standard_output_line(settings.describe())

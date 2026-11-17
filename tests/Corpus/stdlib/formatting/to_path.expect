@@ -1,0 +1,5 @@
+stdout:
+dossier//fichier.txt
+true
+dossier//fichier.txt
+exit: 0

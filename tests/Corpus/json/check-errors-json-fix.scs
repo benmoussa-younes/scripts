@@ -1,0 +1,2 @@
+let total = 1
+io.write_standard_output_line("{totl}")

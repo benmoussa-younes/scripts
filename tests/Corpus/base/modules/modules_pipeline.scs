@@ -1,0 +1,8 @@
+import "validators.scs" as v
+io.write_standard_output_line(v.classify(0))
+io.write_standard_output_line(v.classify(9))
+io.write_standard_output_line("valid={v.is_valid("x")}")
+io.write_standard_output_line("invalid={v.is_valid("")}")
+let names = ["a", "", "b"]
+let valid = names.filter((s: string) => v.is_valid(s))
+io.write_standard_output_line("count={valid.length()}")

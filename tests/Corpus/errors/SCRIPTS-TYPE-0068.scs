@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0068 2:1
+exit_script(0)

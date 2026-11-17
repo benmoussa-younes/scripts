@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Scripts.Checker</RootNamespace>
+    <AssemblyName>Scripts.Checker</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scripts.Core\Scripts.Core.csproj" />
+  </ItemGroup>
+</Project>

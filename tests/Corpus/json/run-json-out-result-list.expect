@@ -1,0 +1,5 @@
+exit: 0
+stream: stdout
+check: doc["exit_code"] == 0
+check: doc["result"] == [1, 2, 3]
+check: isinstance(doc["result"], list)

@@ -1,0 +1,7 @@
+#!/usr/bin/scripts run
+# scripts → the exit code is DATA carried by the process_result;
+# no global "$?" variable is overwritten by a following statement.
+let failed = process.run(process.request("false", []))?
+io.write_standard_output_line("code direct: {failed.exit_code}")
+io.write_standard_output_line("message")
+io.write_standard_output_line("code apres affichage: {failed.exit_code}")

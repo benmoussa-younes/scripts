@@ -1,0 +1,7 @@
+stdout:
+xs0=1
+nested=b
+mone=1
+mkeys=one,two
+sum=6
+exit: 0

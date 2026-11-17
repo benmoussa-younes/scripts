@@ -1,0 +1,5 @@
+let ages = {"alice": 30, "bob": 25}
+io.write_standard_output_line(ages.keys().join(","))
+let mutable other = {"x": 1}
+other["y"] = 2
+io.write_standard_output_line(other.keys().join(","))

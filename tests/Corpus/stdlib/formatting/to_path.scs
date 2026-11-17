@@ -1,0 +1,6 @@
+let location = "dossier//fichier.txt".to_path()
+io.write_standard_output_line((location).to_string())
+let absolute = "/a/b".to_path()
+io.write_standard_output_line("{(absolute).is_absolute()}")
+let roundtrip = ((location).to_string()).to_path()
+io.write_standard_output_line((roundtrip).to_string())

@@ -1,0 +1,5 @@
+stdout:
+ab=true
+ac=false
+m12=true
+exit: 0

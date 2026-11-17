@@ -1,0 +1,11 @@
+let root_directory = filesystem.make_temporary_directory("scripts-chmod-")?
+let target_path = root_directory / "a.txt"
+filesystem.write_file_overwrite("", target_path)?
+filesystem.set_permissions(target_path, 0o600)?
+let status = filesystem.get_path_status(target_path)?
+io.write_standard_output_line("{status.permissions == 0o600}")
+match filesystem.set_permissions(target_path, 0o10000) {
+    ok(_) => io.write_standard_output_line("set")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(root_directory)?

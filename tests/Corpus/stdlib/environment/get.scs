@@ -1,0 +1,13 @@
+environment.set_variable("SCRIPTS_STDLIB_VARIABLE", "valeur")?
+io.write_standard_output_line(environment.get_variable("SCRIPTS_STDLIB_VARIABLE")?)
+environment.set_variable("SCRIPTS_STDLIB_EMPTY", "")?
+let empty = environment.get_variable("SCRIPTS_STDLIB_EMPTY")?
+io.write_standard_output_line("[{empty}]")
+match environment.get_variable("SCRIPTS_STDLIB_ABSENTE") {
+    ok(content) => io.write_standard_output_line(content)
+    error(failure) => io.write_standard_output_line(failure.subject)
+}
+match environment.get_variable("") {
+    ok(content) => io.write_standard_output_line(content)
+    error(failure) => io.write_standard_output_line("[{failure.subject}]")
+}

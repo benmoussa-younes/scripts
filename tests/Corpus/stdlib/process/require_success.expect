@@ -1,0 +1,13 @@
+stdout:
+succès 0
+other subject=false message=the program `false` exited with code 1
+other subject=/bin/sh message=the program `/bin/sh` exited with code 3: boom
+exit: 0
+stderr:
+warning[SCRIPTS-LINT-0001]: the program `/bin/sh` is an interpreter or a launcher: it can bypass the "an argument is an argument" discipline
+   --> require_success.scs:11:41
+    |
+ 11 | let noisy = process.run(process.request("/bin/sh", ["-c", "echo boom >&2; exit 3"]))?
+    |                                         ^^^^^^^^^
+    = cause: `process.request` or `process.spawn` receives a literal program whose basename ∈ {`sh bash dash zsh csh scripts ksh tcsh env xargs busybox python python3 perl ruby node`}
+    = suggestion: call the program you meant directly, with its arguments: `process.run(process.request(program, […]))`

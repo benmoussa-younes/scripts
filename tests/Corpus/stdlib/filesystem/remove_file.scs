@@ -1,0 +1,14 @@
+let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
+let file_path = work_directory / "temporaire.txt"
+filesystem.write_file_overwrite("x", file_path)?
+filesystem.remove_file(file_path)?
+io.write_standard_output_line("{filesystem.path_exists(file_path)}")
+match filesystem.remove_file(file_path) {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match filesystem.remove_file(work_directory) {
+    ok(_) => io.write_standard_output_line("supprimé")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+filesystem.remove_directory_tree(work_directory)?

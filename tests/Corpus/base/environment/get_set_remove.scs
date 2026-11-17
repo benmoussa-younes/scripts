@@ -1,0 +1,8 @@
+environment.set_variable("SCRIPTS_CORPUS_VARIABLE", "valeur")?
+let present = environment.get_variable("SCRIPTS_CORPUS_VARIABLE")?
+io.write_standard_output_line(present)
+environment.remove_variable("SCRIPTS_CORPUS_VARIABLE")?
+match environment.get_variable("SCRIPTS_CORPUS_VARIABLE") {
+    ok(value) => io.write_standard_output_line("ok {value}")
+    error(failure) => io.write_standard_output_line(failure.subject)
+}

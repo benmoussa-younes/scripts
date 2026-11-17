@@ -1,0 +1,5 @@
+stdout:
+got 42
+failed: nope
+other
+exit: 0

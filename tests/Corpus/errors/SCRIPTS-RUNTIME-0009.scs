@@ -1,0 +1,2 @@
+# expect: SCRIPTS-RUNTIME-0009 2:1 exit=253
+let r = "abc".replace("", "x")

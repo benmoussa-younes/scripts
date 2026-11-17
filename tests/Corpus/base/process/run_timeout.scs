@@ -1,0 +1,6 @@
+let fast = process.run(process.request("true", []).with_timeout(5000))?
+io.write_standard_output_line("{fast.exit_code}")
+match process.run(process.request("sleep", ["5"]).with_timeout(50)) {
+    ok(result) => io.write_standard_output_line("ok {result.exit_code}")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

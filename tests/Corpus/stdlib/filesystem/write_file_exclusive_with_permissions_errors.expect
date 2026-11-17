@@ -1,0 +1,6 @@
+stdout:
+not_a_directory
+not_found
+already_exists
+not a directory
+exit: 0

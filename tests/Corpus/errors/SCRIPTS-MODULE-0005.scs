@@ -1,0 +1,2 @@
+# expect: SCRIPTS-MODULE-0005 2:8
+import "std:json" as j

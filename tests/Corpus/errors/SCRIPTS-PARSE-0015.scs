@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0015 2:9
+let x = 1e999

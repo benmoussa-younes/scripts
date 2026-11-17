@@ -1,0 +1,25 @@
+# An unbounded wait (0) returns the buffered outputs and consumes the handle.
+let handle = process.spawn("echo", ["fils"])?
+let outcome = process.wait_for_process(handle, 0)?
+io.write_standard_output_line(outcome.standard_output.trim_whitespace())
+match process.wait_for_process(handle, 0) {
+    ok(again) => io.write_standard_output_line(again.standard_output)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A positive deadline that expires terminates the child, reports timed_out and consumes the handle.
+let slow = process.spawn("sleep", ["5"])?
+match process.wait_for_process(slow, 100) {
+    ok(_) => io.write_standard_output_line("fini")
+    error(failure) => io.write_standard_output_line("{failure.kind} subject={failure.subject}")
+}
+match process.wait_for_process(slow, 0) {
+    ok(_) => io.write_standard_output_line("encore")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+
+# A child that ends before the deadline returns its outputs.
+let fast = process.spawn("echo", ["fils"])?
+let bounded = process.wait_for_process(fast, 5000)?
+io.write_standard_output_line(bounded.standard_output.trim_whitespace())
+io.write_standard_output_line(bounded.program)

@@ -1,0 +1,2 @@
+# expect: SCRIPTS-MODULE-0001 2:8
+import "absent.scs" as lib

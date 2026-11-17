@@ -1,0 +1,3 @@
+# expect: SCRIPTS-RUNTIME-0018 3:1 exit=130
+# signal: SIGINT 200 ms after startup
+let outcome = process.run(process.request("sleep", ["10"]))?

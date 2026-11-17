@@ -1,0 +1,8 @@
+io.write_standard_output_line("add={2 + 3}")
+io.write_standard_output_line("sub={10 - 4}")
+io.write_standard_output_line("mul={6 * 7}")
+io.write_standard_output_line("div={17 / 5}")
+io.write_standard_output_line("mod={17 % 5}")
+let n = 8
+io.write_standard_output_line("neg={-n}")
+io.write_standard_output_line("combined={2 + 3 * 4 - 1}")

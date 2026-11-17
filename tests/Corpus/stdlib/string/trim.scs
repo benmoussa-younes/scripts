@@ -1,0 +1,6 @@
+let trimmed = "  x y \t\n".trim_whitespace()
+io.write_standard_output_line("[{trimmed}]")
+io.write_standard_output_line("[{"   ".trim_whitespace()}]")
+let not_white = "\u{FEFF}a".trim_whitespace()
+io.write_standard_output_line(not_white)
+io.write_standard_output_line("[{"	\ta\n".trim_whitespace()}]")

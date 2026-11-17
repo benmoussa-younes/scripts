@@ -1,0 +1,10 @@
+let converted = "x".parse_integer().transform_error(failure => failure.kind)
+match converted {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(kind_text) => io.write_standard_output_line(kind_text)
+}
+let unchanged = "5".parse_integer().transform_error(failure => failure.kind)
+match unchanged {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(kind_text) => io.write_standard_output_line(kind_text)
+}

@@ -1,0 +1,5 @@
+let evens = [1, 2, 3, 4].filter(n => n % 2 == 0)
+for even in evens {
+    io.write_standard_output_line("{even}")
+}
+io.write_standard_output_line("{evens.length()}")

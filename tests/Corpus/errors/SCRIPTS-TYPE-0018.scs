@@ -1,0 +1,4 @@
+# expect: SCRIPTS-TYPE-0018 4:14
+let a = "1".parse_integer()
+let b = "2".parse_integer()
+let same = a == b

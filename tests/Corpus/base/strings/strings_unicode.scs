@@ -1,0 +1,8 @@
+let escaped_open = "literal \{brace\}"
+io.write_standard_output_line(escaped_open)
+let ascii = "\u{41}\u{42}\u{43}"
+io.write_standard_output_line(ascii)
+let unicode = "\u{E9}\u{1F600}"
+io.write_standard_output_line("unicode={unicode}")
+io.write_standard_output_line("unicode_len={unicode.length()}")
+io.write_standard_output_line("end")

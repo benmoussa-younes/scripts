@@ -1,0 +1,5 @@
+defaut: valeur par defaut
+dans le fils: craft shell
+apres remove: code 1
+est absente: true
+vide: valeur par defaut

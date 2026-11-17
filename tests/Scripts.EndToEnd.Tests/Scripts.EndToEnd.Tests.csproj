@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Scripts.App\Scripts.App.csproj" />
+  </ItemGroup>
+</Project>

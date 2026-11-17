@@ -1,0 +1,3 @@
+let groups = ["a", "bb", "cc"].group_by(text => text.length())
+io.write_standard_output_line(groups.keys().transform(key => "{key}").join(","))
+io.write_standard_output_line(groups.get_value(2)?.join(","))

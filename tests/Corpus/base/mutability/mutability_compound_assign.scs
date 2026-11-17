@@ -1,0 +1,11 @@
+let mutable n = 10
+n -= 3
+n *= 2
+n /= 7
+io.write_standard_output_line("n={n}")
+let mutable s = "ab"
+s += "cd"
+io.write_standard_output_line("s={s}")
+let mutable p = p"/a"
+p /= "b"
+io.write_standard_output_line("p={p}")

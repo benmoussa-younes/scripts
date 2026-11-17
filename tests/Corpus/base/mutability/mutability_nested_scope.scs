@@ -1,0 +1,7 @@
+let mutable outer_list = [1, 2]
+if true {
+    let copy = outer_list
+    outer_list.append(3)
+    io.write_standard_output_line("inner_copy={copy.length()}")
+}
+io.write_standard_output_line("outer={outer_list.length()}")

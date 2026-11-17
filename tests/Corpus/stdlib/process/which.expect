@@ -1,0 +1,6 @@
+stdout:
+sh
+not_found
+invalid_argument
+true
+exit: 0

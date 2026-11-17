@@ -1,0 +1,9 @@
+public function visible() -> integer {
+    return 1
+}
+function hidden() -> integer {
+    return 2
+}
+public function uses_hidden() -> integer {
+    return hidden() + 10
+}

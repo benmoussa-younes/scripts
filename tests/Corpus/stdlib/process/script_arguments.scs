@@ -1,0 +1,2 @@
+io.write_standard_output_line("{process.arguments().length()}")
+io.write_standard_output_line(process.arguments().join("|"))

@@ -1,0 +1,4 @@
+stdout:
+true
+already_exists
+exit: 0

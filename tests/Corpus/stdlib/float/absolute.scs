@@ -1,0 +1,5 @@
+io.write_standard_output_line("{0.0.absolute()}")
+io.write_standard_output_line("{(-0.0).absolute()}")
+io.write_standard_output_line("{1.5.absolute()}")
+io.write_standard_output_line("{(-1.5).absolute()}")
+io.write_standard_output_line("{(-2.5e-3).absolute()}")

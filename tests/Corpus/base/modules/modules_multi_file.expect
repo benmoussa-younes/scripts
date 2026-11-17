@@ -1,0 +1,4 @@
+stdout:
+shout=HI!
+upper=ABC
+exit: 0

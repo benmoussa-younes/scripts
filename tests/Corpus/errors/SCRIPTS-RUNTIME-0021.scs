@@ -1,0 +1,2 @@
+# expect: SCRIPTS-RUNTIME-0021 2:1 exit=253
+assert(1 == 2, "one is not two")

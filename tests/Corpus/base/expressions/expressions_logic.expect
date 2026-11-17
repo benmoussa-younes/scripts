@@ -1,0 +1,9 @@
+stdout:
+t_and_t=true
+t_and_f=false
+t_or_f=true
+f_or_f=false
+demorgan=true
+nested=true
+mix=true
+exit: 0

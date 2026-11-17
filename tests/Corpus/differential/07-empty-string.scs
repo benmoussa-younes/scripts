@@ -1,0 +1,7 @@
+#!/usr/bin/scripts run
+# scripts → the empty string is an argument like any other: it is passed through.
+let empty_value = ""
+let args = [empty_value]
+io.write_standard_output_line("arguments: {args.length()}")
+let shown = process.run(process.request("printf", ["quoted=[%s]\n", empty_value]))?
+io.write_standard_output_line(shown.standard_output.trim_whitespace())

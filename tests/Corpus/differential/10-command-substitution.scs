@@ -1,0 +1,6 @@
+#!/usr/bin/scripts run
+# scripts → a command's output is a VALUE (stdout), never split;
+# it keeps its final \n (unlike bash's $(...)).
+let captured = process.run(process.request("printf", ["a b\nc\n"]))?.standard_output
+io.write_standard_output_line("capture=[{captured}]")
+io.write_standard_output_line("lignes={captured.lines().length()}")

@@ -1,0 +1,7 @@
+nom=[mon fichier.txt]
+salutation: bonjour le monde
+prix: 5$ {a}
+[mon fichier.txt]
+[x]
+existe: mon fichier.txt
+lu: contenu

@@ -1,0 +1,15 @@
+let good = process.run(process.request("true", []))?
+match good.require_success() {
+    ok(result) => io.write_standard_output_line("succès {result.exit_code}")
+    error(e) => io.write_standard_output_line("échec {e.kind}")
+}
+let bad = process.run(process.request("false", []))?
+match bad.require_success() {
+    ok(result) => io.write_standard_output_line("succès {result.exit_code}")
+    error(e) => io.write_standard_output_line("{e.kind} subject={e.subject} message={e.message}")
+}
+let noisy = process.run(process.request("/bin/sh", ["-c", "echo boom >&2; exit 3"]))?
+match noisy.require_success() {
+    ok(result) => io.write_standard_output_line("succès {result.exit_code}")
+    error(e) => io.write_standard_output_line("{e.kind} subject={e.subject} message={e.message}")
+}

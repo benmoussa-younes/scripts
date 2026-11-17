@@ -1,0 +1,4 @@
+let outcome = process.run_shell("echo un deux")?
+io.write_standard_output_line(outcome.standard_output.trim_whitespace())
+let failing = process.run_shell("exit 5")?
+io.write_standard_output_line("{failing.exit_code}")

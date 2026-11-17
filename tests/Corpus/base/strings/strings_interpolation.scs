@@ -1,0 +1,9 @@
+let name = "world"
+let count = 3
+let price = 2.5
+let active = true
+io.write_standard_output_line("hello {name}")
+io.write_standard_output_line("count={count} price={price}")
+io.write_standard_output_line("active={active}")
+io.write_standard_output_line("nested={"a" + name}")
+io.write_standard_output_line("{count} items")

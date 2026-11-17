@@ -1,0 +1,9 @@
+public function square(n: integer) -> integer {
+    return n * n
+}
+public function cube(n: integer) -> integer {
+    return n * n * n
+}
+public function sum_of_squares(values: list<integer>) -> integer {
+    return values.fold(0, (acc: integer, v: integer) => acc + square(v))
+}

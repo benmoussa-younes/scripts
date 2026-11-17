@@ -1,0 +1,14 @@
+let root_directory = filesystem.make_temporary_directory("scripts-lock-")?
+let lock_path = root_directory / "state.lock"
+let first = filesystem.acquire_file_lock(lock_path, 0)?
+let status = filesystem.get_path_status(lock_path)?
+io.write_standard_output_line("{status.kind} {status.permissions == 0o600}")
+match filesystem.acquire_file_lock(lock_path, 50) {
+    ok(_) => io.write_standard_output_line("acquired")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+first.release()?
+let second = filesystem.acquire_file_lock(lock_path, 50)?
+second.release()?
+io.write_standard_output_line("reacquired")
+filesystem.remove_directory_tree(root_directory)?

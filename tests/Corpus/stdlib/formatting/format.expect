@@ -1,0 +1,5 @@
+stdout:
+b-a-{a}
+invalid_format
+{}
+exit: 0

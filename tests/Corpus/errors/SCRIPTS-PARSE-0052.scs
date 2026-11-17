@@ -1,0 +1,2 @@
+# expect: SCRIPTS-PARSE-0052 2:8
+import p"lib.scs" as lib

@@ -1,0 +1,14 @@
+io.write_standard_output_line("ab".pad_end(5, "xy")?)
+io.write_standard_output_line("abc".pad_end(2, "0")?)
+io.write_standard_output_line("😀".pad_end(3, "-")?)
+io.write_standard_output_line("a".pad_end(3, "😀")?)
+io.write_standard_output_line("😀a".pad_end(4, "-")?)
+io.write_standard_output_line("abc".pad_end(3, "")?)
+match "a".pad_end(-1, "0") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match "a".pad_end(3, "") {
+    ok(_) => io.write_standard_output_line("ok")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

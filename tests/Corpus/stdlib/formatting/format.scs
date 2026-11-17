@@ -1,0 +1,10 @@
+let greeting = r"{1}-{0}-{{{0}}}".format_template(["a", "b"]).value_or_fail()
+io.write_standard_output_line(greeting)
+match r"{2}".format_template(["a"]) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match r"{{}}".format_template([]) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,14 @@
+exit: 253
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 253
+check: doc["success"] is False
+check: doc["termination"] == "runtime_error"
+check: doc["stdout"] == "before\n"
+check: doc["result"] is None
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-RUNTIME-0004"
+check: doc["errors"][0]["severity"] == "error"
+check: doc["errors"][0]["file"] == "run-json-out-runtime-error.scs"
+check: doc["errors"][0]["line"] == 3
+check: doc["warnings"] == []

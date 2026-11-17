@@ -1,0 +1,4 @@
+# expect: SCRIPTS-RUNTIME-0008 3:1 exit=253
+let separator = ""
+let parts = "a,b".split(separator)
+let _ = parts

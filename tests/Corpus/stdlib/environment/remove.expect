@@ -1,0 +1,4 @@
+stdout:
+true
+A=B
+exit: 0

@@ -1,0 +1,5 @@
+let identifier = process.identifier()
+let positive = identifier > 0
+io.write_standard_output_line("{positive}")
+let stable = process.identifier() == process.identifier()
+io.write_standard_output_line("{stable}")

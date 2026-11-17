@@ -1,0 +1,14 @@
+# expect: SCRIPTS-TYPE-0066 8:57
+function outer() -> result<integer, error> {
+    let mutable count = 0
+    function bump(value: integer) -> integer {
+        count += 1
+        return value
+    }
+    let values = parallel.transform([1, 2], 2, value => bump(value))?
+    return ok(count + values.length())
+}
+match outer() {
+    ok(value) => io.write_standard_output_line("{value}")
+    error(failure) => io.write_standard_output_line(failure.message)
+}

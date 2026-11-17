@@ -1,0 +1,10 @@
+function sum_list(values: list<integer>) -> integer {
+    let mutable total = 0
+    for v in values {
+        total += v
+    }
+    return total
+}
+let original = [1, 2, 3]
+io.write_standard_output_line("sum={sum_list(original)}")
+io.write_standard_output_line("original_len={original.length()}")

@@ -1,0 +1,26 @@
+let root_directory = filesystem.make_temporary_directory("scripts-exclusive-mode-")?
+let target_path = root_directory / "secret.txt"
+filesystem.write_file_exclusive_with_permissions("secret", target_path, 0o640)?
+let status = filesystem.get_path_status(target_path)?
+io.write_standard_output_line("{status.permissions == 0o640}")
+io.write_standard_output_line(filesystem.read_file(target_path)?)
+match filesystem.write_file_exclusive_with_permissions("other", target_path, 0o600) {
+    ok(_) => io.write_standard_output_line("written")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line(filesystem.read_file(target_path)?)
+let link_target = root_directory / "absent.txt"
+let link_path = root_directory / "link.txt"
+filesystem.make_symbolic_link(link_target, link_path)?
+match filesystem.write_file_exclusive_with_permissions("other", link_path, 0o600) {
+    ok(_) => io.write_standard_output_line("written")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line("{filesystem.path_exists(link_target)}")
+let refused_path = root_directory / "refused.txt"
+match filesystem.write_file_exclusive_with_permissions("x", refused_path, 0o1000) {
+    ok(_) => io.write_standard_output_line("written")
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+io.write_standard_output_line("{filesystem.path_exists(refused_path)}")
+filesystem.remove_directory_tree(root_directory)?

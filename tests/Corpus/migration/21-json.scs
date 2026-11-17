@@ -1,0 +1,6 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 21: build and emit JSON
+
+let nom = "alice"
+let n = 1
+io.write_standard_output_line("\{\"nom\":\"{nom}\",\"n\":{n}\}")

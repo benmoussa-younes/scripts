@@ -1,0 +1,19 @@
+function make_adder(delta: integer) -> function(integer) -> integer {
+    return (x: integer) => x + delta
+}
+let add10 = make_adder(10)
+let add100 = make_adder(100)
+io.write_standard_output_line("a={add10(1)}")
+io.write_standard_output_line("b={add100(1)}")
+function make_counter() -> function() -> integer {
+    let mutable captured = 0
+    function bump() -> integer {
+        captured += 1
+        return captured
+    }
+    return bump
+}
+let counter = make_counter()
+io.write_standard_output_line("bump1={counter()}")
+io.write_standard_output_line("bump2={counter()}")
+io.write_standard_output_line("bump3={counter()}")

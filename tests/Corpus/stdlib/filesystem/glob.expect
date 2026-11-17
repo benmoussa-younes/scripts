@@ -1,0 +1,8 @@
+stdout:
+a.txt,b.txt,😀.txt
+a.txt,😀.txt
+2
+a.txt,sub,b.txt,c.md,😀.txt
+invalid_argument
+fifo=0 listed=3
+exit: 0

@@ -1,0 +1,10 @@
+let plain = "hello"
+let with_quote = "say \"hi\""
+let newline = "line1\nline2"
+let tab = "a\tb"
+let backslash = "c:\\dir"
+io.write_standard_output_line(plain)
+io.write_standard_output_line(with_quote)
+io.write_standard_output_line(newline)
+io.write_standard_output_line(tab)
+io.write_standard_output_line(backslash)

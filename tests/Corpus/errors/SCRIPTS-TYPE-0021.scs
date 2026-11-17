@@ -1,0 +1,3 @@
+# expect: SCRIPTS-TYPE-0021 3:3
+let mutable n = 1
+n += "a"

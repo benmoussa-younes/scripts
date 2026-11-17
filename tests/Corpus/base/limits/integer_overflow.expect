@@ -1,0 +1,9 @@
+exit: 253
+stderr:
+error[SCRIPTS-RUNTIME-0001]: integer overflow: `9223372036854775807 + 3`
+  --> integer_overflow.scs:2:1
+   |
+ 2 | let x = big + "abc".length()
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = cause: `+`, `-`, `*`, unary `-` of `-9223372036854775808`, `-9223372036854775808 / -1` or `-9223372036854775808 % -1` leaves the range of 64-bit integers (checked arithmetic)
+   = suggestion: check the bounds before the operation, or work in `float` with `to_float`

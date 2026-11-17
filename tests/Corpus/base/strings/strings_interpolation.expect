@@ -1,0 +1,7 @@
+stdout:
+hello world
+count=3 price=2.5
+active=true
+nested=aworld
+3 items
+exit: 0

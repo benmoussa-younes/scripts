@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0005 2:5
+let assert = 1

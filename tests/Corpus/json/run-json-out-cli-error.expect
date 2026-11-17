@@ -1,0 +1,13 @@
+exit: 252
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 252
+check: doc["success"] is False
+check: doc["termination"] == "static_error"
+check: doc["stdout"] == ""
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-CLI-0009"
+check: doc["errors"][0]["severity"] == "error"
+check: doc["errors"][0]["file"] is None
+check: doc["errors"][0]["line"] is None
+check: doc["errors"][0]["column"] is None

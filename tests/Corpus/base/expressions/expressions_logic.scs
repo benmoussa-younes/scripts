@@ -1,0 +1,9 @@
+let a = true
+let b = false
+io.write_standard_output_line("t_and_t={a and a}")
+io.write_standard_output_line("t_and_f={a and b}")
+io.write_standard_output_line("t_or_f={a or b}")
+io.write_standard_output_line("f_or_f={b or b}")
+io.write_standard_output_line("demorgan={not (a and b) == (not a or not b)}")
+io.write_standard_output_line("nested={not (not true)}")
+io.write_standard_output_line("mix={(true and false) or true}")

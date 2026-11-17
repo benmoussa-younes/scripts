@@ -1,0 +1,25 @@
+stdout:
+null
+null
+""
+"a\"b"
+"back\\slash"
+"line\u000abreak\u0009tab"
+"a\"b\\c\u000ad"
+0
+42
+-9223372036854775808
+9223372036854775807
+-0.0
+3.0
+1.0E+20
+true
+false
+[]
+[1,"x"]
+{}
+{"a":1,"b":false}
+{"a\"b":"c\\d"}
+depth base ok 2000
+depth wrapped depth_exceeded
+exit: 0

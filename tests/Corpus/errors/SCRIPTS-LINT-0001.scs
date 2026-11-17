@@ -1,0 +1,3 @@
+# expect-warning: SCRIPTS-LINT-0001 2:31
+let request = process.request("bash", ["-c", "echo"])
+let _ = process.run(request)?

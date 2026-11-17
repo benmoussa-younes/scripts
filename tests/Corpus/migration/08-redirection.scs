@@ -1,0 +1,18 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 08: redirections (>, >>) and here-doc
+let temporary_directory = filesystem.make_temporary_directory("scripts-migration-08")?
+let target_file = temporary_directory / "out.txt"
+let command_output_file = temporary_directory / "captured.txt"
+let user_name = "ana"
+
+filesystem.write_file_overwrite("premiere\n", target_file)?
+filesystem.append_file("deuxieme\n", target_file)?
+filesystem.append_file("ligne un\n  ligne deux indentee\nbonjour {user_name}\n", target_file)?
+io.write_standard_output_line(filesystem.read_file(target_file)?.trim_whitespace())
+
+filesystem.write_file_overwrite(process.run(process.request("echo", ["capture"]))?.standard_output, command_output_file)?
+io.write_standard_output_line(filesystem.read_file(command_output_file)?.trim_whitespace())
+
+let _ = process.run(process.request("echo", ["ignore"]))?
+
+filesystem.remove_directory_tree(temporary_directory)?

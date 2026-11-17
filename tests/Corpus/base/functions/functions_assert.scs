@@ -1,0 +1,8 @@
+let total = 2 + 2
+assert(total == 4, "two plus two is four")
+let mutable count = 0
+for item in [1, 2, 3] {
+    assert(item > 0, "every item is positive")
+    count += 1
+}
+io.write_standard_output_line("checked {count}")

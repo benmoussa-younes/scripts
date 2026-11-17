@@ -1,0 +1,20 @@
+# BUG-003: a function inside a returned list has no JSON rendering (DESIGN §8.4),
+# so the checker rejects it before execution with SCRIPTS-TYPE-0054 and exit 251.
+exit: 251
+stream: stdout
+check: doc["schema_version"] == 1
+check: doc["exit_code"] == 251
+check: doc["success"] is False
+check: doc["termination"] == "static_error"
+check: doc["stdout"] == ""
+check: doc["stderr"] == ""
+check: doc["result"] is None
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-TYPE-0054"
+check: doc["errors"][0]["severity"] == "error"
+check: doc["errors"][0]["file"] == "run-json-out-function-container.scs"
+check: doc["errors"][0]["line"] == 3
+check: doc["errors"][0]["column"] == 8
+check: doc["errors"][0]["end_column"] == 11
+check: doc["warnings"] == []
+check: "internal error" not in raw

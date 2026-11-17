@@ -1,0 +1,17 @@
+stdout:
+any=true
+all=true
+count=2
+find=7
+not_found
+first=3
+sum=31
+min=1
+max=18
+vide=false true 0 0
+first_vide=missing_index
+min_vide=not_found
+max_vide=not_found
+abricot
+pomme
+exit: 0

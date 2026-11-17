@@ -1,0 +1,6 @@
+stdout:
+true
+invalid_regex
+false
+true
+exit: 0

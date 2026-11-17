@@ -1,0 +1,8 @@
+let text = r"""first "quoted" line
+  second ""two"" line
+{not} interpolation, \n stays literal
+"""
+io.write_standard_output_line(text)
+io.write_standard_output_line("lines={text.lines().length()}")
+io.write_standard_output_line("length={text.length()}")
+io.write_standard_output_line("{text.contains("\\n")}")

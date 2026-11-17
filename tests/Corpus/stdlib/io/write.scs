@@ -1,0 +1,11 @@
+# write keeps its argument byte for byte (empty, NUL, embedded newline) and
+# orders with print on the same standard output.
+io.write_standard_output("")
+io.write_standard_output("a")
+io.write_standard_output("\u{0}")
+io.write_standard_output("b\n")
+io.write_standard_output_line("c")
+io.write_standard_output("d")
+io.write_standard_output("\n")
+io.write_standard_output("e\nf")
+io.write_standard_output("\n")

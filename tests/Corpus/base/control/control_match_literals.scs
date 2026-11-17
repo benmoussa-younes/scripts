@@ -1,0 +1,13 @@
+function word(n: integer) -> string {
+    return match n {
+        0 => "zero"
+        1 | 2 => "one-or-two"
+        3 | 4 | 5 => "few"
+        _ => "many"
+    }
+}
+io.write_standard_output_line(word(0))
+io.write_standard_output_line(word(2))
+io.write_standard_output_line(word(3))
+io.write_standard_output_line(word(5))
+io.write_standard_output_line(word(100))

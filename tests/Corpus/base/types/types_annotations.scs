@@ -1,0 +1,11 @@
+let a: integer = 10
+let b: float = 2.5
+let c: string = "text"
+let d: boolean = false
+let e: path = p"/etc/hosts"
+let f: list<integer> = [1, 2, 3]
+let g: map<string, integer> = {"x": 1}
+let h: result<integer, string> = ok(7)
+io.write_standard_output_line("a={a} b={b} c={c} d={d}")
+io.write_standard_output_line("e={e} flen={f.length()} glen={g.length()}")
+io.write_standard_output_line("h={h.value_or(-1)}")

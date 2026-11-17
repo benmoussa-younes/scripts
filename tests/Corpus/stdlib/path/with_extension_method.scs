@@ -1,0 +1,3 @@
+io.write_standard_output_line(p"a/b.txt".with_extension(".md").to_string())
+io.write_standard_output_line(p"a/.bashrc".with_extension(".bak").to_string())
+io.write_standard_output_line(p"a/b.txt".with_extension("").to_string())

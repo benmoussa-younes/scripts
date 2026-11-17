@@ -1,0 +1,4 @@
+stdout:
+glob invalid_argument
+match invalid_argument
+exit: 0

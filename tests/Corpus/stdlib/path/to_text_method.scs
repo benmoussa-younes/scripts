@@ -1,0 +1,4 @@
+let p = p"/a/b.txt"
+io.write_standard_output_line(p.to_string())
+io.write_standard_output_line(p.to_string().uppercased())
+io.write_standard_output_line(p"/tmp/".to_string())

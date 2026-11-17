@@ -1,0 +1,12 @@
+exit: 251
+stream: stdout
+json-last
+check: doc["schema_version"] == 1
+check: doc["success"] is False
+check: len(doc["errors"]) == 1
+check: doc["errors"][0]["code"] == "SCRIPTS-TYPE-0012"
+check: doc["errors"][0]["end_column"] - doc["errors"][0]["column"] == 5
+check: doc["errors"][0]["source_line"] == "let age: integer = \"abc\""
+check: "suggestion" in doc["errors"][0]
+check: "cause" in doc["errors"][0]
+check: doc["warnings"] == []

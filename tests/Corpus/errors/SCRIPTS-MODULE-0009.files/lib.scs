@@ -1,0 +1,2 @@
+# file: lib.scs
+public let value = "x".trim_whitespace()

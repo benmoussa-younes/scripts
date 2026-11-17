@@ -1,0 +1,8 @@
+stdout:
+a=/etc/config
+b=relative/path
+combined=/etc/config/file.conf
+dir=/etc/config
+base=file.conf
+ext=conf
+exit: 0

@@ -1,0 +1,19 @@
+io.write_standard_output_line(255.to_radix(2)?)
+io.write_standard_output_line(255.to_radix(8)?)
+io.write_standard_output_line(255.to_radix(10)?)
+io.write_standard_output_line(255.to_radix(16)?)
+io.write_standard_output_line((-1).to_radix(16)?)
+io.write_standard_output_line((-255).to_radix(16)?)
+io.write_standard_output_line(35.to_radix(36)?)
+let minimum = -9223372036854775807 - 1
+io.write_standard_output_line(minimum.to_radix(2)?)
+io.write_standard_output_line(minimum.to_radix(36)?)
+io.write_standard_output_line(0.to_radix(2)?)
+match 255.to_radix(1) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}
+match 255.to_radix(37) {
+    ok(text) => io.write_standard_output_line(text)
+    error(failure) => io.write_standard_output_line(failure.kind)
+}

@@ -1,0 +1,7 @@
+stdout:
+joined_len=4
+joined0=1
+joined2=3
+s=abcdef
+streq=true
+exit: 0

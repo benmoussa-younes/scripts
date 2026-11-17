@@ -1,0 +1,7 @@
+# Duplicate key: json.decode rejects the document as invalid_syntax (no last-wins
+# ambiguity for as_map()).
+let document = json.decode("\{\"a\": 1, \"b\": 2, \"a\": 3\}")
+match document {
+    ok(_) => io.write_standard_output_line("accepted")
+    error(failure) => io.write_standard_output_line("rejected:{failure.kind}")
+}

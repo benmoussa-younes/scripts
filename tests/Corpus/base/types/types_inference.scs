@@ -1,0 +1,10 @@
+let count = 42
+let ratio = 1.5
+let label = "ready"
+let enabled = true
+let location = p"/var/log"
+io.write_standard_output_line("count={count}")
+io.write_standard_output_line("ratio={ratio}")
+io.write_standard_output_line("label={label}")
+io.write_standard_output_line("enabled={enabled}")
+io.write_standard_output_line("location={location}")

@@ -1,0 +1,7 @@
+let text = r"""alpha
+  beta "quote" \n
+"""
+io.write_standard_output_line(text)
+io.write_standard_output_line("lines={text.lines().length()}")
+io.write_standard_output_line("length={text.length()}")
+io.write_standard_output_line("{text.contains("\r")}")

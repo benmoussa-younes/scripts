@@ -1,0 +1,5 @@
+exit: 0
+stdout:
+Script `ENTREE`:
+  declares the constant `path_value` = the path "/tmp/x"
+  evaluates a `match` on destructive operation: removes the directory `path_value` and all its contents

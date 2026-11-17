@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0070 2:5
+let _ = filesystem.read_file(p"/tmp/scripts-absent-0070")

@@ -1,0 +1,4 @@
+let ages = {"alice": 30}
+let has_alice = ages.contains_key("alice")
+let has_bob = ages.contains_key("bob")
+io.write_standard_output_line("{has_alice} {has_bob}")

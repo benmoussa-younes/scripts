@@ -1,0 +1,7 @@
+stdout:
+a
+x.txt
+b.txt
+a,x.txt,b.txt
+not_a_directory
+exit: 0

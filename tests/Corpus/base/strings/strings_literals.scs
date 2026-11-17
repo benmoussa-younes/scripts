@@ -1,0 +1,7 @@
+io.write_standard_output_line("plain")
+io.write_standard_output_line("with spaces   kept")
+io.write_standard_output_line("tabs\tbetween")
+io.write_standard_output_line("quote='single' and \"double\"")
+io.write_standard_output_line("unicode: café \u{E9}")
+let combined = "a" + "b" + "c"
+io.write_standard_output_line("combined={combined} len={combined.length()}")

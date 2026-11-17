@@ -1,0 +1,18 @@
+# read_line at EOF, then write without a newline, then the shared stream: a
+# read_standard_input after the EOF of read_line returns an empty string.
+match io.read_standard_input_line() {
+    ok(line) => io.write_standard_output_line("read {line.length()} characters")
+    error(e) => io.write_standard_output_line("read failure {e.kind}")
+}
+io.write_standard_output("without newline")
+io.write_standard_output(" or terminator")
+io.write_standard_output_line("")
+io.write_standard_output_line("after print")
+match io.read_standard_input() {
+    ok(text) => io.write_standard_output_line("remaining {text.length()} characters")
+    error(e) => io.write_standard_output_line("remaining failure {e.kind}")
+}
+match io.read_standard_input_line() {
+    ok(line) => io.write_standard_output_line("again {line.length()} characters")
+    error(e) => io.write_standard_output_line("again {e.kind}")
+}

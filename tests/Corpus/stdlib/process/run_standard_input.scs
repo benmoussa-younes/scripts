@@ -1,0 +1,4 @@
+let outcome = process.run(process.request("cat", []).with_standard_input("abc"))?
+io.write_standard_output_line(outcome.standard_output)
+let empty_input = process.run(process.request("cat", []))?
+io.write_standard_output_line("{empty_input.standard_output.length()}")

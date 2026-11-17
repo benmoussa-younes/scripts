@@ -1,0 +1,22 @@
+#!/usr/bin/scripts run
+# scripts → Pattern 07: pipelines (ps | grep | wc -l, sort -u, xargs)
+let process_listing = "nginx master\nsshd main\nnginx worker\n"
+let nginx_count = process_listing.lines()
+    .filter(entry_line => entry_line.contains("nginx"))
+    .length()
+io.write_standard_output_line("processus nginx: {nginx_count}")
+
+let sorted_unique = process.run(process.request("sort", ["-u"]).with_standard_input("b\na\nc\na\n"))?.standard_output.lines().join(",")
+io.write_standard_output_line("tri unique: {sorted_unique}")
+
+let names = ["ann", "bob"]
+let shouted_names = names
+    .transform(name_text => name_text.uppercased())
+    .join(",")
+io.write_standard_output_line("majuscules: {shouted_names}")
+
+let items = ["one", "two"]
+for item_text in items {
+    let echoed = process.run(process.request("echo", ["item:", item_text]))?
+    io.write_standard_output_line(echoed.standard_output.trim_whitespace())
+}

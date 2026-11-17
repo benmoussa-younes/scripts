@@ -1,0 +1,4 @@
+io.write_standard_output_line("a-b-c".replace("-", "+"))
+io.write_standard_output_line("aaa".replace("aa", "b"))
+io.write_standard_output_line("abc".replace("x", "y"))
+io.write_standard_output_line("abc".replace("b", ""))

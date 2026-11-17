@@ -1,0 +1,7 @@
+Scripts 0.1.0
+Copyright (C) 2026 Younes BENMOUSSA <younes.benmoussa@pm.me>
+
+Scripts code is GPL-3.0-or-later. It includes a vendored subset of Core under
+LGPL-3.0-or-later; see THIRD-PARTY and LICENSES/ for the exact texts.
+The prose documents (README.md, AGENTS.md, CHANGELOG.md, NOTICE and
+THIRD-PARTY) are CC-BY-SA-4.0.

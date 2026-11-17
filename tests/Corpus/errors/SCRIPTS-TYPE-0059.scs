@@ -1,0 +1,2 @@
+# expect: SCRIPTS-TYPE-0059 2:9
+let x = process

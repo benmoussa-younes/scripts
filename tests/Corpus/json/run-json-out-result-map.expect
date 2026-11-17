@@ -1,0 +1,5 @@
+exit: 0
+stream: stdout
+check: doc["exit_code"] == 0
+check: doc["result"] == {"alpha": 1, "beta": 2}
+check: isinstance(doc["result"], dict)

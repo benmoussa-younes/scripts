@@ -1,0 +1,9 @@
+exit: 253
+stderr:
+error[SCRIPTS-RUNTIME-0022]: the right operand of `/` on a path is `""`: it is absolute or empty
+  --> path_join_empty.scs:2:1
+   |
+ 2 | let joined = p"/srv" / segment
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = cause: `a / b` joins paths lexically and fails closed: a computed operand that starts with `/` would silently replace the base path, and an empty one has no segment to add. The value is known only at run time, so the join aborts instead of guessing.
+   = suggestion: check the operand before joining (strip the leading `/`, or reject an empty segment) and build it with `text.to_path()`

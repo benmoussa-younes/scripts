@@ -1,0 +1,7 @@
+let rows = "a\r\nb\n\nc\n".lines()
+io.write_standard_output_line(rows.join("|"))
+let none_rows = "".lines()
+io.write_standard_output_line("{none_rows.length()}")
+let isolated = "a\rb".lines()
+io.write_standard_output_line("{isolated.length()}")
+io.write_standard_output_line("{isolated.get_at_index(0).value_or_fail().length()}")

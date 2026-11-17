@@ -1,0 +1,10 @@
+[12345]: true
+[12a45]: false
+[]: false
+[007]: true
+ana@example.com: true
+ana@example.org: false
+Ana@example.com: false
+ab: true
+a: false
+motif invalide: invalid_regex
