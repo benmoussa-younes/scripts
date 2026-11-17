@@ -329,6 +329,12 @@ internal static partial class Libc
     /// <summary>F_DUPFD_CLOEXEC: duplicate at or above the given minimum and keep FD_CLOEXEC (fcntl(2), Linux).</summary>
     public const int DuplicateAboveCloseOnExec = 1030;
 
+    /// <summary>F_GETFD: read the per-descriptor flags (fcntl(2)).</summary>
+    public const int GetFileDescriptorFlags = 1;
+
+    /// <summary>FD_CLOEXEC: the descriptor is closed on exec; the runtime's own startup files carry it.</summary>
+    public const int FileDescriptorCloseOnExec = 1;
+
     /// <summary>POSIX_SPAWN_SETPGROUP: put the child in the process group named by setpgroup (0 = its pid).</summary>
     public const short SpawnSetProcessGroup = 0x02;
 

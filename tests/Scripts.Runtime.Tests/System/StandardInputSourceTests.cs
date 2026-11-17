@@ -326,4 +326,34 @@ public sealed partial class StandardInputSourceTests
 
     [LibraryImport("libc", EntryPoint = "close", SetLastError = true)]
     private static partial int CloseDescriptor(int descriptor);
+
+    [Fact]
+    public void A_descriptor_opened_with_close_on_exec_is_runtime_owned()
+    {
+        using var workspace = new SystemTestWorkspace();
+        var path = workspace.Write("fd.txt", "x");
+        var nativePath = NativeFileSystem.ToNativePath(path);
+
+        var flagged = Libc.Open(nativePath, Libc.OpenReadOnly | Libc.OpenCloseOnExec, 0);
+        Assert.True(flagged >= 0);
+        try
+        {
+            Assert.True(StandardInputSource.IsRuntimeOwnedDescriptor(flagged));
+        }
+        finally
+        {
+            Libc.Close(flagged);
+        }
+
+        var plain = Libc.Open(nativePath, Libc.OpenReadOnly, 0);
+        Assert.True(plain >= 0);
+        try
+        {
+            Assert.False(StandardInputSource.IsRuntimeOwnedDescriptor(plain));
+        }
+        finally
+        {
+            Libc.Close(plain);
+        }
+    }
 }

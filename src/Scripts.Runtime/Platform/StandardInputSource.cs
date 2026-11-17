@@ -76,10 +76,17 @@ public static class StandardInputSource
             throw new ArgumentOutOfRangeException(nameof(maximumBytes), maximumBytes, "the maximum byte count cannot be negative");
         }
 
+        if (IsRuntimeOwnedDescriptor(Libc.StandardInput))
+        {
+            // The .NET host opened one of its own files on a standard input that was closed before the process
+            // started; those descriptors carry FD_CLOEXEC, unlike a shell redirection the user wrote. The stream is
+            // absent (DESIGN §9), never a script.
+            return new StandardInputReadResult([], string.Empty);
+        }
+
         if (IsRuntimeRandomStream())
         {
-            // The .NET host opened /dev/urandom on a standard input that was closed before the process started: that
-            // stream never ends and is not the script. An absent stream (DESIGN §9).
+            // Older hosts leave /dev/urandom instead of a regular file; the inode check keeps that case covered.
             return new StandardInputReadResult([], string.Empty);
         }
 
@@ -195,6 +202,17 @@ public static class StandardInputSource
 
         Libc.Close(descriptor);
         return true;
+    }
+
+    /// <summary>
+    /// True when a descriptor was opened by the runtime with FD_CLOEXEC. A shell redirection (<c>&lt; file</c>,
+    /// <c>&lt; /dev/null</c>, a pipe) never carries that flag: the flag is cleared by <c>exec</c> and not set by the
+    /// shell, so the check distinguishes a user stream from the host's own startup leftovers on a closed descriptor 0.
+    /// </summary>
+    internal static bool IsRuntimeOwnedDescriptor(int descriptor)
+    {
+        var flags = Libc.FileControl(descriptor, Libc.GetFileDescriptorFlags, 0);
+        return flags >= 0 && (flags & Libc.FileDescriptorCloseOnExec) != 0;
     }
 
     /// <summary>

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-17
+
+### Fixed
+
+- Treat a descriptor 0 opened by the .NET runtime with `FD_CLOEXEC` as an
+  absent standard input, so `scripts run -` and `check -` with a closed
+  standard input remain an empty script on hosts where the runtime leaves a
+  regular file on descriptor 0 (GitHub Actions); this removes the 251
+  static-error regression.
+
 ## [0.1.0] - 2026-11-17
 
 ### Added
@@ -34,5 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; the JSON codecs
   are local GPL-3.0-or-later adaptations.
 
-[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.1
 [0.1.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.0
