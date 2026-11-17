@@ -3,14 +3,23 @@
 | Component | Version | Licence | Source | Files |
 |---|---|---|---|---|
 | Core subset (Results, Serialization.Values, Concurrency) | v0.1.1, commit 954aa50 | LGPL-3.0-or-later | https://github.com/benmoussa-younes/core | `src/Scripts.Core/Compatibility/Core/Results/**`, `src/Scripts.Core/Compatibility/Core/Serialization/Values/**`, `src/Scripts.Core/Compatibility/Core/Concurrency/**` |
+| .NET 10 runtime (Native AOT) | 10.0 (SDK 10.0.404) | MIT | https://github.com/dotnet/runtime | statically linked into `/usr/bin/scripts`; see `LICENSE.DOTNET` and `THIRD-PARTY-DOTNET.txt` |
+| Test-only NuGet packages (`xunit.v3.aot` and transitive dependencies) | xunit.v3.aot 4.0.3 | MIT/Apache-2.0 (per package) | https://www.nuget.org | not distributed; used only to build and run the test suites |
 
-The subset is vendored by source, not as a binary. The v0.1.1 security fix
+The Core subset is vendored by source, not as a binary. The v0.1.1 security fix
 (CWE-119/120/122/788) is in `Core.Platform.Linux.RawFileWalker`, which Scripts
 does not vendor; its directory walker reads entries with `readdir(3)`. The
 `Results`, `Serialization.Values` and `Concurrency` trees are identical between
 v0.1.0 and v0.1.1, apart from the deliberate project-name wording in one
-comment, so the pin moved without a source change. The JSON codecs used by the language live under
+comment, so the pin moved without a source change. The JSON codecs used by the
+language live under
 `src/Scripts.Core/Compatibility/Core/Serialization/Codecs/Json/`: they are
 local adaptations of Core's JSON codecs by the same copyright holder,
 relicensed GPL-3.0-or-later; the three vendored trees above remain
 LGPL-3.0-or-later.
+
+The published Native AOT binary contains .NET runtime components. The MIT
+licence of the .NET runtime is in `LICENSE.DOTNET`; the runtime's own
+third-party notices are in `THIRD-PARTY-DOTNET.txt`. The NuGet packages above
+are test-only: they are restored from nuget.org to build and run the tests, and
+are not part of the published binary.

@@ -6,12 +6,42 @@ SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 
 [[annotations]]
-path = ["README.md", "AGENTS.md", "CHANGELOG.md", "NOTICE", "THIRD-PARTY"]
+path = ["README.md", "AGENTS.md", "CHANGELOG.md", "THIRD-PARTY"]
 SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
 [[annotations]]
-path = ["LICENSE", "LICENSE.LGPL3", "LICENSES/**", "REUSE.toml", ".gitattributes", ".gitignore", ".editorconfig", "global.json", "nuget.config", "Scripts.slnx", "Directory.Build.props", "Directory.Build.targets", ".github/**"]
+path = ["LICENSE"]
+SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ["LICENSE.LGPL3"]
+SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
+SPDX-License-Identifier = "LGPL-3.0-or-later"
+
+[[annotations]]
+path = ["LICENSES/GPL-3.0-or-later.txt"]
+SPDX-FileCopyrightText = "Free Software Foundation, Inc."
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ["LICENSES/LGPL-3.0-or-later.txt"]
+SPDX-FileCopyrightText = "Free Software Foundation, Inc."
+SPDX-License-Identifier = "LGPL-3.0-or-later"
+
+[[annotations]]
+path = ["LICENSES/CC-BY-SA-4.0.txt"]
+SPDX-FileCopyrightText = "Creative Commons"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ["LICENSE.DOTNET", "THIRD-PARTY-DOTNET.txt"]
+SPDX-FileCopyrightText = ".NET Foundation and Contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["REUSE.toml", ".gitattributes", ".gitignore", ".editorconfig", "global.json", "nuget.config", "Scripts.slnx", "Directory.Build.props", "Directory.Build.targets", ".github/**"]
 SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 

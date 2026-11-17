@@ -127,8 +127,8 @@ if [ -f "${DOSSIER_PACKAGING}/debian/copyright" ]; then
         "${DOSSIER_TRAVAIL}/racine/usr/share/doc/${PAQUET}/copyright"
 fi
 # Licence texts (GPL v3 for scripts, LGPL v3 for the vendored Core subset), shipped verbatim,
-# plus NOTICE and THIRD-PARTY, which record the provenance of the vendored source.
-for document in "${RACINE_DEPOT}/LICENSE" "${RACINE_DEPOT}/LICENSE.LGPL3" "${RACINE_DEPOT}/NOTICE" "${RACINE_DEPOT}/THIRD-PARTY"; do
+# plus THIRD-PARTY, LICENSE.DOTNET and THIRD-PARTY-DOTNET, which record the provenance of the vendored and runtime components.
+for document in "${RACINE_DEPOT}/LICENSE" "${RACINE_DEPOT}/LICENSE.LGPL3" "${RACINE_DEPOT}/LICENSE.DOTNET" "${RACINE_DEPOT}/THIRD-PARTY" "${RACINE_DEPOT}/THIRD-PARTY-DOTNET.txt"; do
     [ -f "${document}" ] || continue
     install -m 0644 "${document}" "${DOSSIER_TRAVAIL}/racine/usr/share/doc/${PAQUET}/$(basename "${document}")"
 done

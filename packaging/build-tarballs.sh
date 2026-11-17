@@ -83,7 +83,7 @@ staging="${work}/${source_prefix}"
 mkdir -p "${staging}/licences"
 cp "${binary}" "${staging}/scripts"
 chmod 755 "${staging}/scripts"
-for document in LICENSE LICENSE.LGPL3 NOTICE THIRD-PARTY LICENSES/CC-BY-SA-4.0.txt; do
+for document in LICENSE LICENSE.LGPL3 LICENSE.DOTNET THIRD-PARTY THIRD-PARTY-DOTNET.txt LICENSES/CC-BY-SA-4.0.txt; do
     [ -f "${project_root}/${document}" ] && cp "${project_root}/${document}" "${staging}/licences/$(basename "${document}")"
 done
 cat >"${staging}/INSTALL.txt" <<EOF
@@ -93,7 +93,8 @@ scripts ${release_version} — Scripts (single native binary, no .NET runtime)
   scripts --version
 
 Requires Linux x86_64, glibc >= 2.34; links only against libc and libm.
-Licences: GPL-3.0-or-later (scripts), LGPL-3.0-or-later (the vendored Core subset).
+Licences: GPL-3.0-or-later (scripts), LGPL-3.0-or-later (the vendored Core subset),
+MIT (.NET 10 runtime components; see LICENSE.DOTNET and THIRD-PARTY-DOTNET.txt).
 The complete corresponding source is in scripts_${release_version}_src.tar.gz.
 EOF
 tar --sort=name --owner=0 --group=0 --numeric-owner --mtime="@${stamp}" \

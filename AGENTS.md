@@ -30,9 +30,9 @@ filesystem corpus is generated at test time, not tracked.
 - Scripts is GPL-3.0-or-later; the vendored Core subset (`Results`,
   `Serialization.Values`, `Concurrency`) under `src/Scripts.Core/Compatibility/Core/`
   is LGPL-3.0-or-later, and the local JSON codecs are GPL-3.0-or-later. The
-  prose documents (README, AGENTS, CHANGELOG, NOTICE, THIRD-PARTY) are
-  CC-BY-SA-4.0; see `NOTICE`,
-  `THIRD-PARTY` and `LICENSES/`.
+  .NET 10 runtime components are MIT (`LICENSE.DOTNET`,
+  `THIRD-PARTY-DOTNET.txt`). The prose documents (README, AGENTS, CHANGELOG,
+  THIRD-PARTY) are CC-BY-SA-4.0; see `THIRD-PARTY` and `LICENSES/`.
 - The command is `scripts`; sources are `.scs`; error codes are `SCRIPTS-*`.
 - The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.
 - `tests/Scripts.Corpus.Tests` runs the corpus in xUnit; its data lives under
