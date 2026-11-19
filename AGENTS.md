@@ -1,46 +1,56 @@
 # AGENTS.md — Scripts
 
-A short `AGENTS.md` may exist in a subfolder when that folder has important LLM
-rules. Keep it to a few lines; the closest file wins.
+A statically typed scripting language for Linux system automation, shipped as
+one native executable (Native AOT, .NET 10). A `.scs` file is loaded, statically
+checked and interpreted; there is no build step for the script, and data is
+never re-parsed as code.
 
 ## Build and test
 
 ```sh
 dotnet build Scripts.slnx -c Release
 reuse lint
+tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, AOT tests, licences
+tools/scripts/binaries/gate-static     # the lighter worker gate: build, fast AOT tests, tree hygiene
 ```
 
 Tests run only as Native AOT executables (`tools/scripts/binaries/aot-tests.sh`,
-six projects); there is no `dotnet test`/VSTest path. The gate is
-`tools/scripts/binaries/gate`; it runs `check-all` with the build (5 steps:
-build, AOT app, helpers, AOT tests, licences) and prints one `VERDICT` line;
-`check-all --no-build` runs 4 (the AOT publishes still compile). The gate is a
-bash script; no `bcs` bootstrap is required. `tools/scripts/binaries/gate-static` is the
-lighter worker gate (build, fast AOT tests, tree hygiene). None changes tracked
-files. The product is `scripts`.
+six projects); there is no `dotnet test`/VSTest path. `check-all --no-build`
+skips the build step. The gate prints one `VERDICT` line and does not change
+tracked files. `reuse lint` scans the whole tree; the undecodable-name fixture is
+generated at test time.
 
-`reuse lint` scans the whole tree; the undecodable-name fixture used by the
-filesystem corpus is generated at test time, not tracked.
+## Conventions
+
+- Sources are `.scs`; the command is `scripts`; error codes are `SCRIPTS-*`.
+- A program is a literal: a computed program breaks the launcher check
+  (`SCRIPTS-LINT-0004`) and the argument discipline.
+- The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.
+- `tests/Scripts.Corpus.Tests` runs the corpus in xUnit, with the four
+  black-box axes (fuzz, semantics, JSON, system) in the same project.
+- A subfolder may carry a short `AGENTS.md`; the closest file wins.
 
 ## Repository facts
 
-- Root markdown is limited to `README.md`, `AGENTS.md` and `CHANGELOG.md`; the
-  agent plan and kanban live in `~/agents/projects/scripts/`; one root
-  `AGENTS.md`.
-- Scripts is GPL-3.0-or-later; the vendored Core subset (`Results`,
-  `Serialization.Values`, `Concurrency`) under `src/Scripts.Core/Compatibility/Core/`
-  is LGPL-3.0-or-later, and the local JSON codecs are GPL-3.0-or-later. The
-  .NET 10 runtime components are MIT (`LICENSE.DOTNET`,
-  `THIRD-PARTY-DOTNET.txt`). The prose documents (README, AGENTS, CHANGELOG,
-  THIRD-PARTY) are CC-BY-SA-4.0; see `THIRD-PARTY` and `LICENSES/`.
-- The command is `scripts`; sources are `.scs`; error codes are `SCRIPTS-*`.
-- The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.
-- `tests/Scripts.Corpus.Tests` runs the corpus in xUnit; its data lives under
-  `tests/Corpus`. The four black-box axes (fuzz, semantics, JSON, system) run
-  in the same project; no shell test runner remains (the migration fixtures keep
-  their `.sh` scripts). Every test project is published as a Native AOT
-  executable and run directly.
+- Scripts is `GPL-3.0-or-later`; the vendored Core subset under
+  `src/Scripts.Core/Compatibility/Core/` is `LGPL-3.0-or-later`; the .NET 10
+  runtime components are MIT (`LICENSE.DOTNET`, `THIRD-PARTY-DOTNET.txt`).
+- The prose documents (README, AGENTS, CHANGELOG, THIRD-PARTY) are
+  `CC-BY-SA-4.0`; see `THIRD-PARTY` and `LICENSES/`.
 - Scripts is consumed as source; no NuGet package is produced.
+- Root markdown is limited to `README.md`, `AGENTS.md` and `CHANGELOG.md`.
+
+## Commits and releases
+
+- One branch per task, `work/<slug>`; one concern per commit; English,
+  imperative subject; the body says why.
+- Commits and tags are GPG-signed. The maintainer merges a green `check`
+  locally; publishing (push, tag, release) is the owner's act.
+
+## Security
+
+- No secret and no consumer's data in the tree or in a fixture.
+- A vulnerability report is private: follow `SECURITY.md`.
 
 ## Maintenance
 
