@@ -81,7 +81,7 @@ Tests run only as Native AOT executables, published by
 runs `check-all` with the build (5 steps: build, AOT app, helpers, AOT tests,
 licences); `check-all --no-build` runs the 4 remaining steps (the AOT publishes
 still compile). It prints one `VERDICT` line and does not change tracked files.
-`gate-static` is the lighter worker gate. `reuse` 5.0.2 is needed for the
+`gate-static` is the lighter gate. `reuse` 5.0.2 is needed for the
 licence step.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the

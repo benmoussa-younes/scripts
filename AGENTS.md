@@ -11,7 +11,7 @@ never re-parsed as code.
 dotnet build Scripts.slnx -c Release
 reuse lint
 tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, AOT tests, licences
-tools/scripts/binaries/gate-static     # the lighter worker gate: build, fast AOT tests, tree hygiene
+tools/scripts/binaries/gate-static     # the lighter gate: build, fast AOT tests, tree hygiene
 ```
 
 Tests run only as Native AOT executables (`tools/scripts/binaries/aot-tests.sh`,
@@ -44,13 +44,13 @@ generated at test time.
 
 - One branch per task, `work/<slug>`; one concern per commit; English,
   imperative subject; the body says why.
-- Commits and tags are GPG-signed. The maintainer merges a green `check`
-  locally; publishing (push, tag, release) is the owner's act.
+- Commits and tags are GPG-signed. A change lands on `main` only when
+  `tools/scripts/binaries/gate` prints `VERDICT: PASS`; a release is the maintainer's decision.
 
 ## Security
 
 - No secret and no consumer's data in the tree or in a fixture.
-- A vulnerability report is private: follow `SECURITY.md`.
+- A vulnerability report is private: report it privately (GitHub's private vulnerability reporting), never in a public issue.
 
 ## Maintenance
 
