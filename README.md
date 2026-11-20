@@ -85,7 +85,7 @@ still compile). It prints one `VERDICT` line and does not change tracked files.
 licence step.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the
-filesystem corpus is generated at test time, not tracked.
+filesystem corpus is generated at test time.
 
 ## Layout
 
