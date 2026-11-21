@@ -291,6 +291,7 @@ public static class ScriptsApplication
         // entry is rewritten and reloaded until it parses or its error has no fix; each rewrite removes a `{{` or `}}`.
         while (command.Fix && loaded.Error?.Fix is { File: { } fixedFile } && fixedFile.Path == command.ScriptPath)
         {
+            var textBefore = fixedFile.Text;
             int appliedToSyntax;
             try
             {
@@ -308,6 +309,11 @@ public static class ScriptsApplication
 
             applied += appliedToSyntax;
             loaded = LoadProgram(command.ScriptPath, false);
+            // A fix that rewrites the same text would loop forever: stop as soon as the entry did not change.
+            if (loaded.Error?.Fix?.File?.Text == textBefore)
+            {
+                break;
+            }
         }
 
         if (loaded.Error is not null)
