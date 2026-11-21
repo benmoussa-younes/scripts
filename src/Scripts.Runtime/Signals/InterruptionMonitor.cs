@@ -139,8 +139,9 @@ public sealed class InterruptionMonitor : IDisposable
     }
 
     /// <summary>
-    /// Installs SIGINT/SIGTERM/SIGHUP handlers that cancel the default termination. A SIGINT that was ignored when the
-    /// process started (non-interactive background job) stays ignored, per POSIX convention.
+    /// Installs SIGINT/SIGTERM/SIGHUP handlers that cancel the default termination. A SIGINT or SIGHUP that was ignored
+    /// when the process started (a background job, `nohup`) stays ignored, per POSIX convention: no handler is installed,
+    /// so the inherited disposition is kept instead of being overridden.
     /// </summary>
     public void ListenForSignals()
     {
@@ -150,7 +151,10 @@ public sealed class InterruptionMonitor : IDisposable
         }
 
         Listen(PosixSignal.SIGTERM, "SIGTERM", TerminateExitCode);
-        Listen(PosixSignal.SIGHUP, "SIGHUP", HangUpExitCode);
+        if (!SignalDispositions.IsIgnored(Libc.SignalHangUp))
+        {
+            Listen(PosixSignal.SIGHUP, "SIGHUP", HangUpExitCode);
+        }
     }
 
     public void Dispose()
