@@ -28,6 +28,7 @@ public sealed class InterruptionMonitor : IDisposable
     private readonly Action<int> forceExit;
     private readonly TimeSpan watchdogDelay;
     private readonly ManualResetEventSlim interrupted = new(false);
+    private readonly CancellationTokenSource interruptedSource = new();
     private readonly List<PosixSignalRegistration> registrations = [];
     private InterruptionTermination? pending;
     private Timer? watchdog;
@@ -45,6 +46,9 @@ public sealed class InterruptionMonitor : IDisposable
 
     /// <summary>Signalled once an interruption is pending; blocking waits include it in their wait set.</summary>
     public WaitHandle WaitHandle => interrupted.WaitHandle;
+
+    /// <summary>Cancelled once an interruption is pending; event waits pass it instead of building a WaitHandle set (R0).</summary>
+    public CancellationToken CancellationToken => interruptedSource.Token;
 
     public bool IsInterrupted => pending is not null;
 
@@ -129,6 +133,8 @@ public sealed class InterruptionMonitor : IDisposable
             interrupted.Set();
         }
 
+        // Outside the gate: cancellation runs the waiters' registrations synchronously.
+        interruptedSource.Cancel();
         Interrupted?.Invoke();
     }
 
