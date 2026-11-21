@@ -63,6 +63,7 @@ public static class ErrorCodes
     public const string Parse0056 = "SCRIPTS-PARSE-0056";
     public const string Parse0057 = "SCRIPTS-PARSE-0057";
     public const string Parse0058 = "SCRIPTS-PARSE-0058";
+    public const string Parse0059 = "SCRIPTS-PARSE-0059";
     public const string Type0001 = "SCRIPTS-TYPE-0001";
     public const string Type0002 = "SCRIPTS-TYPE-0002";
     public const string Type0003 = "SCRIPTS-TYPE-0003";

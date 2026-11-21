@@ -285,8 +285,39 @@ public static class ScriptsApplication
         }
 
         var loaded = LoadProgram(command.ScriptPath, command.StandardInput);
+        var applied = 0;
+
+        // A syntax error may carry a safe fix too (L6: `{{` in a string). The parser stops at the first error, so the
+        // entry is rewritten and reloaded until it parses or its error has no fix; each rewrite removes a `{{` or `}}`.
+        while (command.Fix && loaded.Error?.Fix is { File: { } fixedFile } && fixedFile.Path == command.ScriptPath)
+        {
+            int appliedToSyntax;
+            try
+            {
+                appliedToSyntax = ApplySafeFixes(fixedFile, [loaded.Error]);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                return ReportFixWriteFailure(command, exception);
+            }
+
+            if (appliedToSyntax == 0)
+            {
+                break;
+            }
+
+            applied += appliedToSyntax;
+            loaded = LoadProgram(command.ScriptPath, false);
+        }
+
         if (loaded.Error is not null)
         {
+            if (applied > 0 && !command.ErrorsJson &&
+                !WriteStandardOutput($"applied {applied} fix(es) to {command.ScriptPath}\n"))
+            {
+                return ExitCodes.RuntimeFailure;
+            }
+
             // DESIGN §8.3: under --errors-json, check always writes the JSON document on stdout, including load errors.
             if (command.ErrorsJson)
             {
@@ -301,24 +332,14 @@ public static class ScriptsApplication
         {
             var moduleFixes = result.Errors.Count(error => error.Fix is { File: not null }
                 && error.Fix.File.Path != loaded.Program!.Entry.Source.Path);
-            int applied;
+            int appliedToProgram;
             try
             {
-                applied = ApplySafeFixes(loaded.Program!, result.Errors);
+                appliedToProgram = ApplySafeFixes(loaded.Program!.Entry.Source, result.Errors);
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                // A read-only file or a full disk is an environment condition, not a scripts bug (audit B1):
-                // report a typed CLI error (252) instead of the internal-error path (254).
-                var failure = Diagnostics.Create(ErrorCodes.Cli0014, null, new Span(0, 0), ("reason", exception.Message));
-                if (command.ErrorsJson)
-                {
-                    return WriteCheckJson([failure], [], command.DenyWarnings);
-                }
-
-                return WriteStandardError(DiagnosticReporter.RenderHuman([failure], []))
-                    ? ExitCodes.ScriptUnreadable
-                    : ExitCodes.RuntimeFailure;
+                return ReportFixWriteFailure(command, exception);
             }
 
             if (moduleFixes > 0 && !command.ErrorsJson)
@@ -327,7 +348,7 @@ public static class ScriptsApplication
                     $"{moduleFixes} fix(es) in imported modules were not applied: --fix rewrites the entry script only\n");
             }
 
-            if (applied > 0)
+            if (appliedToProgram > 0)
             {
                 var reloaded = LoadProgram(command.ScriptPath, false);
                 if (reloaded.Error is not null)
@@ -341,11 +362,13 @@ public static class ScriptsApplication
                 }
 
                 result = ProgramChecker.Check(reloaded.Program!);
-                if (!command.ErrorsJson &&
-                    !WriteStandardOutput($"applied {applied} fix(es) to {command.ScriptPath}\n"))
-                {
-                    return ExitCodes.RuntimeFailure;
-                }
+            }
+
+            applied += appliedToProgram;
+            if (applied > 0 && !command.ErrorsJson &&
+                !WriteStandardOutput($"applied {applied} fix(es) to {command.ScriptPath}\n"))
+            {
+                return ExitCodes.RuntimeFailure;
             }
         }
 
@@ -370,12 +393,29 @@ public static class ScriptsApplication
     }
 
     /// <summary>
+    /// A read-only file or a full disk is an environment condition, not a scripts bug (audit B1): report a typed CLI
+    /// error (252) instead of the internal-error path (254).
+    /// </summary>
+    private static int ReportFixWriteFailure(CheckCommand command, Exception exception)
+    {
+        var failure = Diagnostics.Create(ErrorCodes.Cli0014, null, new Span(0, 0), ("reason", exception.Message));
+        if (command.ErrorsJson)
+        {
+            return WriteCheckJson([failure], [], command.DenyWarnings);
+        }
+
+        return WriteStandardError(DiagnosticReporter.RenderHuman([failure], []))
+            ? ExitCodes.ScriptUnreadable
+            : ExitCodes.RuntimeFailure;
+    }
+
+    /// <summary>
     /// Applies the safe fixes carried by the diagnostics to the entry file, in reverse span order, and returns how many
     /// edits were applied. A module's file is left untouched: <c>check</c> names the entry script.
     /// </summary>
-    private static int ApplySafeFixes(LoadedProgram program, IReadOnlyList<Diagnostic> errors)
+    private static int ApplySafeFixes(SourceFile entry, IReadOnlyList<Diagnostic> errors)
     {
-        var entryPath = program.Entry.Source.Path;
+        var entryPath = entry.Path;
         var fixes = errors
             .Select(error => error.Fix)
             .Where(fix => fix is { File: not null } && fix.File.Path == entryPath)
@@ -387,7 +427,7 @@ public static class ScriptsApplication
             return 0;
         }
 
-        var text = program.Entry.Source.Text;
+        var text = entry.Text;
         var applied = 0;
         foreach (var fix in fixes)
         {
@@ -405,7 +445,7 @@ public static class ScriptsApplication
             // BUG-021: SourceReading strips the BOM before decoding, so a rewrite would drop it. Read the
             // original bytes and re-encode exactly one U+FEFF, which UTF8Encoding(false) writes as EF BB BF;
             // a file without a BOM gains none. The BUG-017 no-follow pre-check already refused a symlink.
-            var originalText = program.Entry.Source.Text;
+            var originalText = entry.Text;
             if (StartsWithUtf8ByteOrderMark(entryPath))
             {
                 originalText = "\uFEFF" + originalText;

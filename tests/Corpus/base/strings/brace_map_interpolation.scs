@@ -1,0 +1,5 @@
+let spaced = "{ {"a": 1}.length() }"
+let tight = "{{"a": 1}.length()}"
+io.write_standard_output_line(spaced)
+io.write_standard_output_line(tight)
+io.write_standard_output_line("\{x\}")

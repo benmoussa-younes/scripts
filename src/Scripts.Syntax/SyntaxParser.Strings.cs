@@ -14,14 +14,17 @@ internal sealed partial class SyntaxParser
             parts.Add(segment switch
             {
                 TextSegment textSegment => new TextPart(new Span(textSegment.Start, textSegment.End), textSegment.Text),
-                InterpolationSegment interpolation => new InterpolationPart(new Span(interpolation.Start, interpolation.End), ParseInterpolation(interpolation)),
+                InterpolationSegment interpolation => new InterpolationPart(new Span(interpolation.Start, interpolation.End), ParseInterpolation(token, interpolation)),
                 _ => throw new InvalidOperationException("Unknown string segment."),
             });
         }
 
         if (token.Failure is { } failure)
         {
-            throw new SyntaxErrorException(failure);
+            throw failure.Code == ErrorCodes.Parse0020 && StartsWithDoubleBrace(failure.Span.Start)
+                && IsClosedSingleLineString(token)
+                ? DoubleBrace(token, failure.Span.Start)
+                : new SyntaxErrorException(failure);
         }
 
         if (token.Style == StringStyle.Path)
@@ -38,8 +41,103 @@ internal sealed partial class SyntaxParser
         return new StringLiteral(span, string.Concat(parts.Cast<TextPart>().Select(part => part.Text)));
     }
 
+    /// <summary>
+    /// L6: `{{` opens an interpolation whose expression starts with a map literal. When that interpolation does not parse,
+    /// the author almost surely meant a literal brace (the Python/C#/Rust habit): PARSE-0059 replaces the first error of
+    /// the segment. A valid `{{"a": 1}.length()}` is untouched, so no accepted program changes meaning.
+    /// </summary>
+    private Expression ParseInterpolation(StringToken token, InterpolationSegment segment)
+    {
+        if (!StartsWithDoubleBrace(segment.Start))
+        {
+            return ParseInterpolationTokens(segment);
+        }
+
+        try
+        {
+            return ParseInterpolationTokens(segment);
+        }
+        catch (SyntaxErrorException failure) when (failure.Diagnostic.Code != ErrorCodes.Parse0059
+            && IsClosedSingleLineString(token))
+        {
+            throw DoubleBrace(token, segment.Start);
+        }
+    }
+
+    private bool StartsWithDoubleBrace(int openBrace) =>
+        openBrace + 1 < text.Length && text[openBrace] == '{' && text[openBrace + 1] == '{';
+
+    /// <summary>
+    /// True when the token is a normal string closed on its line: outside that shape a `{{` diagnostic would hide the
+    /// real error (an unterminated interpolation) and no brace rewrite is safe.
+    /// </summary>
+    private bool IsClosedSingleLineString(StringToken token) =>
+        token.Style == StringStyle.Normal
+        && token.End - token.Start >= 2
+        && text[token.Start] == '"'
+        && text[token.End - 1] == '"'
+        && text.AsSpan(token.Start + 1, token.End - token.Start - 2).IndexOfAny('\n', '\r') < 0;
+
+    private SyntaxErrorException DoubleBrace(StringToken token, int openBrace)
+    {
+        var span = new Span(openBrace, openBrace + 2);
+        var fix = EscapedBraces(token) is { } replacement
+            ? new Fix("write literal braces as `\\{` and `\\}`", source, new Span(token.Start, token.End), replacement)
+            : null;
+        return new SyntaxErrorException(Diagnostics.Create(ErrorCodes.Parse0059, source, span, fix));
+    }
+
+    /// <summary>
+    /// The string token rewritten with `{{` → `\{` and `}}` → `\}` outside escapes, or null when the token is not a
+    /// single-line normal string closed on its line (a nested string or an unterminated one is not rewritten).
+    /// </summary>
+    private string? EscapedBraces(StringToken token)
+    {
+        if (token.Style != StringStyle.Normal || token.End - token.Start < 2 || text[token.Start] != '"' || text[token.End - 1] != '"')
+        {
+            return null;
+        }
+
+        var content = text.AsSpan(token.Start + 1, token.End - token.Start - 2);
+        if (content.IndexOfAny('"', '\n', '\r') >= 0)
+        {
+            return null;
+        }
+
+        var builder = new System.Text.StringBuilder(content.Length + 2);
+        builder.Append('"');
+        for (var index = 0; index < content.Length; index++)
+        {
+            var current = content[index];
+            if (current == '\\' && index + 1 < content.Length)
+            {
+                // `\u{…}` keeps its braces; any other escape is two characters.
+                var escapeEnd = index + 1;
+                if (content[escapeEnd] == 'u' && escapeEnd + 1 < content.Length && content[escapeEnd + 1] == '{')
+                {
+                    var close = content[escapeEnd..].IndexOf('}');
+                    escapeEnd = close < 0 ? content.Length - 1 : escapeEnd + close;
+                }
+
+                builder.Append(content[index..(escapeEnd + 1)]);
+                index = escapeEnd;
+            }
+            else if (current is '{' or '}' && index + 1 < content.Length && content[index + 1] == current)
+            {
+                builder.Append('\\').Append(current);
+                index++;
+            }
+            else
+            {
+                builder.Append(current);
+            }
+        }
+
+        return builder.Append('"').ToString();
+    }
+
     /// <summary>Parses the tokens collected by the lexer for one `{…}`; the surrounding token stream is restored afterwards.</summary>
-    private Expression ParseInterpolation(InterpolationSegment segment)
+    private Expression ParseInterpolationTokens(InterpolationSegment segment)
     {
         var interpolationTokens = segment.Tokens;
         if (interpolationTokens.Count == 0)

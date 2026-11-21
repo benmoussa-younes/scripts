@@ -234,6 +234,31 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Check_fix_rewrites_double_braces_then_applies_checker_fixes()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            // L6: each `{{` string is a parse error with its own fix; the checker's rename is applied after them.
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "fix.scs",
+                "let total = 1\nlet a = \"a {{total}}\"\nlet b = \"b {{x}} {total}\"\nio.write_standard_output_line(\"{totl}{a}{b}\")\n");
+            var result = ScriptsProcess.Run("check", "--fix", script);
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal($"applied 3 fix(es) to {script}\n", result.StandardOutput);
+            Assert.Equal(
+                "let total = 1\nlet a = \"a \\{total\\}\"\nlet b = \"b \\{x\\} {total}\"\nio.write_standard_output_line(\"{total}{a}{b}\")\n",
+                File.ReadAllText(script));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_fix_resolves_a_name_without_extension_and_names_the_file_it_wrote()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();

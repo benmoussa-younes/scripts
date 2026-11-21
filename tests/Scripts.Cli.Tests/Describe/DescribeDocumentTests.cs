@@ -405,8 +405,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var errorCodes = document.RootElement.GetProperty("error_codes").EnumerateArray().ToList();
 
-        Assert.Equal(187, ErrorCatalog.All.Count);
-        Assert.Equal(187, errorCodes.Count);
+        Assert.Equal(188, ErrorCatalog.All.Count);
+        Assert.Equal(188, errorCodes.Count);
         for (var errorIndex = 0; errorIndex < errorCodes.Count; errorIndex++)
         {
             var expected = ErrorCatalog.All[errorIndex];
@@ -478,7 +478,9 @@ public sealed class DescribeDocumentTests
                 .Select(match => match.Groups[1].Value)
                 .Distinct(StringComparer.Ordinal)
                 .Where(name => !messageNames.Contains(name))
-                .Select(name => error.Code + ":" + name));
+                .Select(name => error.Code + ":" + name)
+                // PARSE-0059 shows the literal string `"\{x\}"` in its suggestion: an example, not a placeholder.
+                .Where(entry => entry != ErrorCodes.Parse0059 + ":x"));
         }
 
         Assert.Equal(32, contextual.Count);

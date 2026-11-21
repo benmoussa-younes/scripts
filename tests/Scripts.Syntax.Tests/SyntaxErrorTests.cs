@@ -243,6 +243,7 @@ public sealed class SyntaxErrorTests
     [InlineData("io.write_standard_output_line(\"\\u{110000}\")", ErrorCodes.Parse0018, 1, 32)]
     [InlineData("io.write_standard_output_line(\"a{}b\")", ErrorCodes.Parse0019, 1, 33)]
     [InlineData("io.write_standard_output_line(\"a{x")]
+    [InlineData("io.write_standard_output_line(\"a{{x", ErrorCodes.Parse0020, 1, 33)]
     [InlineData("io.write_standard_output_line(\"a}b\")", ErrorCodes.Parse0021, 1, 33)]
     [InlineData("io.write_standard_output_line(\"{0}\")", ErrorCodes.Parse0022, 1, 32)]
     [InlineData("io.write_standard_output_line(\"{true}\")", ErrorCodes.Parse0022, 1, 32)]
@@ -400,6 +401,44 @@ public sealed class SyntaxErrorTests
         var error = Parsing.Fail("let p = p\"a{b}\"");
         Assert.Equal(ErrorCodes.Parse0053, error.Code);
         Assert.Equal((1, 12), error.Start);
+    }
+
+    [Theory]
+    // L6: `{{` is not an escape; when the interpolation it opens does not parse, PARSE-0059 replaces its error.
+    [InlineData("io.write_standard_output_line(\"valeur {{x}}\")", 1, 39)]
+    [InlineData("let s = \"a {{ b\"", 1, 12)]
+    [InlineData("let s = \"{{\"", 1, 10)]
+    [InlineData("let s = \"{x} {{y}}\"", 1, 14)]
+    public void A_double_brace_that_does_not_parse_is_PARSE_0059(string source, int line, int column)
+    {
+        var error = Parsing.Fail(source);
+        Assert.Equal(ErrorCodes.Parse0059, error.Code);
+        Assert.Equal((line, column), error.Start);
+        Assert.Equal((line, column + 2), error.End);
+    }
+
+    [Theory]
+    [InlineData("let n = \"{{\"a\": 1}.length()}\"")]
+    [InlineData("let n = \"{ {\"a\": 1}.length() }\"")]
+    public void A_double_brace_opening_a_valid_map_interpolation_is_unchanged(string source) =>
+        Parsing.Parse(source);
+
+    [Theory]
+    [InlineData("let s = \"valeur {{x}}\"", "\"valeur \\{x\\}\"")]
+    [InlineData("let s = \"\\u{7B}{{x}} \\{\"", "\"\\u{7B}\\{x\\} \\{\"")]
+    public void A_double_brace_error_carries_a_fix_scoped_to_the_string(string source, string replacement)
+    {
+        var fix = Parsing.Fail(source).Fix;
+        Assert.NotNull(fix);
+        Assert.Equal(replacement, fix.Replacement);
+        Assert.Equal(8, fix.Span.Start);
+        Assert.Equal(source.Length, fix.Span.End);
+    }
+
+    [Fact]
+    public void A_double_brace_in_a_path_literal_keeps_PARSE_0053()
+    {
+        Assert.Equal(ErrorCodes.Parse0053, Parsing.Fail("let p = p\"a{{b}}\"").Code);
     }
 
     [Fact]
