@@ -267,6 +267,7 @@ public sealed class SystemCoverageTests
         "process.script_path",
         "process.pipeline",
         "process.exit_with_code",
+        "process.exit_with_message",
         "process.pipeline_to_file_overwrite",
         "time.unix_seconds", "time.monotonic_milliseconds", "time.sleep_milliseconds", "time.to_utc_iso8601", "time.to_local_iso8601", "time.parse_iso8601",
         "random.bytes_hex", "random.bytes_base64", "random.integer_below",

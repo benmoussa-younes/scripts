@@ -165,6 +165,7 @@ public sealed class MatchTests
         Checking.AssertMarked("let r: string = match 1 {\n    1 => \"a\"\n    _ => ‸2\n}", "SCRIPTS-TYPE-0012");
         Assert.Equal("string", Checking.TypeOfLastLet("let _v = match 1 {\n    1 => \"a\"\n    _ => \"b\"\n}").ToString());
         Assert.Equal("integer", Checking.TypeOfLastLet("let _v = match \"1\".parse_integer() {\n    ok(n) => n\n    error(_) => process.exit_with_code(1)\n}").ToString());
+        Assert.Equal("integer", Checking.TypeOfLastLet("let _v = match \"1\".parse_integer() {\n    ok(n) => n\n    error(e) => process.exit_with_message(2, \"bad: {e.kind}\")\n}").ToString());
     }
 
     [Fact]

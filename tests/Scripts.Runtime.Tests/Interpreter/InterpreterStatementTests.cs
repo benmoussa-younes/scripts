@@ -448,6 +448,28 @@ public sealed class InterpreterStatementTests
     }
 
     [Fact]
+    public void ExitWithMessageWritesTheMessageOnStandardErrorAndEndsWithItsCode()
+    {
+        var run = InterpreterHarness.Run("process.defer(() => io.write_standard_output_line(\"cleanup\"))\nio.write_standard_output_line(\"bye\")\nprocess.exit_with_message(3, \"stopped: {1 + 1}\")\nio.write_standard_output_line(\"never\")\n");
+
+        Assert.Equal(3, run.ExitCode);
+        Assert.Equal(RunTermination.ExitScript, run.Outcome.Termination);
+        Assert.Null(run.Outcome.Failure);
+        Assert.Equal("bye\ncleanup\n", run.StandardOutput);
+        Assert.Equal("stopped: 2\n", run.StandardError);
+    }
+
+    [Theory]
+    [InlineData("process.exit_with_message(0, \"x\")\n")]
+    [InlineData("process.exit_with_message(256, \"x\")\n")]
+    public void ExitWithMessageOutsideOneTo255FailsWithRuntime0016(string source)
+    {
+        var run = InterpreterHarness.AssertFailure(source, "SCRIPTS-RUNTIME-0016", "1:1");
+
+        Assert.Contains("1..255 expected", run.Outcome.Failure!.Message, StringComparison.Ordinal);
+        Assert.Equal("", run.StandardError);
+    }
+    [Fact]
     public void AssertTrueReturnsUnitAndTheRunContinues()
     {
         var run = InterpreterHarness.Run("assert(2 + 2 == 4, \"two plus two is four\")\nio.write_standard_output_line(\"after\")\n");

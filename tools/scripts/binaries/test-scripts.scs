@@ -12,7 +12,7 @@ function run_version(repo: path, search_path: string) -> process_result {
         .with_environment({"PATH": search_path})
     return match process.run(request) {
         ok(outcome) => outcome
-        error(_failure) => process.exit_with_code(251)
+        error(failure) => process.exit_with_message(251, "test-scripts: {failure.message}")
     }
 }
 
@@ -29,7 +29,7 @@ function git_run(repo: path, arguments: list<string>) -> process_result {
     let request = process.request("git", arguments).with_working_directory(repo)
     return match process.run(request) {
         ok(outcome) => outcome
-        error(_failure) => process.exit_with_code(251)
+        error(failure) => process.exit_with_message(251, "test-scripts: {failure.message}")
     }
 }
 

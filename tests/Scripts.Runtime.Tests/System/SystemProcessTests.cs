@@ -579,7 +579,7 @@ public sealed class SystemProcessMiscTests
         var failure = Assert.Throws<RuntimeFailure>(() => Call("process.exit_with_code", Integer(code)));
 
         Assert.Equal("SCRIPTS-RUNTIME-0016", failure.Code);
-        Assert.Equal(("code", code.ToString(System.Globalization.CultureInfo.InvariantCulture)), Assert.Single(failure.Arguments));
+        Assert.Equal(new[] { ("code", code.ToString(System.Globalization.CultureInfo.InvariantCulture)), ("range", "0..255") }, failure.Arguments);
     }
 }
 

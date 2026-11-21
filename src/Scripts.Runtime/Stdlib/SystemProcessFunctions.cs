@@ -20,6 +20,7 @@ internal static class SystemProcessFunctions
         table["process.terminate"] = KillProcess;
         table["process.arguments"] = ScriptArguments;
         table["process.exit_with_code"] = ExitScript;
+        table["process.exit_with_message"] = ExitWithMessage;
         table["process.request"] = Request;
         table["process.run"] = Run;
         table["process.run_inherit"] = RunInherit;
@@ -262,8 +263,24 @@ internal static class SystemProcessFunctions
     {
         var exitCode = SystemValues.IntegerAt(arguments, 0);
         throw exitCode is < 0 or > MaximumExitScriptCode
-            ? new RuntimeFailure("SCRIPTS-RUNTIME-0016", ("code", SystemValues.Invariant(exitCode)))
+            ? new RuntimeFailure("SCRIPTS-RUNTIME-0016", ("code", SystemValues.Invariant(exitCode)), ("range", "0..255"))
             : new ScriptExit((int)exitCode);
+    }
+
+    /// <summary>L7: writes the message and a newline on stderr (as `io.write_standard_error_line`), then exits like `exit_with_code`.</summary>
+    private static Value ExitWithMessage(RuntimeContext context, Value[] arguments)
+    {
+        var exitCode = SystemValues.IntegerAt(arguments, 0);
+        if (exitCode is < 1 or > MaximumExitScriptCode)
+        {
+            throw new RuntimeFailure("SCRIPTS-RUNTIME-0016", ("code", SystemValues.Invariant(exitCode)), ("range", "1..255"));
+        }
+
+        context.StandardOutput.Flush();
+        context.StandardError.Write(SystemValues.TextAt(arguments, 1));
+        context.StandardError.Write("\n");
+        context.StandardError.Flush();
+        throw new ScriptExit((int)exitCode);
     }
 
     /// <summary>
