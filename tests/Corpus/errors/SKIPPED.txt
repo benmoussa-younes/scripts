@@ -13,6 +13,7 @@ SCRIPTS-RUNTIME-0012	unreachable guard rail in 0.1.0: no script can build 1000 l
 SCRIPTS-RUNTIME-0015	depends on the available memory; manual test under ulimit -v
 SCRIPTS-RUNTIME-0018	specific harness: # signal: SIGINT 200 ms after startup
 SCRIPTS-RUNTIME-0019	specific harness: # run: scripts run script.scs > /dev/full
+SCRIPTS-LINT-0002	— retired: `process.run_shell` was removed (`SCRIPTS-TYPE-0068`)
 SCRIPTS-LINT-0009	— retired: the rule is now the static `SCRIPTS-TYPE-0069` and the fatal `SCRIPTS-RUNTIME-0022`
 SCRIPTS-LINT-0008	— retired: the rule is now the static `SCRIPTS-TYPE-0070`
 SCRIPTS-CLI-0011	— CLI cases live in the CLI tests, not in the generated .scs cases

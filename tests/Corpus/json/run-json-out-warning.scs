@@ -1,2 +1,2 @@
 #!/usr/bin/scripts run
-let _ = process.run_shell("echo hi")?
+let _ = process.run(process.request("sh", ["-c", "echo hi"]))?

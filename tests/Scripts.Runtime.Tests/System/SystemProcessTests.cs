@@ -344,59 +344,6 @@ public sealed class SystemExecWithTimeoutTests
 }
 
 [Collection(SystemTestCollection.Name)]
-public sealed class SystemExecShellTests
-{
-    [Fact]
-    public void Runs_the_command_line_through_bin_sh_as_a_single_argument()
-    {
-        using var context = NewContext();
-
-        var outcome = Ok<RecordValue>(Call(context, "process.run_shell", Text("echo one two; echo three >&2; exit 4")));
-
-        Assert.Equal("one two\n", outcome.GetText("standard_output"));
-        Assert.Equal("three\n", outcome.GetText("standard_error"));
-        Assert.Equal(4, outcome.GetInteger("exit_code"));
-        Assert.Equal("/bin/sh", outcome.GetText("program"));
-    }
-
-    [Fact]
-    public void Expands_shell_syntax_and_closes_stdin()
-    {
-        using var context = NewContext();
-        WithEnvironment("SCRIPTS_SYSTEM_SHELL_VARIABLE", "developed", () =>
-        {
-            var outcome = Ok<RecordValue>(Call(context, "process.run_shell", Text("echo $SCRIPTS_SYSTEM_SHELL_VARIABLE; cat")));
-
-            Assert.Equal("developed\n", outcome.GetText("standard_output"));
-        });
-    }
-
-    [Fact]
-    public void Nul_in_the_command_line_is_invalid_argument_with_bin_sh_as_program()
-    {
-        using var context = NewContext();
-
-        AssertProcessError(Call(context, "process.run_shell", Text("echo\0x")), "invalid_argument", "/bin/sh");
-    }
-
-    [Fact]
-    public void Flushes_standard_output_before_running()
-    {
-        using var workspace = new SystemTestWorkspace();
-        var path = workspace.Combine("out.txt");
-        using var file = SystemRawFiles.OpenShared(path);
-        var channel = new Scripts.Runtime.Output.FileDescriptorOutputChannel((int)file.SafeFileHandle.DangerousGetHandle(), "stdout", true);
-        using var context = new RuntimeContext(channel, new Scripts.Runtime.Output.MemoryOutputChannel(), []);
-
-        Call(context, "io.write_standard_output_line", Text("before"));
-        Assert.Equal(0, new FileInfo(path).Length);
-        Ok<RecordValue>(Call(context, "process.run_shell", Text("true")));
-
-        Assert.Equal("before\n", File.ReadAllText(path));
-    }
-}
-
-[Collection(SystemTestCollection.Name)]
 public sealed class SystemExecInheritTests
 {
     [Fact]

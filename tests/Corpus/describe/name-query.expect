@@ -3,5 +3,5 @@ stream: stdout
 deterministic: 2
 check: list(doc.keys())[:4] == ["language", "version", "schema_version", "query"]
 check: doc["query"] == "process"
-check: len(doc["functions"]) == 17
+check: len(doc["functions"]) == 16
 check: all(f["qualified_name"].startswith("process.") for f in doc["functions"])

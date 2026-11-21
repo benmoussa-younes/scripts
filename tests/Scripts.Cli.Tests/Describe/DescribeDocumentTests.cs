@@ -86,7 +86,7 @@ public sealed class DescribeDocumentTests
         static int Count(string name) =>
             JsonDocument.Parse(DescribeDocument.Render(name)).RootElement.GetProperty("functions").GetArrayLength();
 
-        Assert.Equal(17, Count("process"));
+        Assert.Equal(16, Count("process"));
         Assert.Equal(40, Count("filesystem"));
         Assert.Equal(25, Count("list"));
         Assert.Equal(6, Count("io"));
@@ -220,8 +220,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var functions = document.RootElement.GetProperty("functions").EnumerateArray().ToList();
 
-        Assert.Equal(208, StdlibCatalog.All.Count);
-        Assert.Equal(208, functions.Count);
+        Assert.Equal(207, StdlibCatalog.All.Count);
+        Assert.Equal(207, functions.Count);
         Assert.Equal(
             StdlibCatalog.All.Select(entry => entry.QualifiedName),
             functions.Select(item => item.GetProperty("qualified_name").GetString()!));
@@ -322,7 +322,7 @@ public sealed class DescribeDocumentTests
         var byName = document.RootElement.GetProperty("functions").EnumerateArray()
             .ToDictionary(item => item.GetProperty("kind").GetString() + ":" + item.GetProperty("qualified_name").GetString()!);
         // The pair `(kind, qualified_name)` is unique: no collision in the construction above.
-        Assert.Equal(208, byName.Count);
+        Assert.Equal(207, byName.Count);
 
         Assert.Equal(JsonValueKind.Null, byName["module_function:filesystem.read_file"].GetProperty("receiver").ValueKind);
         Assert.Equal("module_function", byName["module_function:filesystem.read_file"].GetProperty("kind").GetString());
@@ -335,7 +335,7 @@ public sealed class DescribeDocumentTests
         }
         Assert.Contains("module_function:process.run", byName.Keys);
         Assert.Contains("module_function:process.run_inherit", byName.Keys);
-        Assert.Contains("module_function:process.run_shell", byName.Keys);
+        Assert.DoesNotContain("module_function:process.run_shell", byName.Keys);
         // The global directory calls are gone: the names now belong to the filesystem namespace only.
         foreach (var removed in new[] { "function:list_directory", "function:walk_directory" })
         {
@@ -380,7 +380,6 @@ public sealed class DescribeDocumentTests
 
         Assert.Equal("module_function", byName["module_function:json.encode"].GetProperty("kind").GetString());
         Assert.Equal(StdlibCatalog.All.Count(entry => entry.Kind == StdlibKind.Method), byName.Values.Count(item => item.GetProperty("kind").GetString() == "method"));
-        Assert.True(byName["module_function:process.run_shell"].GetProperty("dangerous").GetBoolean());
         Assert.True(byName["module_function:filesystem.write_file_overwrite"].GetProperty("destructive").GetBoolean());
         Assert.False(byName["module_function:system.get_information"].GetProperty("deterministic").GetBoolean());
         foreach (var item in byName.Values.Where(item => item.GetProperty("kind").GetString() == "method"))

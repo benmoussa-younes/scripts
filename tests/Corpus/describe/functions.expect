@@ -1,9 +1,9 @@
 exit: 0
 stream: stdout
-# The 206 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 99 module functions + 103 methods.
-check: len(doc["functions"]) == 208
+# The 207 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 99 module functions + 104 methods.
+check: len(doc["functions"]) == 207
 check: sum(1 for f in doc["functions"] if f["kind"] == "function") == 4
-check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 100
+check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 99
 check: sum(1 for f in doc["functions"] if f["kind"] == "method") == 104
 check: {f["kind"] for f in doc["functions"]} == {"function", "method", "module_function"}
 check: all(list(f.keys()) == ["qualified_name", "signature", "examples", "kind", "receiver", "parameters", "returns", "error_types", "error_kinds", "dangerous", "destructive", "mutates_receiver", "deterministic", "effects", "description", "semantics", "explain"] for f in doc["functions"])
@@ -43,9 +43,8 @@ check: not any(f["qualified_name"] in {"exec", "exec_with_input", "exec_with_tim
 check: next(f for f in doc["functions"] if f["qualified_name"] == "process.arguments")["returns"] == "list<string>"
 check: next(f for f in doc["functions"] if f["qualified_name"] == "process.exit_with_code")["returns"] == "never"
 
-# Flags: process.run_shell dangerous, remove_* destructive, process.run non-deterministic.
-check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_shell")["dangerous"] is True
-check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run_shell")["destructive"] is False
+# Flags: remove_* destructive, process.run non-deterministic (process.run_shell was retired).
+check: not any(f["qualified_name"] == "process.run_shell" for f in doc["functions"])
 check: next(f for f in doc["functions"] if f["qualified_name"] == "filesystem.remove_directory_tree")["destructive"] is True
 check: next(f for f in doc["functions"] if f["qualified_name"] == "process.run")["deterministic"] is False
 check: next(f for f in doc["functions"] if f["qualified_name"] == "io.write_standard_output_line")["deterministic"] is True

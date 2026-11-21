@@ -145,7 +145,6 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.ModuleFunction, "random.bytes_hex")] = "let _r = random.bytes_hex(1)?",
         [SnippetKey(StdlibKind.ModuleFunction, "random.bytes_base64")] = "let _r = random.bytes_base64(1)?",
         [SnippetKey(StdlibKind.ModuleFunction, "random.integer_below")] = "let _r = random.integer_below(2)?",
-        [SnippetKey(StdlibKind.ModuleFunction, "process.run_shell")] = "let _r = process.run_shell(\"true\")?",
         [SnippetKey(StdlibKind.ModuleFunction, "process.arguments")] = "let _r = process.arguments()",
         [SnippetKey(StdlibKind.ModuleFunction, "json.null_value")] = "let _r = json.null_value()",
         [SnippetKey(StdlibKind.ModuleFunction, "json.from_string")] = "let _r = json.from_string(\"a\")",
@@ -272,7 +271,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(208, StdlibCatalog.All.Count);
+        Assert.Equal(207, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -309,7 +308,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(208, reached.Count);
+        Assert.Equal(207, reached.Count);
     }
 
     /// <summary>

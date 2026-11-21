@@ -6,12 +6,10 @@ namespace Scripts.Runtime.Stdlib;
 
 internal static class SystemProcessFunctions
 {
-    private const string ShellProgram = "/bin/sh";
     private const long MaximumExitScriptCode = 255;
 
     public static void Register(Dictionary<string, StdlibImplementation> table)
     {
-        table["process.run_shell"] = ExecuteShell;
         table["process.find_program_path"] = Which;
         table["process.identifier"] = (_, _) => IntegerValue.From(Environment.ProcessId);
         table["process.set_umask"] = SetUmask;
@@ -218,14 +216,6 @@ internal static class SystemProcessFunctions
         }
 
         return string.Empty;
-    }
-
-    private static Value ExecuteShell(RuntimeContext context, Value[] arguments)
-    {
-        context.StandardOutput.Flush();
-        var commandLine = SystemValues.TextAt(arguments, 0);
-        return SystemValues.GuardProcess(() =>
-            SystemValues.Success(ProcessOperations.Execute(context, ShellProgram, ["-c", commandLine], null, null)));
     }
 
     private static Value Which(RuntimeContext context, Value[] arguments) =>

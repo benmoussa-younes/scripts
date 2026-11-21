@@ -14,7 +14,7 @@ internal delegate int StandardInputRead(byte[] buffer, int offset, int count);
 /// LIMITATION (documented): <see cref="ReadLine"/> reads ahead in chunks, so the descriptor position advances past
 /// the rest of the prefetched bytes (they stay in the reader's pending buffer). A later <c>process.run_inherit</c> child
 /// (which inherits file descriptor 0) therefore starts at the current descriptor position and does not see the
-/// buffered remainder; <c>process.run_shell</c> closes stdin instead. The buffering is intentionally not changed for that.
+/// buffered remainder. The buffering is intentionally not changed for that.
 /// </para>
 /// <para>
 /// The reader created by <see cref="RuntimeContext"/> polls descriptor 0 with a short timeout and checks the

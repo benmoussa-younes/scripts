@@ -16,7 +16,6 @@ internal static class RetiredNames
         ["script_arguments"] = "process.arguments",
         ["process_id"] = "process.identifier",
         ["which"] = "process.find_program_path",
-        ["exec_shell"] = "process.run_shell",
         ["uname"] = "system.get_information",
         ["whoami"] = "system.user_name",
         ["current_directory"] = "filesystem.get_current_directory",
@@ -43,11 +42,18 @@ internal static class RetiredNames
         ["sha256_file"] = "filesystem.sha256_file",
     };
 
-    /// <summary>Global functions that became methods: the fix would rewrite the whole call, so it is prose only.</summary>
+    /// <summary>Global functions that became methods or explicit requests: prose only, no blind rename.</summary>
     private static readonly Dictionary<string, string> Conversions = new(StringComparer.Ordinal)
     {
         ["format"] = "`(template).format_template(values)`",
         ["to_path"] = "`(text).to_path()`",
+        ["exec_shell"] = "`process.run(process.request(program, arguments))`",
+    };
+
+    /// <summary>Module members that were removed with a structured replacement (prose only, no blind rename).</summary>
+    private static readonly Dictionary<(string Module, string Old), string> ModuleMemberConversions = new()
+    {
+        [("process", "run_shell")] = "`process.run(process.request(program, arguments))`",
     };
 
     /// <summary>Module members whose name changed inside the same namespace.</summary>
@@ -130,6 +136,9 @@ internal static class RetiredNames
 
     public static bool TryModuleMember(string moduleName, string oldMember, out string replacement) =>
         ModuleMembers.TryGetValue((moduleName, oldMember), out replacement!);
+
+    public static bool TryModuleMemberConversion(string moduleName, string oldMember, out string rewrite) =>
+        ModuleMemberConversions.TryGetValue((moduleName, oldMember), out rewrite!);
 
     public static bool TryMethod(string receiverKind, string oldMethod, out string replacement) =>
         Methods.TryGetValue((receiverKind, oldMethod), out replacement!);

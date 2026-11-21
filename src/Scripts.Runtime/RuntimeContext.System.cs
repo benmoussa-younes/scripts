@@ -40,7 +40,7 @@ public sealed partial class RuntimeContext : IDisposable
         StandardInput = new StandardInputReader(Interruption);
     }
 
-    /// <summary>Buffered stdout; flushed before any eprint, before process.run_inherit/process.run_shell, by Shutdown and on signal.</summary>
+    /// <summary>Buffered stdout; flushed before any eprint, before process.run_inherit, by Shutdown and on signal.</summary>
     public ITrackedOutputChannel StandardOutput { get; }
 
     /// <summary>stderr; its IsAtLineStart tells the `--errors-json` writer whether a newline must precede the JSON line.</summary>

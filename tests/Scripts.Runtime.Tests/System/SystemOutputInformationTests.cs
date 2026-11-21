@@ -261,7 +261,7 @@ public sealed class SystemCoverageTests
     /// </summary>
     private static readonly string[] StandardModuleNames =
     [
-        "io.read_standard_input", "io.read_standard_input_line", "io.write_standard_output", "io.write_standard_output_line", "io.write_standard_error_line", "io.write_standard_error", "process.arguments", "process.defer", "process.find_program_path", "process.identifier", "process.set_umask", "process.request", "process.run", "process.run_shell",
+        "io.read_standard_input", "io.read_standard_input_line", "io.write_standard_output", "io.write_standard_output_line", "io.write_standard_error_line", "io.write_standard_error", "process.arguments", "process.defer", "process.find_program_path", "process.identifier", "process.set_umask", "process.request", "process.run",
         "process.run_inherit",
         "process.spawn", "process.wait_for_process", "process.terminate",
         "process.script_path",

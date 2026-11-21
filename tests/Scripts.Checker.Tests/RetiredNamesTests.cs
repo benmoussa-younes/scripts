@@ -69,6 +69,8 @@ public sealed class RetiredNamesTests
     [Theory]
     [InlineData("let rendered = format(r\"{0}\", [\"a\"])", "format_template")]
     [InlineData("let location = to_path(\"a\")", "to_path")]
+    [InlineData("let outcome = exec_shell(\"echo a\")?", "process.run(process.request(program, arguments))")]
+    [InlineData("let outcome = process.run_shell(\"echo a\")?", "process.run(process.request(program, arguments))")]
     public void A_global_that_became_a_method_is_prose_only(string source, string hint)
     {
         var diagnostic = Retired(source);

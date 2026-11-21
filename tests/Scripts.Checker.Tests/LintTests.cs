@@ -164,17 +164,11 @@ public sealed class LintTests
     }
 
     [Fact]
-    public void Exec_shell_is_flagged_on_the_function_name()
-    {
-        Checking.AssertMarkedWarnings("let outcome = process.‸run_shell(\"echo a\")?\nio.write_standard_output_line(outcome.standard_output)", "SCRIPTS-LINT-0002");
-    }
-
-    [Fact]
     public void Warnings_are_ordered_and_never_count_as_errors()
     {
         var result = Checking.AssertMarkedWarnings(
-            "let a = process.‸run_shell(\"x\")?\nlet b = process.run(process.request(‸\"sh\", []))?\nio.write_standard_output_line(a.standard_output + b.standard_output)",
-            "SCRIPTS-LINT-0002",
+            "let name = \"echo\"\nlet a = process.run(process.request(‸name, []))?\nlet b = process.run(process.request(‸\"sh\", []))?\nio.write_standard_output_line(a.standard_output + b.standard_output)",
+            "SCRIPTS-LINT-0004",
             "SCRIPTS-LINT-0001");
         Assert.Empty(result.Errors);
     }
@@ -273,9 +267,9 @@ public sealed class LintTests
     [Fact]
     public void Warnings_are_still_reported_next_to_errors()
     {
-        var result = Checking.Check("let a = process.run_shell(\"x\")?\nlet n: integer = \"a\"\nio.write_standard_output_line(a.standard_output)");
+        var result = Checking.Check("let a = process.run(process.request(\"sh\", []))?\nlet n: integer = \"a\"\nio.write_standard_output_line(a.standard_output)");
         Assert.Equal(["SCRIPTS-TYPE-0012 2:18"], Checking.ErrorPositions(result));
-        Assert.Equal(["SCRIPTS-LINT-0002 1:17"], Checking.WarningPositions(result));
+        Assert.Equal(["SCRIPTS-LINT-0001 1:37"], Checking.WarningPositions(result));
     }
 
     [Fact]

@@ -128,7 +128,7 @@ internal sealed partial class FileAnalyzer
                 return ErrorType.Instance;
             }
 
-            ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count, identifier.Span);
+            ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count);
             return CheckSignatureCall(
                 signature,
                 new TypeBindings(),
@@ -266,7 +266,7 @@ internal sealed partial class FileAnalyzer
             return ErrorType.Instance;
         }
 
-        ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count, member.MemberSpan);
+        ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count);
         return CheckSignatureCall(
             signature,
             new TypeBindings(),
@@ -795,13 +795,8 @@ internal sealed partial class FileAnalyzer
             ("signature", signature.SignatureText));
     }
 
-    private void ApplyLint(StdlibEntry entry, IReadOnlyList<Expression> arguments, int parameterCount, Span nameSpan)
+    private void ApplyLint(StdlibEntry entry, IReadOnlyList<Expression> arguments, int parameterCount)
     {
-        if (LintRules.IsShellEntryPoint(entry))
-        {
-            Report(ErrorCodes.Lint0002, nameSpan);
-        }
-
         if (arguments.Count == 0)
         {
             return;

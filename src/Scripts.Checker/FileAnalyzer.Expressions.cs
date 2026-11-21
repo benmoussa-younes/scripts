@@ -732,6 +732,12 @@ internal sealed partial class FileAnalyzer
             return;
         }
 
+        if (RetiredNames.TryModuleMemberConversion(moduleName, memberName, out var rewrite))
+        {
+            Report(ErrorCodes.Type0068, span, ("old", $"{moduleName}.{memberName}"), ("new", rewrite));
+            return;
+        }
+
         Report(
             ErrorCodes.Type0011,
             span,
