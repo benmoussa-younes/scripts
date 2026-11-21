@@ -2,18 +2,18 @@ let work_directory = filesystem.make_temporary_directory("scripts-stdlib-hard-li
 let existing_path = work_directory / "existing.txt"
 filesystem.write_file_overwrite("content", existing_path)?
 let link_path = work_directory / "link.txt"
-filesystem.make_hard_link(existing_path, link_path)?
+filesystem.make_hard_link(existing_path = existing_path, new_path = link_path)?
 let existing_status = filesystem.get_path_status(existing_path)?
 let link_status = filesystem.get_path_status(link_path)?
 io.write_standard_output_line("{existing_status.inode == link_status.inode}")
 io.write_standard_output_line("{link_status.link_count}")
-match filesystem.make_hard_link(existing_path, link_path) {
+match filesystem.make_hard_link(existing_path = existing_path, new_path = link_path) {
     ok(_) => io.write_standard_output_line("created")
     error(failure) => io.write_standard_output_line(failure.kind)
 }
 let directory_path = work_directory / "directory"
 filesystem.make_directory(directory_path)?
-match filesystem.make_hard_link(directory_path, work_directory / "directory-link") {
+match filesystem.make_hard_link(existing_path = directory_path, new_path = work_directory / "directory-link") {
     ok(_) => io.write_standard_output_line("created")
     error(failure) => io.write_standard_output_line(failure.kind)
 }

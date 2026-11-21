@@ -18,15 +18,15 @@ let moved_file = work_directory / "moved.txt"
 
 filesystem.make_directory_tree(deep_directory)?
 filesystem.write_file_overwrite("data\n", source_file)?
-filesystem.copy_file(source_file, copy_target)?
+filesystem.copy_file(source_path = source_file, destination_path = copy_target)?
 io.write_standard_output_line("copie ok")
-match filesystem.copy_file(source_file, copy_target) {
+match filesystem.copy_file(source_path = source_file, destination_path = copy_target) {
     ok(_) => io.write_standard_output_line("copie ecrasee")
     error(copy_failure) => io.write_standard_output_line("copie refusee: {copy_failure.kind}")
 }
-filesystem.copy_file_overwrite(source_file, copy_target)?
+filesystem.copy_file_overwrite(source_path = source_file, destination_path = copy_target)?
 io.write_standard_output_line("copie ecrasee explicitement")
-filesystem.move_path(copy_target, moved_file)?
+filesystem.move_path(source_path = copy_target, destination_path = moved_file)?
 let copy_target_exists = filesystem.path_exists(copy_target)
 io.write_standard_output_line("ancien chemin existe: {copy_target_exists}")
 print_entry_names(work_directory)?

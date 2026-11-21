@@ -1,0 +1,4 @@
+# expect-warning: SCRIPTS-LINT-0014 3:6
+function move(from: path, to: path) -> unit {}
+move(p"a", p"b")
+io.write_standard_output_line("ok")

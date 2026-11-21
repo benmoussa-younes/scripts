@@ -463,6 +463,57 @@ internal sealed partial class FileAnalyzer
     }
 
     /// <summary>
+    /// SCRIPTS-LINT-0014: two consecutive `path` parameters receive positional arguments, so a swap cannot be detected.
+    /// Reported once per call, at the first such pair, unless both arguments already carry the parameter names. The
+    /// fix names every argument (a call is either fully positional or fully named) and keeps the source order, hence
+    /// the evaluation order.
+    /// </summary>
+    private void ReportPositionalPaths(IReadOnlyList<CoreCallArgument> arguments, CallSignature signature)
+    {
+        var names = signature.ParameterNames;
+        if (names.Count != signature.Parameters.Count || arguments.Count != names.Count)
+        {
+            return;
+        }
+
+        for (var position = 0; position + 1 < names.Count; position++)
+        {
+            if (!ScriptTypes.Path.Equals(signature.Parameters[position])
+                || !ScriptTypes.Path.Equals(signature.Parameters[position + 1]))
+            {
+                continue;
+            }
+
+            var first = arguments[position];
+            var second = arguments[position + 1];
+            if (first.Expression is IdentifierExpression { } firstIdentifier && firstIdentifier.Name == names[position]
+                && second.Expression is IdentifierExpression { } secondIdentifier && secondIdentifier.Name == names[position + 1])
+            {
+                continue;
+            }
+
+            var start = arguments[0].Expression.Span.Start;
+            var named = new System.Text.StringBuilder();
+            for (var index = 0; index < arguments.Count; index++)
+            {
+                var expression = arguments[index].Expression.Span;
+                var nextStart = index + 1 < arguments.Count ? arguments[index + 1].Expression.Span.Start : expression.End;
+                named.Append(names[index]).Append(" = ").Append(source.Text, expression.Start, nextStart - expression.Start);
+            }
+
+            var fix = new Fix("name the arguments", source, new Span(start, arguments[^1].Expression.Span.End), named.ToString());
+            Report(
+                ErrorCodes.Lint0014,
+                new Span(first.Expression.Span.Start, second.Expression.Span.End),
+                fix,
+                ("first", names[position]),
+                ("second", names[position + 1]),
+                ("function", signature.DisplayName));
+            return;
+        }
+    }
+
+    /// <summary>
     /// Binds a call's arguments to its signature. A positional call keeps the historical path unchanged. A named
     /// call (the parser guarantees it is fully named) is mapped to the parameter positions and validated: every
     /// parameter must be named exactly once, with no unknown or repeated name (SCRIPTS-TYPE-0067). The AST keeps the
@@ -477,6 +528,7 @@ internal sealed partial class FileAnalyzer
         bound = Wrap(arguments);
         if (!arguments.Any(argument => argument.Name is not null))
         {
+            ReportPositionalPaths(arguments, signature);
             return true;
         }
 

@@ -639,6 +639,46 @@ public sealed class LintTests
         Assert.Empty(result.Warnings);
     }
 
+    [Theory]
+    // L3: two consecutive `path` parameters receiving positional arguments are SCRIPTS-LINT-0014.
+    [InlineData("filesystem.copy_file(‸p\"a\", p\"b\")?")]
+    [InlineData("let a = p\"a\"\nfilesystem.make_hard_link(‸a, p\"b\")?")]
+    [InlineData("function move(from: path, to: path) -> unit {\n    io.write_standard_output_line(\"{from} {to}\")\n}\nmove(‸p\"a\", p\"b\")")]
+    public void Consecutive_paths_passed_by_position_are_LINT_0014(string marked) =>
+        Checking.AssertMarkedWarnings(marked, "SCRIPTS-LINT-0014");
+
+    [Theory]
+    [InlineData("let source_path = p\"a\"\nlet destination_path = p\"b\"\nfilesystem.copy_file(source_path, destination_path)?")]
+    [InlineData("filesystem.copy_file(source_path = p\"a\", destination_path = p\"b\")?")]
+    [InlineData("io.write_standard_output_line(\"a-b\".replace(\"-\", \"+\"))")]
+    [InlineData("let copy = (a: path, b: path) => \"{a}{b}\"\nio.write_standard_output_line(copy(p\"a\", p\"b\"))")]
+    public void Named_self_describing_string_and_function_value_arguments_are_not_LINT_0014(string source) =>
+        AssertNoErrorsOrWarnings(source);
+
+    [Fact]
+    public void The_LINT_0014_fix_names_every_argument_and_keeps_their_order()
+    {
+        const string text = "filesystem.copy_file(p\"a\" ,  p\"b\")?";
+        var fix = Checking.Check(text).Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("source_path = p\"a\" ,  destination_path = p\"b\"", fix.Replacement);
+        Assert.Equal((21, 33), (fix.Span.Start, fix.Span.End));
+    }
+
+    [Fact]
+    public void The_LINT_0014_fix_keeps_a_comment_between_the_arguments()
+    {
+        const string text = "filesystem.copy_file(p\"a\", # keep\n    p\"b\")?";
+        var fix = Checking.Check(text).Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("source_path = p\"a\", # keep\n    destination_path = p\"b\"", fix.Replacement);
+
+        var fixedText = text[..fix.Span.Start] + fix.Replacement + text[fix.Span.End..];
+        var checkedAfterFix = Checking.Check(fixedText);
+        Assert.Empty(checkedAfterFix.Errors);
+        Assert.Empty(checkedAfterFix.Warnings);
+    }
+
     private static void AssertType0070WithoutWarnings(string marked)
     {
         var (text, positions) = Checking.StripMarks(marked);

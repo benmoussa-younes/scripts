@@ -3,10 +3,10 @@ let source_file = work_directory / "a.txt"
 let moved_file = work_directory / "b.txt"
 filesystem.write_file_overwrite("nouveau", source_file)?
 filesystem.write_file_overwrite("ancien", moved_file)?
-filesystem.move_path_overwrite(source_file, moved_file)?
+filesystem.move_path_overwrite(source_path = source_file, destination_path = moved_file)?
 io.write_standard_output_line(filesystem.read_file(moved_file)?)
 io.write_standard_output_line("{filesystem.path_exists(source_file)}")
-match filesystem.move_path_overwrite(moved_file, moved_file) {
+match filesystem.move_path_overwrite(source_path = moved_file, destination_path = moved_file) {
     ok(_) => io.write_standard_output_line("déplacé")
     error(failure) => io.write_standard_output_line(failure.kind)
 }
