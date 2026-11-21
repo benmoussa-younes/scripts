@@ -193,4 +193,5 @@ public static class ErrorCodes
     public const string Lint0010 = "SCRIPTS-LINT-0010";
     public const string Lint0011 = "SCRIPTS-LINT-0011";
     public const string Lint0012 = "SCRIPTS-LINT-0012";
+    public const string Lint0013 = "SCRIPTS-LINT-0013";
 }

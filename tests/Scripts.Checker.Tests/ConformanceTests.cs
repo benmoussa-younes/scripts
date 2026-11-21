@@ -116,8 +116,8 @@ public sealed class ConformanceTests
     {
         var expected = CheckerCases.SemanticCodes();
         // Active semantic codes: TYPE 68 (70 minus the reserved SCRIPTS-TYPE-0060/0061),
-        // LINT 10 (12 minus the retired SCRIPTS-LINT-0008/0009), MODULE 5.
-        Assert.Equal(68 + 10 + 5, expected.Count);
+        // LINT 11 (13 minus the retired SCRIPTS-LINT-0008/0009), MODULE 5.
+        Assert.Equal(68 + 11 + 5, expected.Count);
         Assert.Equal(expected, CheckerCases.AllNames());
     }
 

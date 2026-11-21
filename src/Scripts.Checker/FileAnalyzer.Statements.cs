@@ -253,6 +253,7 @@ internal sealed partial class FileAnalyzer
         {
             case VariableSymbol variable:
                 isMutable = variable.IsMutable;
+                variable.IsWritten = true;
                 if (!variable.IsMutable)
                 {
                     Report(ErrorCodes.Type0039, assignment.TargetSpan, ("name", variable.Name));

@@ -11,12 +11,12 @@ let several: list<result<integer, error>> = [
     error(error("permission_denied", "M_LAST", "s")),
 ]
 match several.collect() {
-    ok(numbers) => io.write_standard_output_line("inattendu")
+    ok(_numbers) => io.write_standard_output_line("inattendu")
     error(failure) => io.write_standard_output_line("{failure.kind}/{failure.message}")
 }
 
 let none: list<result<integer, error>> = []
 match none.collect() {
     ok(numbers) => io.write_standard_output_line("vide={numbers.length()}")
-    error(failure) => io.write_standard_output_line("inattendu")
+    error(_failure) => io.write_standard_output_line("inattendu")
 }

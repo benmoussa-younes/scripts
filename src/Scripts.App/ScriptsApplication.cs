@@ -330,12 +330,15 @@ public static class ScriptsApplication
         var result = ProgramChecker.Check(loaded.Program!);
         if (command.Fix)
         {
-            var moduleFixes = result.Errors.Count(error => error.Fix is { File: not null }
-                && error.Fix.File.Path != loaded.Program!.Entry.Source.Path);
+            // A warning's fix (L5: rename an unread binding) is applied only to a program without errors: an error fix
+            // such as a typo rename may make that binding read, and the two edits together would break the script.
+            IReadOnlyList<Diagnostic> fixable = result.Errors.Count > 0 ? result.Errors : result.Warnings;
+            var moduleFixes = fixable.Count(diagnostic => diagnostic.Fix is { File: not null }
+                && diagnostic.Fix.File.Path != loaded.Program!.Entry.Source.Path);
             int appliedToProgram;
             try
             {
-                appliedToProgram = ApplySafeFixes(loaded.Program!.Entry.Source, result.Errors);
+                appliedToProgram = ApplySafeFixes(loaded.Program!.Entry.Source, fixable);
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
@@ -429,14 +432,17 @@ public static class ScriptsApplication
 
         var text = entry.Text;
         var applied = 0;
+        var editedFrom = text.Length;
         foreach (var fix in fixes)
         {
-            if (fix.Span.Start < 0 || fix.Span.End > text.Length || fix.Span.Start > fix.Span.End)
+            // Fixes are applied from the end of the file; one overlapping an edit already made is skipped.
+            if (fix.Span.Start < 0 || fix.Span.End > editedFrom || fix.Span.Start > fix.Span.End)
             {
                 continue;
             }
 
             text = string.Concat(text.AsSpan(0, fix.Span.Start), fix.Replacement, text.AsSpan(fix.Span.End));
+            editedFrom = fix.Span.Start;
             applied++;
         }
 

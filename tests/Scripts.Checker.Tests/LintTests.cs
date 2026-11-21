@@ -41,10 +41,10 @@ public sealed class LintTests
     public void Exec_request_checks_its_program_argument()
     {
         Checking.AssertMarkedWarnings(
-            "let request = process.request(‸\"sh\", [\"-c\", \"x\"])",
+            "let _request = process.request(‸\"sh\", [\"-c\", \"x\"])",
             "SCRIPTS-LINT-0001");
         Checking.AssertMarkedWarnings(
-            "let program = \"true\"\nlet request = process.request(‸program, [])",
+            "let program = \"true\"\nlet _request = process.request(‸program, [])",
             "SCRIPTS-LINT-0004");
     }
 
@@ -542,7 +542,7 @@ public sealed class LintTests
     {
         // Declared outside the innermost loop body, the string accumulates across its iterations: still quadratic.
         Checking.AssertMarkedWarnings("""
-            for outer in ["a", "b"] {
+            for _outer in ["a", "b"] {
                 let mutable s = ""
                 for inner in ["x", "y"] {
                     ‸s = s + inner
@@ -591,6 +591,45 @@ public sealed class LintTests
             """);
         Assert.Contains(result.Errors, error => error.Code == "SCRIPTS-TYPE-0001");
         Assert.DoesNotContain(result.Warnings, warning => warning.Code == "SCRIPTS-LINT-0012");
+    }
+
+    [Theory]
+    // L5: a local, `for`, pattern or non-public script binding never read is SCRIPTS-LINT-0013.
+    [InlineData("let ‸unused = \"a\".trim_whitespace()\nio.write_standard_output_line(\"ok\")")]
+    [InlineData("for ‸index in range(0, 2) {\n    io.write_standard_output_line(\"t\")\n}")]
+    [InlineData("match \"7\".parse_integer() {\n    ok(‸value) => io.write_standard_output_line(\"e\")\n    error(_) => io.write_standard_output_line(\"n\")\n}")]
+    [InlineData("function f() -> integer {\n    let ‸inner = 1\n    return 2\n}\nio.write_standard_output_line(\"{f()}\")")]
+    [InlineData("let mutable ‸total = 0\nfor n in [1, 2] {\n    total += n\n}")]
+    public void An_unread_binding_is_LINT_0013(string marked) =>
+        Checking.AssertMarkedWarnings(marked, "SCRIPTS-LINT-0013");
+
+    [Theory]
+    [InlineData("let mutable items = [1]\nitems.append(2)")]
+    [InlineData("let _kept = \"a\".trim_whitespace()")]
+    [InlineData("function f(unused: integer) -> integer {\n    return 1\n}\nio.write_standard_output_line(\"{f(2)}\")")]
+    [InlineData("let doubled = [1].transform(n => 2)\nio.write_standard_output_line(\"{doubled.length()}\")")]
+    public void Reads_parameters_constants_and_underscore_names_are_not_LINT_0013(string source) =>
+        AssertNoErrorsOrWarnings(source);
+
+    [Fact]
+    public void An_unread_result_binding_is_TYPE_0049_only()
+    {
+        var result = Checking.Check("let parsed = \"1\".parse_integer()");
+        Assert.Equal(["SCRIPTS-TYPE-0049"], result.Errors.Select(error => error.Code));
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void The_LINT_0013_fix_renames_the_declaration_only_when_safe()
+    {
+        var fix = Checking.Check("let unused = \"a\".trim_whitespace()").Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("_unused", fix.Replacement);
+        Assert.Equal((4, 10), (fix.Span.Start, fix.Span.End));
+
+        // A write would be left behind by a declaration-only rename, and an existing `_unused` could be shadowed.
+        Assert.Null(Checking.Check("let mutable total = \"a\".length()\ntotal = 1").Warnings.Single().Fix);
+        Assert.Null(Checking.Check("let unused = \"a\".trim_whitespace()\nlet _unused = \"b\".trim_whitespace()").Warnings.Single().Fix);
     }
 
     private static void AssertNoErrorsOrWarnings(string source)
