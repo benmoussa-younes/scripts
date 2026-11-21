@@ -279,6 +279,10 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "float.minimum")] = "let _r = 1.0.minimum(2.0)",
         [SnippetKey(StdlibKind.Method, "float.maximum")] = "let _r = 1.0.maximum(2.0)",
         [SnippetKey(StdlibKind.Method, "list<float>.sum_floats")] = "let _r = [1.0, 2.0].sum_floats()?",
+        [SnippetKey(StdlibKind.Method, "string.find_all_regex")] = "let _r = \"a1b2\".find_all_regex(\"\\\\d+\")?",
+        [SnippetKey(StdlibKind.Method, "list<T>.chunked")] = "let _r = [1, 2, 3].chunked(2)?",
+        [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_encode")] = "let _r = encoding.url_encode(\"a b\")",
+        [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_decode")] = "let _r = encoding.url_decode(\"a%20b\")?",
     };
 
     /// <summary>`(kind, qualified_name)` — unique across the catalogue.</summary>
@@ -291,7 +295,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(225, StdlibCatalog.All.Count);
+        Assert.Equal(229, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -328,7 +332,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(225, reached.Count);
+        Assert.Equal(229, reached.Count);
     }
 
     /// <summary>

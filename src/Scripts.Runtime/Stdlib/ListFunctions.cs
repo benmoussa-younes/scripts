@@ -34,6 +34,7 @@ internal static class ListFunctions
         table["list<T>.remove_at"] = RemoveAt;
         table["list<T>.distinct"] = Distinct;
         table["list<list<T>>.flatten"] = Flatten;
+        table["list<T>.chunked"] = Chunked;
         table["list<T>.group_by"] = GroupBy;
     }
 
@@ -51,6 +52,42 @@ internal static class ListFunctions
         for (var index = (int)startIndex; index < startIndex + count; index++)
         {
             result.Add(items[index].DeepCopy());
+        }
+
+        return ResultValue.Ok(new ListValue(result));
+    }
+
+    private static Value Chunked(RuntimeContext context, Value[] arguments)
+    {
+        var items = List(arguments, 0).Items;
+        var size = Integer(arguments, 1);
+        if (size <= 0)
+        {
+            return ResultValue.Error(ErrorValues.Error(
+                "invalid_argument",
+                string.Empty,
+                "chunk size must be positive"));
+        }
+
+        if (items.Count == 0)
+        {
+            return ResultValue.Ok(new ListValue([]));
+        }
+
+        var chunkSize = (int)Math.Min(size, items.Count);
+        var chunkCount = (items.Count + chunkSize - 1) / chunkSize;
+        SizeLimits.EnsureListLength(chunkCount);
+        var result = new List<Value>(chunkCount);
+        for (var offset = 0; offset < items.Count; offset += chunkSize)
+        {
+            var length = Math.Min(chunkSize, items.Count - offset);
+            var chunk = new List<Value>(length);
+            for (var index = 0; index < length; index++)
+            {
+                chunk.Add(items[offset + index].DeepCopy());
+            }
+
+            result.Add(new ListValue(chunk));
         }
 
         return ResultValue.Ok(new ListValue(result));

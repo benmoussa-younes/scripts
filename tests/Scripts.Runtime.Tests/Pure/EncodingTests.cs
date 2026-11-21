@@ -112,4 +112,41 @@ public class EncodingTests
         var error = ErrorRecord(Call(function, Text(text)));
         Assert.Equal(string.Empty, error.GetText("subject"));
     }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("ABCxyz0129-_.~", "ABCxyz0129-_.~")]
+    [InlineData("hello world", "hello%20world")]
+    [InlineData("a+b=c&d/e?f#g%h", "a%2Bb%3Dc%26d%2Fe%3Ff%23g%25h")]
+    [InlineData("café", "caf%C3%A9")]
+    [InlineData("\U0001F600", "%F0%9F%98%80")]
+    public void Url_encode_follows_rfc3986_with_uppercase_hex_and_never_uses_plus(string text, string expected) =>
+        Assert.Equal(Text(expected), Call("encoding.url_encode", Text(text)));
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("hello%20world", "hello world")]
+    [InlineData("a+b", "a+b")]
+    [InlineData("caf%c3%a9", "café")]
+    [InlineData("caf%C3%A9", "café")]
+    [InlineData("%F0%9F%98%80", "\U0001F600")]
+    [InlineData("%EF%BB%BFa", "\uFEFFa")]
+    public void Url_decode_decodes_both_cases_keeps_plus_and_preserves_bom(string text, string expected) =>
+        Assert.Equal(expected, OkText(Call("encoding.url_decode", Text(text))));
+
+    [Theory]
+    [InlineData("%")]
+    [InlineData("%2")]
+    [InlineData("abc%2")]
+    [InlineData("%ZZ")]
+    [InlineData("%2G")]
+    public void Url_decode_rejects_malformed_percent_sequences(string text) =>
+        AssertValueError(Call("encoding.url_decode", Text(text)), "invalid_argument");
+
+    [Theory]
+    [InlineData("%FF")]
+    [InlineData("%C0%AF")]
+    [InlineData("%ED%A0%80")]
+    public void Url_decode_rejects_invalid_utf8_bytes(string text) =>
+        AssertValueError(Call("encoding.url_decode", Text(text)), "invalid_encoding");
 }

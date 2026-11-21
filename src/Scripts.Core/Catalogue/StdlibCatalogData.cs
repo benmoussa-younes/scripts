@@ -653,6 +653,13 @@ public static class StdlibCatalogData
             "splits {receiver} at every match of {pattern}",
             "splits at every **non-overlapping** match of `pattern` (the `matches` engine); captures are **not** included; leading, trailing and adjacent matches produce empty elements; no match → `[receiver]`; an empty **literal** pattern is `SCRIPTS-TYPE-0065` before execution, a zero-length match (including an empty pattern computed at run time) → `error(invalid_argument)`; an invalid/unsupported pattern → `error(invalid_regex)`; an unpaired surrogate half in a piece is replaced by U+FFFD."),
         new(
+            "string.find_all_regex", StdlibKind.Method, "string", null, "find_all_regex",
+            [new("pattern", "string")], "result<list<string>, error>", "string.find_all_regex(pattern: string) -> result<list<string>, error>", "let numbers = \"a12b345c\".find_all_regex(\"\\\\d+\")?\nio.write_standard_output_line(numbers.join(\",\"))\nlet none = \"abc\".find_all_regex(\"\\\\d+\")?\nio.write_standard_output_line(\"{none.length()}\")", "12,345\n0",
+            "returns all **non-overlapping** matches of `pattern` in order of appearance (the `NonBacktracking` engine)",
+            ["invalid_regex"], ["none"], false, false, false, true,
+            "finds all matches of {pattern} in {receiver}",
+            "returns all **non-overlapping** matches of `pattern` in order of appearance (the `NonBacktracking` engine); no match → `ok([])`; an invalid or unsupported pattern → `error(invalid_regex)`; zero-length matches advance by one UTF-16 code unit so matching always terminates; respects `MaximumCollectionLength` and replaces any isolated surrogate half with U+FFFD."),
+        new(
             "string.pad_start", StdlibKind.Method, "string", null, "pad_start",
             [new("width", "integer"), new("padding_text", "string")], "result<string, error>", "string.pad_start(width: integer, padding_text: string) -> result<string, error>", "io.write_standard_output_line(\"42\".pad_start(5, \"0\")?)\nio.write_standard_output_line(\"abc\".pad_start(2, \"0\")?)\nmatch \"a\".pad_start(-1, \"0\") {\n    ok(_) => io.write_standard_output_line(\"ok\")\n    error(failure) => io.write_standard_output_line(failure.kind)\n}", "00042\nabc\nout_of_range",
             "`width` counts **Unicode scalars** (like `length`/`substring`)",
@@ -1086,6 +1093,13 @@ public static class StdlibCatalogData
             [], ["none"], false, false, false, true,
             "concatenates the inner lists of {receiver}",
             "flattens one level: concatenates the inner lists in order into a new list of copies; the receiver is unchanged. The receiver MUST be a `list<list<T>>`."),
+        new(
+            "list<T>.chunked", StdlibKind.Method, "list<T>", null, "chunked",
+            [new("size", "integer")], "result<list<list<T>>, error>", "list<T>.chunked(size: integer) -> result<list<list<T>>, error>", "let chunks = [1, 2, 3, 4, 5].chunked(2)?\nio.write_standard_output_line(\"{chunks.length()}\")\nmatch [1, 2].chunked(0) {\n    ok(_) => io.write_standard_output_line(\"ok\")\n    error(failure) => io.write_standard_output_line(failure.kind)\n}", "3\ninvalid_argument",
+            "splits the receiver into contiguous sublists of length `size` (the last chunk may be shorter)",
+            ["invalid_argument"], ["none"], false, false, false, true,
+            "splits {receiver} into chunks of size {size}",
+            "splits the receiver into contiguous sublists of length `size` (the last chunk may be shorter); `size <= 0` → `error(invalid_argument)`; an empty list with `size > 0` → `ok([])`; pure, deterministic, copies elements by value without mutating the receiver."),
         new(
             "list<T>.group_by", StdlibKind.Method, "list<T>", null, "group_by",
             [new("key_function", "function(T) -> K")], "map<K, list<T>>", "list<T>.group_by(key_function: function(T) -> K) -> map<K, list<T>>", "let groups = [\"a\", \"bb\", \"cc\"].group_by(text => text.length())\nio.write_standard_output_line(groups.get_value(2)?.join(\",\"))", "bb,cc",
@@ -1548,6 +1562,20 @@ public static class StdlibCatalogData
             ["invalid_argument", "invalid_encoding"], ["none"], false, false, false, true,
             "decodes {text} from hexadecimal",
             "decodes **hexadecimal** digits (upper- or lowercase, two per byte) to bytes, then decodes them as **strict** UTF-8; an odd length or a non-hexadecimal character is `error(invalid_argument)`; decoded bytes that are not valid UTF-8 (no BOM detection, U+FEFF kept) are `error(invalid_encoding)`. An empty input gives `ok(\"\")`."),
+        new(
+            "encoding.url_encode", StdlibKind.ModuleFunction, null, "encoding", "url_encode",
+            [new("text", "string")], "string", "encoding.url_encode(text: string) -> string", "io.write_standard_output_line(encoding.url_encode(\"hello world/é~_-.1\"))", "hello%20world%2F%C3%A9~_-.1",
+            "percent-encodes the UTF-8 bytes of `text` per RFC 3986 (unreserved `A-Z a-z 0-9 - _ . ~` kept; all other bytes encoded as uppercase `%XX`; never `+` for spaces)",
+            [], ["none"], false, false, false, true,
+            "percent-encodes {text} per RFC 3986",
+            "percent-encodes the UTF-8 bytes of `text` per RFC 3986 (unreserved `A-Z a-z 0-9 - _ . ~` kept; all other bytes encoded as uppercase `%XX`; never `+` for spaces); an empty input gives the empty string."),
+        new(
+            "encoding.url_decode", StdlibKind.ModuleFunction, null, "encoding", "url_decode",
+            [new("text", "string")], "result<string, error>", "encoding.url_decode(text: string) -> result<string, error>", "io.write_standard_output_line(encoding.url_decode(\"hello%20world%2f%C3%A9\")?)\nmatch encoding.url_decode(\"%2\") {\n    ok(value) => io.write_standard_output_line(value)\n    error(failure) => io.write_standard_output_line(failure.kind)\n}", "hello world/é\ninvalid_argument",
+            "decodes percent-encoded `%XX` sequences (upper- or lowercase) into bytes, then decodes as **strict** UTF-8",
+            ["invalid_argument", "invalid_encoding"], ["none"], false, false, false, true,
+            "decodes percent-encoded {text}",
+            "decodes percent-encoded `%XX` sequences (upper- or lowercase) into bytes, then decodes as **strict** UTF-8 (no BOM detection, U+FEFF kept); `+` is kept verbatim as `+`; text outside a `%XX` escape is copied as written, so raw UTF-8 passes through; a truncated or non-hexadecimal `%` escape is `error(invalid_argument)`; decoded bytes that are not valid UTF-8 are `error(invalid_encoding)`."),
         new(
             "random.bytes_hex", StdlibKind.ModuleFunction, null, "random", "bytes_hex",
             [new("byte_count", "integer")], "result<string, error>", "random.bytes_hex(byte_count: integer) -> result<string, error>", "let value = random.bytes_hex(16)?\nio.write_standard_output_line(\"{value.length()}\")", "32",
