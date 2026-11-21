@@ -1,10 +1,10 @@
 exit: 0
 stream: stdout
-# The 207 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 99 module functions + 104 methods.
-check: len(doc["functions"]) == 207
+# The 225 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 99 module functions + 122 methods.
+check: len(doc["functions"]) == 225
 check: sum(1 for f in doc["functions"] if f["kind"] == "function") == 4
 check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 99
-check: sum(1 for f in doc["functions"] if f["kind"] == "method") == 104
+check: sum(1 for f in doc["functions"] if f["kind"] == "method") == 122
 check: {f["kind"] for f in doc["functions"]} == {"function", "method", "module_function"}
 check: all(list(f.keys()) == ["qualified_name", "signature", "examples", "kind", "receiver", "parameters", "returns", "error_types", "error_kinds", "dangerous", "destructive", "mutates_receiver", "deterministic", "effects", "description", "semantics", "explain"] for f in doc["functions"])
 # "description", the whole one-line semantics, then the explain template (DESIGN §10).

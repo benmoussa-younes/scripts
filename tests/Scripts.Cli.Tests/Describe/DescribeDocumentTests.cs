@@ -88,7 +88,7 @@ public sealed class DescribeDocumentTests
 
         Assert.Equal(16, Count("process"));
         Assert.Equal(40, Count("filesystem"));
-        Assert.Equal(25, Count("list"));
+        Assert.Equal(26, Count("list"));
         Assert.Equal(6, Count("io"));
         Assert.Equal(10, Count("json"));
         Assert.Equal(7, Count("system"));
@@ -220,8 +220,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var functions = document.RootElement.GetProperty("functions").EnumerateArray().ToList();
 
-        Assert.Equal(207, StdlibCatalog.All.Count);
-        Assert.Equal(207, functions.Count);
+        Assert.Equal(225, StdlibCatalog.All.Count);
+        Assert.Equal(225, functions.Count);
         Assert.Equal(
             StdlibCatalog.All.Select(entry => entry.QualifiedName),
             functions.Select(item => item.GetProperty("qualified_name").GetString()!));
@@ -322,7 +322,7 @@ public sealed class DescribeDocumentTests
         var byName = document.RootElement.GetProperty("functions").EnumerateArray()
             .ToDictionary(item => item.GetProperty("kind").GetString() + ":" + item.GetProperty("qualified_name").GetString()!);
         // The pair `(kind, qualified_name)` is unique: no collision in the construction above.
-        Assert.Equal(207, byName.Count);
+        Assert.Equal(225, byName.Count);
 
         Assert.Equal(JsonValueKind.Null, byName["module_function:filesystem.read_file"].GetProperty("receiver").ValueKind);
         Assert.Equal("module_function", byName["module_function:filesystem.read_file"].GetProperty("kind").GetString());

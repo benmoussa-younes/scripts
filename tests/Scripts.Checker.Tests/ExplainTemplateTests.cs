@@ -259,6 +259,26 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "run_request.with_working_directory")] = "let _r = process.request(\"true\", []).with_working_directory(p\"/tmp\")",
         [SnippetKey(StdlibKind.Method, "run_request.with_environment")] = "let _r = process.request(\"true\", []).with_environment({\"GREETING\": \"hi\"})",
         [SnippetKey(StdlibKind.Method, "run_request.with_timeout")] = "let _r = process.request(\"true\", []).with_timeout(1000)",
+
+        // --- numeric & list<float> math methods ---
+        [SnippetKey(StdlibKind.Method, "integer.power")] = "let _r = 2.power(3)?",
+        [SnippetKey(StdlibKind.Method, "integer.clamp")] = "let _r = 5.clamp(0, 10)?",
+        [SnippetKey(StdlibKind.Method, "integer.minimum")] = "let _r = 3.minimum(7)",
+        [SnippetKey(StdlibKind.Method, "integer.maximum")] = "let _r = 3.maximum(7)",
+        [SnippetKey(StdlibKind.Method, "float.floor")] = "let _r = 1.5.floor()",
+        [SnippetKey(StdlibKind.Method, "float.ceiling")] = "let _r = 1.5.ceiling()",
+        [SnippetKey(StdlibKind.Method, "float.round")] = "let _r = 1.5.round()",
+        [SnippetKey(StdlibKind.Method, "float.truncate")] = "let _r = 1.5.truncate()",
+        [SnippetKey(StdlibKind.Method, "float.power")] = "let _r = 2.0.power(3.0)?",
+        [SnippetKey(StdlibKind.Method, "float.square_root")] = "let _r = 9.0.square_root()?",
+        [SnippetKey(StdlibKind.Method, "float.natural_log")] = "let _r = 1.0.natural_log()?",
+        [SnippetKey(StdlibKind.Method, "float.log2")] = "let _r = 8.0.log2()?",
+        [SnippetKey(StdlibKind.Method, "float.log10")] = "let _r = 100.0.log10()?",
+        [SnippetKey(StdlibKind.Method, "float.exponential")] = "let _r = 0.0.exponential()?",
+        [SnippetKey(StdlibKind.Method, "float.clamp")] = "let _r = 0.5.clamp(0.0, 1.0)?",
+        [SnippetKey(StdlibKind.Method, "float.minimum")] = "let _r = 1.0.minimum(2.0)",
+        [SnippetKey(StdlibKind.Method, "float.maximum")] = "let _r = 1.0.maximum(2.0)",
+        [SnippetKey(StdlibKind.Method, "list<float>.sum_floats")] = "let _r = [1.0, 2.0].sum_floats()?",
     };
 
     /// <summary>`(kind, qualified_name)` — unique across the catalogue.</summary>
@@ -271,7 +291,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(207, StdlibCatalog.All.Count);
+        Assert.Equal(225, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -308,7 +328,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(207, reached.Count);
+        Assert.Equal(225, reached.Count);
     }
 
     /// <summary>

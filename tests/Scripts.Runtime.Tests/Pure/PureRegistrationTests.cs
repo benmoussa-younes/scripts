@@ -23,7 +23,7 @@ public class PureRegistrationTests
 
     [Fact]
     public void ScopeHasTheExpectedCatalogEntryCount() =>
-        Assert.Equal(117, StdlibCatalog.All.Count(IsPureScope));
+        Assert.Equal(135, StdlibCatalog.All.Count(IsPureScope));
 
     [Fact]
     public void EveryCatalogEntryInScopeIsRegistered()

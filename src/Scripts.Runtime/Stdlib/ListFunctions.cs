@@ -26,6 +26,7 @@ internal static class ListFunctions
         table["list<T>.count"] = Count;
         table["list<T>.find_first"] = Find;
         table["list<integer>.sum"] = Sum;
+        table["list<float>.sum_floats"] = SumFloats;
         table["list<T>.minimum"] = Min;
         table["list<T>.maximum"] = Max;
         table["list<T>.slice"] = Slice;
@@ -208,6 +209,21 @@ internal static class ListFunctions
         }
 
         return total;
+    }
+
+    private static Value SumFloats(RuntimeContext context, Value[] arguments)
+    {
+        var total = 0.0;
+        foreach (var item in List(arguments, 0).Items)
+        {
+            total += ((FloatValue)item).Number;
+            if (!double.IsFinite(total))
+            {
+                return ResultValue.Error(ErrorValues.Error("out_of_range", string.Empty, "float sum overflows to infinity"));
+            }
+        }
+
+        return ResultValue.Ok(new FloatValue(total == 0.0 ? 0.0 : total));
     }
 
     private static Value Min(RuntimeContext context, Value[] arguments) =>

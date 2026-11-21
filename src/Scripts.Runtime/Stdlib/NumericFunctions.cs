@@ -19,9 +19,26 @@ internal static class NumericFunctions
         table["integer.shift_right"] = ShiftRight;
         table["integer.to_radix"] = ToRadix;
         table["integer.absolute"] = AbsoluteInteger;
+        table["integer.power"] = IntegerPower;
+        table["integer.clamp"] = IntegerClamp;
+        table["integer.minimum"] = (context, arguments) => IntegerValue.From(Math.Min(Integer(arguments, 0), Integer(arguments, 1)));
+        table["integer.maximum"] = (context, arguments) => IntegerValue.From(Math.Max(Integer(arguments, 0), Integer(arguments, 1)));
         table["string.parse_integer_radix"] = ParseIntegerRadix;
         table["float.to_fixed"] = ToFixed;
         table["float.absolute"] = AbsoluteFloat;
+        table["float.floor"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Floor(Float(arguments, 0))));
+        table["float.ceiling"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Ceiling(Float(arguments, 0))));
+        table["float.round"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Round(Float(arguments, 0), MidpointRounding.ToEven)));
+        table["float.truncate"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Truncate(Float(arguments, 0))));
+        table["float.power"] = FloatPower;
+        table["float.square_root"] = FloatSquareRoot;
+        table["float.natural_log"] = FloatNaturalLog;
+        table["float.log2"] = FloatLog2;
+        table["float.log10"] = FloatLog10;
+        table["float.exponential"] = FloatExponential;
+        table["float.clamp"] = FloatClamp;
+        table["float.minimum"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Min(Float(arguments, 0), Float(arguments, 1))));
+        table["float.maximum"] = (context, arguments) => new FloatValue(NormalizeZero(Math.Max(Float(arguments, 0), Float(arguments, 1))));
     }
 
     private static Value ShiftLeft(RuntimeContext context, Value[] arguments)
@@ -161,7 +178,159 @@ internal static class NumericFunctions
     }
 
     private static Value AbsoluteFloat(RuntimeContext context, Value[] arguments) =>
-        new FloatValue(Math.Abs(Float(arguments, 0)));
+        new FloatValue(NormalizeZero(Math.Abs(Float(arguments, 0))));
+
+    private static Value IntegerPower(RuntimeContext context, Value[] arguments)
+    {
+        var baseValue = Integer(arguments, 0);
+        var exponent = Integer(arguments, 1);
+        if (exponent < 0)
+        {
+            return ResultValue.Error(ErrorValues.Error(
+                "invalid_argument",
+                exponent.ToString(CultureInfo.InvariantCulture),
+                "integer exponent must not be negative"));
+        }
+
+        if (exponent == 0 || baseValue == 1)
+        {
+            return ResultValue.Ok(IntegerValue.From(1));
+        }
+
+        if (baseValue == 0)
+        {
+            return ResultValue.Ok(IntegerValue.From(0));
+        }
+
+        if (baseValue == -1)
+        {
+            return ResultValue.Ok(IntegerValue.From((exponent & 1) == 0 ? 1 : -1));
+        }
+
+        try
+        {
+            checked
+            {
+                var result = 1L;
+                var factor = baseValue;
+                var remaining = exponent;
+                while (remaining > 0)
+                {
+                    if ((remaining & 1) != 0)
+                    {
+                        result *= factor;
+                    }
+
+                    remaining >>= 1;
+                    if (remaining > 0)
+                    {
+                        factor *= factor;
+                    }
+                }
+
+                return ResultValue.Ok(IntegerValue.From(result));
+            }
+        }
+        catch (OverflowException)
+        {
+            return ResultValue.Error(ErrorValues.Error(
+                "out_of_range",
+                string.Empty,
+                "integer power overflows the 64-bit range"));
+        }
+    }
+
+    private static Value IntegerClamp(RuntimeContext context, Value[] arguments)
+    {
+        var value = Integer(arguments, 0);
+        var minimum = Integer(arguments, 1);
+        var maximum = Integer(arguments, 2);
+        if (minimum > maximum)
+        {
+            return ResultValue.Error(ErrorValues.Error(
+                "invalid_argument",
+                string.Empty,
+                "minimum must be less than or equal to maximum"));
+        }
+
+        return ResultValue.Ok(IntegerValue.From(Math.Clamp(value, minimum, maximum)));
+    }
+
+    private static Value FloatPower(RuntimeContext context, Value[] arguments) =>
+        FiniteFloatResult(Math.Pow(Float(arguments, 0), Float(arguments, 1)), "float power result is not finite");
+
+    private static Value FloatSquareRoot(RuntimeContext context, Value[] arguments)
+    {
+        var value = Float(arguments, 0);
+        if (value < 0.0)
+        {
+            return FloatOutOfRange("square root requires a non-negative float");
+        }
+
+        return FiniteFloatResult(Math.Sqrt(value), "square root result is not finite");
+    }
+
+    private static Value FloatNaturalLog(RuntimeContext context, Value[] arguments)
+    {
+        var value = Float(arguments, 0);
+        if (value <= 0.0)
+        {
+            return FloatOutOfRange("natural logarithm requires a strictly positive float");
+        }
+
+        return FiniteFloatResult(Math.Log(value), "natural logarithm result is not finite");
+    }
+
+    private static Value FloatLog2(RuntimeContext context, Value[] arguments)
+    {
+        var value = Float(arguments, 0);
+        if (value <= 0.0)
+        {
+            return FloatOutOfRange("base-2 logarithm requires a strictly positive float");
+        }
+
+        return FiniteFloatResult(Math.Log2(value), "base-2 logarithm result is not finite");
+    }
+
+    private static Value FloatLog10(RuntimeContext context, Value[] arguments)
+    {
+        var value = Float(arguments, 0);
+        if (value <= 0.0)
+        {
+            return FloatOutOfRange("base-10 logarithm requires a strictly positive float");
+        }
+
+        return FiniteFloatResult(Math.Log10(value), "base-10 logarithm result is not finite");
+    }
+
+    private static Value FloatExponential(RuntimeContext context, Value[] arguments) =>
+        FiniteFloatResult(Math.Exp(Float(arguments, 0)), "exponential result is not finite");
+
+    private static Value FloatClamp(RuntimeContext context, Value[] arguments)
+    {
+        var value = Float(arguments, 0);
+        var minimum = Float(arguments, 1);
+        var maximum = Float(arguments, 2);
+        if (minimum > maximum)
+        {
+            return ResultValue.Error(ErrorValues.Error(
+                "invalid_argument",
+                string.Empty,
+                "minimum must be less than or equal to maximum"));
+        }
+
+        return ResultValue.Ok(new FloatValue(NormalizeZero(Math.Clamp(value, minimum, maximum))));
+    }
+
+    private static double NormalizeZero(double value) => value == 0.0 ? 0.0 : value;
+
+    private static ResultValue FiniteFloatResult(double value, string message) =>
+        double.IsFinite(value)
+            ? ResultValue.Ok(new FloatValue(NormalizeZero(value)))
+            : FloatOutOfRange(message);
+
+    private static ResultValue FloatOutOfRange(string message) =>
+        ResultValue.Error(ErrorValues.Error("out_of_range", string.Empty, message));
 
     private static int DigitValue(char character) => character switch
     {
