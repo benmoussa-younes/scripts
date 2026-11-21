@@ -115,9 +115,9 @@ public sealed class ConformanceTests
     public void The_corpus_has_one_case_per_semantic_code()
     {
         var expected = CheckerCases.SemanticCodes();
-        // Active semantic codes: TYPE 69 (71 minus the reserved SCRIPTS-TYPE-0060/0061),
+        // Active semantic codes: TYPE 71 (73 minus the reserved SCRIPTS-TYPE-0060/0061),
         // LINT 12 (14 minus the retired SCRIPTS-LINT-0008/0009), MODULE 5.
-        Assert.Equal(69 + 12 + 5, expected.Count);
+        Assert.Equal(71 + 12 + 5, expected.Count);
         Assert.Equal(expected, CheckerCases.AllNames());
     }
 

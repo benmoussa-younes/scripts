@@ -191,6 +191,33 @@ public sealed class MatchTests
     }
 
     [Fact]
+    public void Block_arms_of_an_expression_match_take_the_value_of_their_last_line()
+    {
+        Assert.Equal("string", Checking.TypeOfLastLet("let _v = match 1 {\n    1 => {\n        let n = 2\n        \"{n}\"\n    }\n    _ => \"b\"\n}").ToString());
+        Assert.Equal("integer", Checking.TypeOfLastLet("let _v = match 1 {\n    1 => {\n        let k = 3\n        match k {\n            3 => 4\n            _ => 5\n        }\n    }\n    _ => 0\n}").ToString());
+        Checking.AssertClean("function f(items: list<integer>) -> integer {\n    for item in items {\n        let half = match item {\n            0 => {\n                continue\n            }\n            1 => {\n                return -1\n            }\n            _ => item / 2\n        }\n        return half\n    }\n    return 0\n}");
+        Checking.AssertClean("let _f = (n: integer) => match n {\n    0 => {\n        for i in [1] {\n            if i > 0 {\n                break\n            }\n        }\n        1\n    }\n    _ => n\n}");
+        Checking.AssertMarked("let _v = match 1 {\n    1 => {\n        \"a\"\n    }\n    _ => ‸2\n}", "SCRIPTS-TYPE-0028");
+    }
+
+    [Fact]
+    public void A_block_arm_without_a_final_value_is_TYPE_0072()
+    {
+        Checking.AssertMarked("let _v = match 1 {\n    1 => {\n        let _a = 1\n    ‸}\n    _ => 2\n}", "SCRIPTS-TYPE-0072");
+        Checking.AssertMarked("let _v = match 1 {\n    1 => { ‸}\n    _ => 2\n}", "SCRIPTS-TYPE-0072");
+        Checking.AssertMarked("let mutable a = 0\nlet _v = match 1 {\n    1 => {\n        a = 1\n    ‸}\n    _ => a\n}", "SCRIPTS-TYPE-0072");
+        Checking.AssertMarked("function f() -> integer {\n    let v = match 1 {\n        0 => {\n            return 3\n            ‸4\n        }\n        _ => 2\n    }\n    return v\n}", "SCRIPTS-TYPE-0053");
+        Checking.AssertMarked("let _v = match 1 {\n    1 => {\n        ‸break\n    }\n    _ => 2\n}", "SCRIPTS-TYPE-0050");
+    }
+
+    [Fact]
+    public void Return_break_and_continue_cannot_leave_a_lambda_through_a_block_arm()
+    {
+        Checking.AssertMarked("for _i in [1] {\n    let _f = (n: integer) => match n {\n        0 => {\n            ‸continue\n        }\n        _ => n\n    }\n}", "SCRIPTS-TYPE-0073");
+        Checking.AssertMarked("let _f = (n: integer) => match n {\n    0 => {\n        ‸return 1\n    }\n    _ => n\n}", "SCRIPTS-TYPE-0073");
+    }
+
+    [Fact]
     public void Patterns_bind_values_with_the_payload_types()
     {
         Assert.Equal("integer", Checking.TypeOfLastLet("let _v = match \"1\".parse_integer() {\n    ok(n) => n + 1\n    error(_) => 0\n}").ToString());

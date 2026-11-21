@@ -330,6 +330,44 @@ public sealed class InterpreterStatementTests
     }
 
     [Fact]
+    public void ExpressionMatchBlockArmsYieldTheirLastLineOrLeaveTheLoopAndFunction()
+    {
+        const string program = """
+            function first_even_half(items: list<integer>) -> integer {
+                for item in items {
+                    let half = match item % 2 {
+                        0 => item / 2
+                        _ => {
+                            if item > 100 {
+                                return -1
+                            }
+                            continue
+                        }
+                    }
+                    return half
+                }
+                return 0
+            }
+            let mutable seen = 0
+            for value in [1, 2, 3, 4] {
+                let tens = match value {
+                    3 => {
+                        break
+                    }
+                    _ => {
+                        let scaled = value * 10
+                        scaled + seen
+                    }
+                }
+                seen = tens
+            }
+            io.write_standard_output_line("{first_even_half([1, 3, 8])} {first_even_half([1, 101, 4])} {first_even_half([1])} {seen}")
+            """;
+
+        Assert.Equal("4 -1 0 30\n", InterpreterHarness.Output(program));
+    }
+
+    [Fact]
     public void MatchStatementWithExpressionArmsCallsTheArm()
     {
         const string program = """

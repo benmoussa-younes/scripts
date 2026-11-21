@@ -28,6 +28,11 @@ public sealed class SyntaxErrorTests
     [InlineData("let f = (a, b)", ErrorCodes.Parse0023, 1, 11)]
     [InlineData("for x xs {\n}", ErrorCodes.Parse0023, 1, 7)]
     [InlineData("match x {\n    1 => f() g()\n}", ErrorCodes.Parse0023, 2, 14)]
+    // after `=>`, `{` opens a block: a map literal arm is parenthesized; only the last line of a block arm of a `match` expression is a bare value
+    [InlineData("let m = match x { _ => {\"a\": 1} }", ErrorCodes.Parse0023, 1, 28)]
+    [InlineData("let m = match x { _ => {\n    a: 1\n} }", ErrorCodes.Parse0023, 2, 6)]
+    [InlineData("let v = match x {\n    _ => {\n        1\n        2\n    }\n}", ErrorCodes.Parse0039, 3, 9)]
+    [InlineData("match x {\n    _ => {\n        1\n    }\n}", ErrorCodes.Parse0039, 3, 9)]
     [InlineData("import \"a.scs\" lib", ErrorCodes.Module0007, 1, 8)]
     [InlineData("import \"a.scs\" as lib extra", ErrorCodes.Parse0023, 1, 23)]
     [InlineData("function f(a b) {\n}", ErrorCodes.Parse0023, 1, 14)]

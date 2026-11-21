@@ -287,13 +287,16 @@ internal sealed partial class SyntaxParser
         throw Unexpected(token, "`{`");
     }
 
-    private BlockStatement ParseBlock(string construct)
+    private BlockStatement ParseBlock(string construct, bool isValueBlock = false)
     {
         var open = RequireOpeningBrace(construct);
         EnterNesting(open.Start);
         Advance();
         PushContext(ContextKind.Block, open);
+        var enclosingValueBlock = inValueBlock;
+        inValueBlock = isValueBlock;
         var statements = ParseStatementList(TokenKind.RightBrace, isTopLevel: false);
+        inValueBlock = enclosingValueBlock;
         Expect(TokenKind.RightBrace, "`}`");
         PopContext();
         LeaveNesting();
@@ -394,6 +397,11 @@ internal sealed partial class SyntaxParser
         EnterNesting(start);
         var match = ParseMatch(isStatement: true);
         LeaveNesting();
+        if (inValueBlock && IsLastLineOfBlock())
+        {
+            // The last line of a block arm of a `match` expression is its value, even when it is itself a `match` (L1).
+            match = match with { IsStatement = false };
+        }
         var follower = Current;
         if (follower.Kind is TokenKind.Dot or TokenKind.Question or TokenKind.LeftBracket or TokenKind.LeftParenthesis)
         {
@@ -420,12 +428,24 @@ internal sealed partial class SyntaxParser
             throw ErrorAt(ErrorCodes.Parse0055, next);
         }
 
-        if (next.Kind == TokenKind.Question || !IsValidExpressionStatement(expression))
+        if (next.Kind == TokenKind.Question || (!IsValidExpressionStatement(expression) && !(inValueBlock && IsLastLineOfBlock())))
         {
             throw ErrorAt(ErrorCodes.Parse0039, first);
         }
 
         return new ExpressionStatement(SpanFrom(first.Start), expression);
+    }
+
+    /// <summary>True when only line breaks separate the current token from the `}` closing the block.</summary>
+    private bool IsLastLineOfBlock()
+    {
+        var index = position;
+        while (Fetch(index).Kind == TokenKind.NewLine)
+        {
+            index++;
+        }
+
+        return Fetch(index).Kind == TokenKind.RightBrace;
     }
 
     private AssignmentStatement ParseAssignment(Token first, Expression target, Token operatorToken, AssignOperator assignOperator)

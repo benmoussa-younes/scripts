@@ -163,11 +163,19 @@ public sealed class ExpressionShapeTests
     [InlineData("match b { true | false => 1 }", "(match b ((alt true false) => 1))")]
     [InlineData("match r { ok(v) => v\n error(_) => 0 }", "(match r ((ok v) => v) ((error _) => 0))")]
     [InlineData("match x { _ | 0 => 1 }", "(match x ((alt _ 0) => 1))")]
-    [InlineData("match x { _ => {\"a\": 1}\n }", "(match x (_ => (map (\"a\" 1))))")]
-    [InlineData("match x { _ => {} }", "(match x (_ => (map)))")]
+    [InlineData("match x { _ => ({\"a\": 1})\n }", "(match x (_ => (map (\"a\" 1))))")]
+    [InlineData("match x { _ => ({}) }", "(match x (_ => (map)))")]
     [InlineData("f(match x { _ => 1 }, 2)", "(call f (match x (_ => 1)) 2)")]
     [InlineData("match x { _ => match y { _ => 1 } }", "(match x (_ => (match y (_ => 1))))")]
     [InlineData("match f(1) { _ => 1 }", "(match (call f 1) (_ => 1))")]
     public void Match_in_expression_position_has_expression_arms(string expression, string expected) =>
+        Assert.Equal(expected, Parsing.PrintExpression(expression));
+
+    [Theory]
+    [InlineData("match x {\n    1 => {\n        let y = 2\n        y + 1\n    }\n    _ => 0\n}", "(match x (1 => (block (let y 2) (expr (+ y 1)))) (_ => 0))")]
+    [InlineData("match x { _ => { } }", "(match x (_ => (block)))")]
+    [InlineData("match x {\n    _ => {\n        match y {\n            _ => {\n                \"a\"\n            }\n        }\n    }\n}", "(match x (_ => (block (expr (match y (_ => (block (expr \"a\"))))))))")]
+    [InlineData("match x {\n    _ => {\n        match y {\n            _ => f()\n        }\n        1\n    }\n}", "(match x (_ => (block (expr (match-statement y (_ => (call f)))) (expr 1))))")]
+    public void Match_in_expression_position_has_block_arms_whose_last_line_is_the_value(string expression, string expected) =>
         Assert.Equal(expected, Parsing.PrintExpression(expression));
 }
