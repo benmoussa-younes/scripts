@@ -396,10 +396,10 @@ public static class StdlibCatalogData
         new(
             "system.get_information", StdlibKind.ModuleFunction, null, "system", "get_information",
             [], "result<system_information, error>", "system.get_information() -> result<system_information, error>", "let information = system.get_information()?\nio.write_standard_output_line(information.kernel_name)", "Linux",
-            "`system.get_information(2)`: `kernel_name` = `sysname`, `host_name` = `nodename`, `kernel_release` = `release`, `machine_architecture` = `machine`",
+            "`uname(2)`: `kernel_name` = `sysname`, `host_name` = `nodename`, `kernel_release` = `release`, `machine_architecture` = `machine`",
             ["other"], ["system_read"], false, false, false, false,
             "reads the system information",
-            "`system.get_information(2)`: `kernel_name` = `sysname`, `host_name` = `nodename`, `kernel_release` = `release`, `machine_architecture` = `machine`; system-call failure → `error` via the errno table."),
+            "`uname(2)`: `kernel_name` = `sysname`, `host_name` = `nodename`, `kernel_release` = `release`, `machine_architecture` = `machine`; system-call failure → `error` via the errno table."),
         new(
             "system.user_name", StdlibKind.ModuleFunction, null, "system", "user_name",
             [], "string", "system.user_name() -> string", "let user_name = system.user_name()\nlet known = user_name.length() > 0\nio.write_standard_output_line(\"{known}\")", "true",
