@@ -10,7 +10,7 @@ public class PureRegistrationTests
     {
         // process_result, pipeline_result, run_request and file_lock methods live in the system scope (SystemStdlib).
         StdlibKind.Method => entry.ReceiverTypeText is not ("process_result" or "pipeline_result" or "run_request" or "file_lock"),
-        StdlibKind.ModuleFunction => entry.ModuleName is "path" or "environment" or "json" or "encoding",
+        StdlibKind.ModuleFunction => entry.ModuleName is "path" or "environment" or "json" or "encoding" or "csv",
         _ => GlobalFunctionNames.Contains(entry.Name),
     };
 
@@ -23,7 +23,7 @@ public class PureRegistrationTests
 
     [Fact]
     public void ScopeHasTheExpectedCatalogEntryCount() =>
-        Assert.Equal(139, StdlibCatalog.All.Count(IsPureScope));
+        Assert.Equal(143, StdlibCatalog.All.Count(IsPureScope));
 
     [Fact]
     public void EveryCatalogEntryInScopeIsRegistered()

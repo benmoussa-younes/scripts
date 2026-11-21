@@ -1,7 +1,7 @@
 exit: 0
 stream: stdout
 check: doc["keywords"] == ["let", "mutable", "function", "return", "if", "else", "while", "for", "in", "match", "break", "continue", "import", "as", "public", "private", "true", "false", "and", "or", "not"]
-check: set(doc["reserved_identifiers"]) == {"environment", "io", "process", "json", "filesystem", "parallel", "time", "system", "encoding", "random", "ok", "error"}
+check: set(doc["reserved_identifiers"]) == {"environment", "io", "process", "json", "filesystem", "parallel", "time", "system", "encoding", "random", "csv", "ok", "error"}
 check: "path" not in doc["reserved_identifiers"]
 check: "async" in doc["future_reserved"]
 check: "struct" in doc["future_reserved"]

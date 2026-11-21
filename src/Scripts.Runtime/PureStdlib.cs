@@ -15,5 +15,6 @@ public static class PureStdlib
         JsonFunctions.Register(table);
         EncodingFunctions.Register(table);
         NumericFunctions.Register(table);
+        CsvFunctions.Register(table);
     }
 }

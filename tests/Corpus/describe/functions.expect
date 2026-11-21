@@ -1,9 +1,9 @@
 exit: 0
 stream: stdout
-# The 229 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 101 module functions + 124 methods.
-check: len(doc["functions"]) == 229
+# The 233 entries of DESIGN §7 / SPEC-STDLIB: 4 global functions + 105 module functions + 124 methods.
+check: len(doc["functions"]) == 233
 check: sum(1 for f in doc["functions"] if f["kind"] == "function") == 4
-check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 101
+check: sum(1 for f in doc["functions"] if f["kind"] == "module_function") == 105
 check: sum(1 for f in doc["functions"] if f["kind"] == "method") == 124
 check: {f["kind"] for f in doc["functions"]} == {"function", "method", "module_function"}
 check: all(list(f.keys()) == ["qualified_name", "signature", "examples", "kind", "receiver", "parameters", "returns", "error_types", "error_kinds", "dangerous", "destructive", "mutates_receiver", "deterministic", "effects", "description", "semantics", "explain"] for f in doc["functions"])

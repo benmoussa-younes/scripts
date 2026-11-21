@@ -283,6 +283,10 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "list<T>.chunked")] = "let _r = [1, 2, 3].chunked(2)?",
         [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_encode")] = "let _r = encoding.url_encode(\"a b\")",
         [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_decode")] = "let _r = encoding.url_decode(\"a%20b\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.parse")] = "let _r = csv.parse(\"a,b\\n1,2\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.parse_row")] = "let _r = csv.parse_row(\"a,b\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.encode_row")] = "let _r = csv.encode_row([\"a\", \"b\"])",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.encode")] = "let _r = csv.encode([[\"a\", \"b\"]])",
     };
 
     /// <summary>`(kind, qualified_name)` — unique across the catalogue.</summary>
@@ -295,7 +299,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(229, StdlibCatalog.All.Count);
+        Assert.Equal(233, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -332,7 +336,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(229, reached.Count);
+        Assert.Equal(233, reached.Count);
     }
 
     /// <summary>
