@@ -1,0 +1,9 @@
+let rows: list<list<string>> = [[""], ["a", "b,c"], ["line\nbreak", "quote\"inside"]]
+let text = csv.encode(rows)
+let back = csv.parse(text)?
+io.write_standard_output_line("{back == rows}")
+io.write_standard_output_line(text.replace("\n", "\\n"))
+let field = csv.parse_row(csv.encode_row([""]))?
+io.write_standard_output_line("{field.length()} [{field[0]}]")
+let empty = csv.parse(csv.encode([]))?
+io.write_standard_output_line("{empty.length()}")

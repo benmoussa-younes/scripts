@@ -1,0 +1,6 @@
+stdout:
+true
+""\na,"b,c"\n"line\nbreak","quote""inside"
+1 []
+0
+exit: 0

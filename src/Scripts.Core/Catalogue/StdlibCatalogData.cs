@@ -1617,14 +1617,14 @@ public static class StdlibCatalogData
             "encodes a list of string fields as one RFC 4180 CSV row",
             [], ["none"], false, false, false, true,
             "encodes {fields} as an RFC 4180 CSV row",
-            "encodes a list of string fields as one RFC 4180 CSV row; wraps a field in `\"` and doubles internal `\"` only when it contains `,`, `\"`, `\\n` or `\\r`; pure and deterministic."),
+            "encodes a list of string fields as one RFC 4180 CSV row; wraps a field in `\"` and doubles internal `\"` only when it contains `,`, `\"`, `\\n` or `\\r`, or when it is the row's only field and is empty (a lone empty field is written `\"\"` so that `csv.parse_row` reads one field, not zero); pure and deterministic."),
         new(
             "csv.encode", StdlibKind.ModuleFunction, null, "csv", "encode",
             [new("rows", "list<list<string>>")], "string", "csv.encode(rows: list<list<string>>) -> string", "io.write_standard_output_line(csv.encode([[\"a\", \"b\"], [\"1\", \"2\"]]))", "a,b\n1,2",
             "encodes rows of string fields as RFC 4180 CSV joined by `\\n`",
             [], ["none"], false, false, false, true,
             "encodes {rows} as RFC 4180 CSV",
-            "encodes rows of string fields as RFC 4180 CSV joined by `\\n` (no `\\r`); each row uses `csv.encode_row`; an empty list returns `\"\"`; pure and deterministic."),
+            "encodes rows of string fields as RFC 4180 CSV joined by `\\n` (no `\\r`); each row uses `csv.encode_row`; an empty list returns `\"\"`; `csv.parse(csv.encode(rows))` returns `rows` when every row has at least one field (a row with no field is not encodable: `csv.encode([[]])` is the empty text, a no-field row followed by another reads back as one empty field, a trailing one disappears); pure and deterministic."),
         new(
             "process_result.require_success", StdlibKind.Method, "process_result", null, "require_success",
             [], "result<process_result, error>", "process_result.require_success() -> result<process_result, error>", "let ok_result = process.run(process.request(\"true\", []))?\nmatch ok_result.require_success() {\n    ok(result) => io.write_standard_output_line(\"success {result.exit_code}\")\n    error(e) => io.write_standard_output_line(e.kind)\n}\nlet bad_result = process.run(process.request(\"false\", []))?\nmatch bad_result.require_success() {\n    ok(result) => io.write_standard_output_line(\"success {result.exit_code}\")\n    error(e) => io.write_standard_output_line(\"failure {e.kind}\")\n}", "success 0\nfailure other",

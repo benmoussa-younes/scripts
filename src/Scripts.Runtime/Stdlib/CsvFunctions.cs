@@ -94,7 +94,9 @@ internal static class CsvFunctions
             }
 
             var field = ((StringValue)fields[index]).Text;
-            var needsQuotes = field.IndexOfAny([',', '"', '\n', '\r']) >= 0;
+            // Without the quotes the row is empty text, which `csv.parse` reads as no field (the round trip loses it).
+            var needsQuotes = field.IndexOfAny([',', '"', '\n', '\r']) >= 0
+                || (field.Length == 0 && fields.Count == 1);
             if (!needsQuotes)
             {
                 SizeLimits.EnsureStringLength((long)builder.Length + field.Length);
