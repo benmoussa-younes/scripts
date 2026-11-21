@@ -17,14 +17,14 @@ io.write_standard_output_line(json.encode(value)?)
 
 # decode failures
 match json.decode("\{oops") {
-    ok(parsed) => io.write_standard_output_line("ok")
+    ok(_parsed) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("syntax: {e.kind}")
 }
 match json.decode("1e400") {
-    ok(parsed) => io.write_standard_output_line("ok")
+    ok(_parsed) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("range: {e.kind}")
 }
 match json.decode("9223372036854775808") {
-    ok(parsed) => io.write_standard_output_line("ok")
+    ok(_parsed) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("overflow: {e.kind}")
 }

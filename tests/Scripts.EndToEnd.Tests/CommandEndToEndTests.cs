@@ -234,6 +234,59 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Check_fix_renames_unread_bindings_so_deny_warnings_passes()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            // L5: SCRIPTS-LINT-0013 carries a rename-to-`_name` fix; once applied the script checks with --deny-warnings.
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "unread.scs",
+                "let name = \"a\".trim_whitespace()\nfor index in range(0, 2) {\n    io.write_standard_output_line(\"t\")\n}\n");
+            Assert.Equal(251, ScriptsProcess.Run("check", "--deny-warnings", script).ExitCode);
+
+            var fixing = ScriptsProcess.Run("check", "--fix", script);
+
+            Assert.Equal(0, fixing.ExitCode);
+            Assert.Equal($"applied 2 fix(es) to {script}\n", fixing.StandardOutput);
+            Assert.Equal(
+                "let _name = \"a\".trim_whitespace()\nfor _index in range(0, 2) {\n    io.write_standard_output_line(\"t\")\n}\n",
+                File.ReadAllText(script));
+            Assert.Equal(0, ScriptsProcess.Run("check", "--deny-warnings", script).ExitCode);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Check_fix_rewrites_double_braces_then_applies_checker_fixes()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            // L6: each `{{` string is a parse error with its own fix; the checker's rename is applied after them.
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "fix.scs",
+                "let total = 1\nlet a = \"a {{total}}\"\nlet b = \"b {{x}} {total}\"\nio.write_standard_output_line(\"{totl}{a}{b}\")\n");
+            var result = ScriptsProcess.Run("check", "--fix", script);
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal($"applied 3 fix(es) to {script}\n", result.StandardOutput);
+            Assert.Equal(
+                "let total = 1\nlet a = \"a \\{total\\}\"\nlet b = \"b \\{x\\} {total}\"\nio.write_standard_output_line(\"{total}{a}{b}\")\n",
+                File.ReadAllText(script));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_fix_resolves_a_name_without_extension_and_names_the_file_it_wrote()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();

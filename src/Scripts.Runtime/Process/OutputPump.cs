@@ -102,7 +102,6 @@ internal sealed class OutputPump
     private readonly ManualResetEventSlim completed = new(false);
     private readonly int fileDescriptor;
     private volatile bool stopRequested;
-    private int disposed;
 
     public OutputPump(Stream stream, IByteSink sink, string threadName)
     {
@@ -112,18 +111,11 @@ internal sealed class OutputPump
         thread = new Thread(Run) { IsBackground = true, Name = threadName };
     }
 
+    /// <summary>
+    /// Set once the pump has reached EOF. Never disposed: another thread may still be waiting on it, and disposing an
+    /// awaited event loses the wake-up (R0). Without a lazy WaitHandle the event holds no OS resource.
+    /// </summary>
     public ManualResetEventSlim Completed => completed;
-
-    /// <summary>Releases the completion event once the observer has seen it; its lazy WaitHandle is a descriptor.</summary>
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref disposed, 1) != 0)
-        {
-            return;
-        }
-
-        completed.Dispose();
-    }
 
     /// <summary>RuntimeFailure or BrokenPipeTermination raised by the sink while pumping.</summary>
     public Exception? Failure { get; private set; }

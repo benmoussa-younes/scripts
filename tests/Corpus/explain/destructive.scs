@@ -1,5 +1,5 @@
 let path_value = p"/tmp/x"
 match filesystem.remove_directory_tree(path_value) {
     ok(_) => io.write_standard_output_line("supprimé")
-    error(e) => io.write_standard_output_line("échec")
+    error(_e) => io.write_standard_output_line("échec")
 }

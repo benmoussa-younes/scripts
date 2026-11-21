@@ -143,10 +143,10 @@ internal static class Checking
     /// <summary>
     /// True when a catalog placeholder such as {name} survives in the rendered texts (codes quoting source text are
     /// exempt). SCRIPTS-TYPE-0064 quotes `{…}`, `{N}` and `{name}` as literal examples, SCRIPTS-PARSE-0022 quotes the
-    /// interpolated `{name}`/`{0}` forms, and SCRIPTS-PARSE-0023 quotes `{ … }` as the arm syntax, so their texts are not
-    /// inspected.
+    /// interpolated `{name}`/`{0}` forms, SCRIPTS-PARSE-0023 quotes `{ … }` as the arm syntax and SCRIPTS-PARSE-0059 quotes
+    /// the literal string `"\{x\}"`, so their texts are not inspected.
     /// </summary>
     public static bool HasUnfilledPlaceholder(Diagnostic diagnostic) =>
-        diagnostic.Code is not (ErrorCodes.Type0029 or ErrorCodes.Type0042 or ErrorCodes.Type0048 or ErrorCodes.Type0055 or ErrorCodes.Type0064 or ErrorCodes.Parse0022 or ErrorCodes.Parse0023)
+        diagnostic.Code is not (ErrorCodes.Type0029 or ErrorCodes.Type0042 or ErrorCodes.Type0048 or ErrorCodes.Type0055 or ErrorCodes.Type0064 or ErrorCodes.Parse0022 or ErrorCodes.Parse0023 or ErrorCodes.Parse0059)
         && System.Text.RegularExpressions.Regex.IsMatch(diagnostic.Message + diagnostic.Cause + diagnostic.Suggestion, @"\{[a-z_]+\}");
 }

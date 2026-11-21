@@ -448,4 +448,23 @@ public class PureStringFunctionsTests
     [Fact]
     public void SubstringWithHugeCountIsOutOfRange() =>
         AssertValueError(Call("string.substring", Text("a"), Integer(1), Integer(long.MaxValue)), "out_of_range");
+
+    [Fact]
+    public void Find_all_regex_returns_non_overlapping_matches_and_handles_empty_or_invalid_patterns()
+    {
+        Assert.Equal(
+            ["12", "345"],
+            ToTexts(OkPayload(Call("string.find_all_regex", Text("a12b345c"), Text("\\d+")))));
+        Assert.Equal(
+            [],
+            ToTexts(OkPayload(Call("string.find_all_regex", Text("abc"), Text("\\d+")))));
+        Assert.Equal(
+            ["a", "", ""],
+            ToTexts(OkPayload(Call("string.find_all_regex", Text("ab"), Text("a*")))));
+        Assert.Equal(
+            [""],
+            ToTexts(OkPayload(Call("string.find_all_regex", Text(""), Text("")))));
+        AssertValueError(Call("string.find_all_regex", Text("abc"), Text("(")), "invalid_regex");
+        AssertValueError(Call("string.find_all_regex", Text("abc"), Text("[[:digit:]]")), "invalid_regex");
+    }
 }

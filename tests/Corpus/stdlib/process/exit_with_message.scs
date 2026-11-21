@@ -1,0 +1,6 @@
+process.defer(() => io.write_standard_output_line("nettoyage"))
+let n = match "x".parse_integer() {
+    ok(value) => value
+    error(failure) => process.exit_with_message(3, "pas un entier: {failure.kind}")
+}
+io.write_standard_output_line("jamais {n}")

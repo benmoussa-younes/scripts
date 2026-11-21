@@ -88,10 +88,11 @@ public sealed class DescribeDocumentTests
 
         Assert.Equal(16, Count("process"));
         Assert.Equal(40, Count("filesystem"));
-        Assert.Equal(25, Count("list"));
+        Assert.Equal(27, Count("list"));
         Assert.Equal(6, Count("io"));
         Assert.Equal(10, Count("json"));
         Assert.Equal(7, Count("system"));
+        Assert.Equal(4, Count("csv"));
         Assert.Equal(0, Count("no_such_name"));
     }
 
@@ -220,8 +221,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var functions = document.RootElement.GetProperty("functions").EnumerateArray().ToList();
 
-        Assert.Equal(206, StdlibCatalog.All.Count);
-        Assert.Equal(206, functions.Count);
+        Assert.Equal(233, StdlibCatalog.All.Count);
+        Assert.Equal(233, functions.Count);
         Assert.Equal(
             StdlibCatalog.All.Select(entry => entry.QualifiedName),
             functions.Select(item => item.GetProperty("qualified_name").GetString()!));
@@ -322,7 +323,7 @@ public sealed class DescribeDocumentTests
         var byName = document.RootElement.GetProperty("functions").EnumerateArray()
             .ToDictionary(item => item.GetProperty("kind").GetString() + ":" + item.GetProperty("qualified_name").GetString()!);
         // The pair `(kind, qualified_name)` is unique: no collision in the construction above.
-        Assert.Equal(206, byName.Count);
+        Assert.Equal(233, byName.Count);
 
         Assert.Equal(JsonValueKind.Null, byName["module_function:filesystem.read_file"].GetProperty("receiver").ValueKind);
         Assert.Equal("module_function", byName["module_function:filesystem.read_file"].GetProperty("kind").GetString());
@@ -335,7 +336,7 @@ public sealed class DescribeDocumentTests
         }
         Assert.Contains("module_function:process.run", byName.Keys);
         Assert.Contains("module_function:process.run_inherit", byName.Keys);
-        Assert.Contains("module_function:process.run_shell", byName.Keys);
+        Assert.DoesNotContain("module_function:process.run_shell", byName.Keys);
         // The global directory calls are gone: the names now belong to the filesystem namespace only.
         foreach (var removed in new[] { "function:list_directory", "function:walk_directory" })
         {
@@ -380,7 +381,6 @@ public sealed class DescribeDocumentTests
 
         Assert.Equal("module_function", byName["module_function:json.encode"].GetProperty("kind").GetString());
         Assert.Equal(StdlibCatalog.All.Count(entry => entry.Kind == StdlibKind.Method), byName.Values.Count(item => item.GetProperty("kind").GetString() == "method"));
-        Assert.True(byName["module_function:process.run_shell"].GetProperty("dangerous").GetBoolean());
         Assert.True(byName["module_function:filesystem.write_file_overwrite"].GetProperty("destructive").GetBoolean());
         Assert.False(byName["module_function:system.get_information"].GetProperty("deterministic").GetBoolean());
         foreach (var item in byName.Values.Where(item => item.GetProperty("kind").GetString() == "method"))
@@ -405,8 +405,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var errorCodes = document.RootElement.GetProperty("error_codes").EnumerateArray().ToList();
 
-        Assert.Equal(187, ErrorCatalog.All.Count);
-        Assert.Equal(187, errorCodes.Count);
+        Assert.Equal(193, ErrorCatalog.All.Count);
+        Assert.Equal(193, errorCodes.Count);
         for (var errorIndex = 0; errorIndex < errorCodes.Count; errorIndex++)
         {
             var expected = ErrorCatalog.All[errorIndex];
@@ -478,7 +478,9 @@ public sealed class DescribeDocumentTests
                 .Select(match => match.Groups[1].Value)
                 .Distinct(StringComparer.Ordinal)
                 .Where(name => !messageNames.Contains(name))
-                .Select(name => error.Code + ":" + name));
+                .Select(name => error.Code + ":" + name)
+                // PARSE-0059 shows the literal string `"\{x\}"` in its suggestion: an example, not a placeholder.
+                .Where(entry => entry != ErrorCodes.Parse0059 + ":x"));
         }
 
         Assert.Equal(32, contextual.Count);

@@ -4,8 +4,8 @@ using static Scripts.Runtime.ArgumentAccess;
 namespace Scripts.Runtime;
 
 /// <summary>
-/// Intrinsic namespace `encoding` (DESIGN §1.5): the base64 and hexadecimal text encodings. A string is UTF-8 text
-/// and bytes are never values, so an encode takes the UTF-8 bytes and a decode returns a string only for strict UTF-8.
+/// Intrinsic namespace `encoding` (DESIGN §1.5): base64, hexadecimal and RFC 3986 percent encodings. A string is UTF-8
+/// text and bytes are never values, so an encode takes the UTF-8 bytes and a decode returns a string only for strict UTF-8.
 /// </summary>
 internal static class EncodingFunctions
 {
@@ -18,6 +18,8 @@ internal static class EncodingFunctions
         table["encoding.base64_decode"] = Base64Decode;
         table["encoding.hex_encode"] = HexEncode;
         table["encoding.hex_decode"] = HexDecode;
+        table["encoding.url_encode"] = UrlEncode;
+        table["encoding.url_decode"] = UrlDecode;
     }
 
     private static Value Base64Encode(RuntimeContext context, Value[] arguments)
@@ -63,6 +65,91 @@ internal static class EncodingFunctions
         }
 
         return DecodeUtf8(bytes, string.Empty);
+    }
+
+    private static Value UrlEncode(RuntimeContext context, Value[] arguments)
+    {
+        const string UpperHex = "0123456789ABCDEF";
+        var bytes = Encoding.UTF8.GetBytes(Text(arguments, 0));
+        long length = 0;
+        foreach (var b in bytes)
+        {
+            length += IsRfc3986Unreserved(b) ? 1 : 3;
+        }
+
+        SizeLimits.EnsureStringLength(length);
+        var chars = new char[(int)length];
+        var pos = 0;
+        foreach (var b in bytes)
+        {
+            if (IsRfc3986Unreserved(b))
+            {
+                chars[pos++] = (char)b;
+            }
+            else
+            {
+                chars[pos++] = '%';
+                chars[pos++] = UpperHex[b >> 4];
+                chars[pos++] = UpperHex[b & 0xF];
+            }
+        }
+
+        return new StringValue(new string(chars));
+    }
+
+    private static Value UrlDecode(RuntimeContext context, Value[] arguments)
+    {
+        var text = Text(arguments, 0);
+        if (text.Length == 0)
+        {
+            return ResultValue.Ok(new StringValue(string.Empty));
+        }
+
+        using var buffer = new MemoryStream(text.Length);
+        var position = 0;
+        while (position < text.Length)
+        {
+            var percent = text.IndexOf('%', position);
+            if (percent < 0)
+            {
+                WriteUtf8Span(buffer, text.AsSpan(position));
+                break;
+            }
+
+            if (percent > position)
+            {
+                WriteUtf8Span(buffer, text.AsSpan(position, percent - position));
+            }
+
+            if (percent + 2 >= text.Length
+                || !TryHexDigit(text[percent + 1], out var high)
+                || !TryHexDigit(text[percent + 2], out var low))
+            {
+                return ResultValue.Error(ErrorValues.Error(
+                    "invalid_argument",
+                    string.Empty,
+                    "expected a percent sign followed by two hexadecimal digits"));
+            }
+
+            buffer.WriteByte((byte)((high << 4) | low));
+            position = percent + 3;
+        }
+
+        return DecodeUtf8(buffer.ToArray(), string.Empty);
+    }
+
+    private static bool IsRfc3986Unreserved(byte value) =>
+        value is (>= (byte)'A' and <= (byte)'Z')
+            or (>= (byte)'a' and <= (byte)'z')
+            or (>= (byte)'0' and <= (byte)'9')
+            or (byte)'-' or (byte)'_' or (byte)'.' or (byte)'~';
+
+    private static void WriteUtf8Span(MemoryStream buffer, ReadOnlySpan<char> span)
+    {
+        var byteCount = Encoding.UTF8.GetByteCount(span);
+        var encoded = new byte[byteCount];
+        Encoding.UTF8.GetBytes(span, encoded);
+        buffer.Write(encoded, 0, encoded.Length);
     }
 
     /// <summary>

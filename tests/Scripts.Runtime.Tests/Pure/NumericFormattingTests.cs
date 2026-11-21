@@ -287,4 +287,109 @@ public class NumericFormattingTests
         Assert.Equal(0.0, result.Number);
         Assert.False(double.IsNegative(result.Number));
     }
+
+    [Theory]
+    [InlineData(0L, 0L, 1L)]
+    [InlineData(0L, 5L, 0L)]
+    [InlineData(1L, long.MaxValue, 1L)]
+    [InlineData(-1L, 0L, 1L)]
+    [InlineData(-1L, 1L, -1L)]
+    [InlineData(-1L, 2L, 1L)]
+    [InlineData(-1L, long.MaxValue, -1L)]
+    [InlineData(2L, 10L, 1024L)]
+    [InlineData(-2L, 63L, long.MinValue)]
+    [InlineData(long.MinValue, 0L, 1L)]
+    [InlineData(long.MinValue, 1L, long.MinValue)]
+    public void Integer_power_computes_exact_64_bit_powers(long baseValue, long exponent, long expected) =>
+        Assert.Equal(expected, OkInteger(Call("integer.power", Integer(baseValue), Integer(exponent))));
+
+    [Theory]
+    [InlineData(2L, -1L, "invalid_argument")]
+    [InlineData(0L, -1L, "invalid_argument")]
+    [InlineData(2L, 63L, "out_of_range")]
+    [InlineData(-2L, 64L, "out_of_range")]
+    [InlineData(2L, long.MaxValue, "out_of_range")]
+    [InlineData(10L, 19L, "out_of_range")]
+    public void Integer_power_rejects_negative_exponents_and_overflow(long baseValue, long exponent, string expectedKind) =>
+        AssertValueError(Call("integer.power", Integer(baseValue), Integer(exponent)), expectedKind);
+
+    [Fact]
+    public void Integer_clamp_minimum_and_maximum_work_and_reject_inverted_bounds()
+    {
+        Assert.Equal(0L, OkInteger(Call("integer.clamp", Integer(-5), Integer(0), Integer(10))));
+        Assert.Equal(5L, OkInteger(Call("integer.clamp", Integer(5), Integer(0), Integer(10))));
+        Assert.Equal(10L, OkInteger(Call("integer.clamp", Integer(15), Integer(0), Integer(10))));
+        AssertValueError(Call("integer.clamp", Integer(5), Integer(10), Integer(0)), "invalid_argument");
+
+        Assert.Equal(Integer(3), Call("integer.minimum", Integer(3), Integer(7)));
+        Assert.Equal(Integer(7), Call("integer.maximum", Integer(3), Integer(7)));
+    }
+
+    [Fact]
+    public void Float_rounding_methods_handle_ties_and_normalize_negative_zero()
+    {
+        Assert.Equal(1.0, ((FloatValue)Call("float.floor", Float(1.7))).Number);
+        Assert.Equal(-2.0, ((FloatValue)Call("float.floor", Float(-1.2))).Number);
+        Assert.False(double.IsNegative(((FloatValue)Call("float.floor", Float(-0.0))).Number));
+
+        Assert.Equal(2.0, ((FloatValue)Call("float.ceiling", Float(1.2))).Number);
+        Assert.Equal(-1.0, ((FloatValue)Call("float.ceiling", Float(-1.7))).Number);
+        var ceilNeg = ((FloatValue)Call("float.ceiling", Float(-0.5))).Number;
+        Assert.Equal(0.0, ceilNeg);
+        Assert.False(double.IsNegative(ceilNeg));
+
+        Assert.Equal(2.0, ((FloatValue)Call("float.round", Float(2.5))).Number);
+        Assert.Equal(4.0, ((FloatValue)Call("float.round", Float(3.5))).Number);
+        var roundNeg = ((FloatValue)Call("float.round", Float(-0.5))).Number;
+        Assert.Equal(0.0, roundNeg);
+        Assert.False(double.IsNegative(roundNeg));
+
+        Assert.Equal(1.0, ((FloatValue)Call("float.truncate", Float(1.9))).Number);
+        Assert.Equal(-1.0, ((FloatValue)Call("float.truncate", Float(-1.9))).Number);
+        var truncNeg = ((FloatValue)Call("float.truncate", Float(-0.5))).Number;
+        Assert.Equal(0.0, truncNeg);
+        Assert.False(double.IsNegative(truncNeg));
+    }
+
+    [Fact]
+    public void Float_transcendental_and_power_methods_reject_invalid_domains_and_non_finite_results()
+    {
+        Assert.Equal(8.0, OkFloat(Call("float.power", Float(2.0), Float(3.0))));
+        AssertValueError(Call("float.power", Float(-1.0), Float(0.5)), "out_of_range");
+        AssertValueError(Call("float.power", Float(10.0), Float(400.0)), "out_of_range");
+
+        Assert.Equal(3.0, OkFloat(Call("float.square_root", Float(9.0))));
+        var sqrtNegZero = OkFloat(Call("float.square_root", Float(-0.0)));
+        Assert.Equal(0.0, sqrtNegZero);
+        Assert.False(double.IsNegative(sqrtNegZero));
+        AssertValueError(Call("float.square_root", Float(-1.0)), "out_of_range");
+
+        Assert.Equal(0.0, OkFloat(Call("float.natural_log", Float(1.0))));
+        AssertValueError(Call("float.natural_log", Float(0.0)), "out_of_range");
+        AssertValueError(Call("float.natural_log", Float(-1.0)), "out_of_range");
+
+        Assert.Equal(3.0, OkFloat(Call("float.log2", Float(8.0))));
+        AssertValueError(Call("float.log2", Float(0.0)), "out_of_range");
+
+        Assert.Equal(2.0, OkFloat(Call("float.log10", Float(100.0))));
+        AssertValueError(Call("float.log10", Float(-2.0)), "out_of_range");
+
+        Assert.Equal(1.0, OkFloat(Call("float.exponential", Float(0.0))));
+        AssertValueError(Call("float.exponential", Float(1000.0)), "out_of_range");
+    }
+
+    [Fact]
+    public void Float_clamp_minimum_maximum_and_list_sum_floats_work_and_detect_overflow()
+    {
+        Assert.Equal(1.0, OkFloat(Call("float.clamp", Float(1.5), Float(0.0), Float(1.0))));
+        Assert.Equal(0.0, OkFloat(Call("float.clamp", Float(-0.5), Float(0.0), Float(1.0))));
+        AssertValueError(Call("float.clamp", Float(0.5), Float(1.0), Float(0.0)), "invalid_argument");
+
+        Assert.Equal(1.5, ((FloatValue)Call("float.minimum", Float(1.5), Float(2.5))).Number);
+        Assert.Equal(2.5, ((FloatValue)Call("float.maximum", Float(1.5), Float(2.5))).Number);
+
+        Assert.Equal(0.0, OkFloat(Call("list<float>.sum_floats", List())));
+        Assert.Equal(4.0, OkFloat(Call("list<float>.sum_floats", List(Float(1.5), Float(2.5)))));
+        AssertValueError(Call("list<float>.sum_floats", List(Float(double.MaxValue), Float(double.MaxValue))), "out_of_range");
+    }
 }

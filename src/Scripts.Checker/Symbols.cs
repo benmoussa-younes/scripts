@@ -30,6 +30,9 @@ internal sealed class VariableSymbol(string name, Span nameSpan, VariableKind ki
 
     public bool IsRead { get; set; }
 
+    /// <summary>Set by an assignment (`x = …`, `x += …`, `x[i] = …`): a write is not a read (SCRIPTS-LINT-0013).</summary>
+    public bool IsWritten { get; set; }
+
     /// <summary>Field names read through this binding (SCRIPTS-LINT-0011: a walk report that never reads `.skipped_paths`).</summary>
     public HashSet<string> ReadMembers { get; } = new(StringComparer.Ordinal);
 

@@ -30,7 +30,7 @@ let source_ordinary_directory = filesystem.get_path_status(ordinary_directory)?
 io.write_standard_output_line("{source_ordinary_directory.permissions == 0o750}")
 let source_ordinary_file = filesystem.get_path_status(ordinary_file)?
 io.write_standard_output_line("{source_ordinary_file.permissions == 0o640}")
-filesystem.copy_directory_tree(source_directory, destination_directory)?
+filesystem.copy_directory_tree(source_path = source_directory, destination_path = destination_directory)?
 io.write_standard_output_line(filesystem.read_file(destination_directory / "sub" / "b.txt")?)
 let copied_setuid = filesystem.get_path_status(destination_directory / "setuid.sh")?
 io.write_standard_output_line("{copied_setuid.permissions == 0o755}")
@@ -42,11 +42,11 @@ let copied_ordinary_directory = filesystem.get_path_status(destination_directory
 io.write_standard_output_line("{copied_ordinary_directory.permissions == 0o750}")
 let copied_ordinary_file = filesystem.get_path_status(destination_directory / "plain.txt")?
 io.write_standard_output_line("{copied_ordinary_file.permissions == 0o640}")
-match filesystem.copy_directory_tree(source_directory, destination_directory) {
+match filesystem.copy_directory_tree(source_path = source_directory, destination_path = destination_directory) {
     ok(_) => io.write_standard_output_line("copied")
     error(failure) => io.write_standard_output_line(failure.kind)
 }
-match filesystem.copy_directory_tree(source_directory, source_directory / "inner") {
+match filesystem.copy_directory_tree(source_path = source_directory, destination_path = source_directory / "inner") {
     ok(_) => io.write_standard_output_line("copied")
     error(failure) => io.write_standard_output_line(failure.kind)
 }

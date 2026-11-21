@@ -1,0 +1,8 @@
+# expect: SCRIPTS-TYPE-0072 6:5
+let code = 3
+let _label = match code {
+    3 => {
+        let _doubled = code * 2
+    }
+    _ => "other"
+}

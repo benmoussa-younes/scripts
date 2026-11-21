@@ -32,6 +32,7 @@ internal static class StringFunctions
         table["string.capture_groups"] = RegexCaptures;
         table["string.replace_regex"] = ReplaceRegex;
         table["string.split_regex"] = SplitRegex;
+        table["string.find_all_regex"] = FindAllRegex;
         table["string.pad_start"] = (context, arguments) => Pad(arguments, atStart: true);
         table["string.pad_end"] = (context, arguments) => Pad(arguments, atStart: false);
         table["string.index_of"] = IndexOf;
@@ -204,6 +205,33 @@ internal static class StringFunctions
         }
 
         AddPiece(items, text[position..]);
+        return ResultValue.Ok(new ListValue(items));
+    }
+
+    /// <summary>All non-overlapping matches in order; zero-length matches advance by one UTF-16 unit so matching terminates.</summary>
+    private static Value FindAllRegex(RuntimeContext context, Value[] arguments)
+    {
+        var text = Text(arguments, 0);
+        if (!RegexEngine.TryCompile(Text(arguments, 1), out var regex, out var failureMessage))
+        {
+            return InvalidRegex(failureMessage);
+        }
+
+        var items = new List<Value>();
+        var index = 0;
+        while (index <= text.Length)
+        {
+            var match = regex!.Match(text, index);
+            if (!match.Success)
+            {
+                break;
+            }
+
+            SizeLimits.EnsureListLength((long)items.Count + 1);
+            items.Add(new StringValue(Sanitize(match.Value)));
+            index = match.Length > 0 ? match.Index + match.Length : match.Index + 1;
+        }
+
         return ResultValue.Ok(new ListValue(items));
     }
 

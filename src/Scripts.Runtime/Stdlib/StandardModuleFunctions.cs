@@ -20,7 +20,7 @@ internal static class StandardModuleFunctions
     /// </summary>
     private static Value ReadStandardInput(RuntimeContext context, Value[] arguments)
     {
-        // The prompt (if any) must reach the terminal before the read blocks, as `exec`/`process.run_shell` do.
+        // The prompt (if any) must reach the terminal before the read blocks, as `process.run_inherit` does.
         context.StandardOutput.Flush();
         return SystemValues.GuardIo(() => SystemValues.Success(new StringValue(context.StandardInput.ReadToEnd())));
     }
@@ -34,7 +34,7 @@ internal static class StandardModuleFunctions
 
     /// <summary>
     /// Writes the text to stdout without a newline, through the same buffered channel as io.write_standard_output_line: no flush of its own,
-    /// so the existing flush points (read_line/read_standard_input/eprint/process.run_inherit/process.run_shell/exit/signal) keep their order.
+    /// so the existing flush points (read_line/read_standard_input/eprint/process.run_inherit/exit/signal) keep their order.
     /// </summary>
     private static Value Write(RuntimeContext context, Value[] arguments)
     {

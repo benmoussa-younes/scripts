@@ -24,8 +24,6 @@ internal static class LintRules
     public static bool LaunchesProgram(StdlibEntry entry) =>
         entry.Kind == StdlibKind.ModuleFunction && ProgramLaunchingModuleFunctions.Contains(entry.QualifiedName);
 
-    public static bool IsShellEntryPoint(StdlibEntry entry) => entry.Kind == StdlibKind.ModuleFunction && entry.QualifiedName == "process.run_shell";
-
     /// <summary>The string methods that cannot split on an empty separator (SCRIPTS-TYPE-0065, DESIGN 7.6).</summary>
     private static readonly HashSet<string> EmptySeparatorHosts = new(StringComparer.Ordinal)
     {

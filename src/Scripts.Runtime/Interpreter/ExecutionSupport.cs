@@ -30,6 +30,16 @@ internal sealed class PropagationSignal(ResultValue errorResult) : Exception("er
     public ResultValue ErrorResult { get; } = errorResult;
 }
 
+/// <summary>
+/// Raised by a `return`/`break`/`continue` inside a block arm of a `match` expression (L1): the expression cannot
+/// return a status, so the signal unwinds to the statement that evaluates it, which completes with <see cref="Status"/>.
+/// The checker rejects these keywords in a lambda (TYPE-0073), so the signal never crosses a function value.
+/// </summary>
+internal sealed class ControlSignal(ExecutionStatus status) : Exception("control flow")
+{
+    public ExecutionStatus Status { get; } = status;
+}
+
 /// <summary>Stdlib entry resolved once per call site; IsMethod tells whether the first argument is the receiver.</summary>
 internal sealed record ResolvedStandardCall(StdlibEntry Entry, StdlibImplementation Implementation, bool IsMethod)
 {

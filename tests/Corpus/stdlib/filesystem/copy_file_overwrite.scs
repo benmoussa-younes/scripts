@@ -3,9 +3,9 @@ let source_file = work_directory / "a.txt"
 let copy_target = work_directory / "b.txt"
 filesystem.write_file_overwrite("nouveau", source_file)?
 filesystem.write_file_overwrite("ancien", copy_target)?
-filesystem.copy_file_overwrite(source_file, copy_target)?
+filesystem.copy_file_overwrite(source_path = source_file, destination_path = copy_target)?
 io.write_standard_output_line(filesystem.read_file(copy_target)?)
-match filesystem.copy_file_overwrite(source_file, source_file) {
+match filesystem.copy_file_overwrite(source_path = source_file, destination_path = source_file) {
     ok(_) => io.write_standard_output_line("copié")
     error(failure) => io.write_standard_output_line(failure.kind)
 }

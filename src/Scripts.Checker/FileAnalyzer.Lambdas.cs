@@ -32,10 +32,14 @@ internal sealed partial class FileAnalyzer
 
         var enclosingScope = currentScope;
         currentScope = new Scope(enclosingScope);
+        // A lambda body never leaves through an enclosing loop: `break`/`continue` in one of its block arms are TYPE-0073.
+        var enclosingLoops = loopStack;
+        loopStack = [];
         lambdaDepth++;
         DeclareLambdaParameters(lambda, parameterTypes);
         var lambdaType = TypeOfLambdaBody(lambda, parameterTypes, expectedFunction, isSilent || isMissingAnnotation);
         lambdaDepth--;
+        loopStack = enclosingLoops;
         currentScope = enclosingScope;
         return lambdaType;
     }

@@ -1,3 +1,0 @@
-# expect-warning: SCRIPTS-LINT-0002 2:23
-let outcome = process.run_shell("echo a")?
-io.write_standard_output_line("{outcome.exit_code}")

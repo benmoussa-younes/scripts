@@ -2,7 +2,7 @@ using Scripts.Runtime.Platform;
 
 namespace Scripts.Runtime.Processes;
 
-/// <summary>Running children (process.run, process.run_inherit, process.run_shell, process.spawn) so signals and shutdown can terminate them.</summary>
+/// <summary>Running children (process.run, process.run_inherit, process.spawn) so signals and shutdown can terminate them.</summary>
 internal sealed class ChildProcessTable
 {
     private readonly object gate = new();

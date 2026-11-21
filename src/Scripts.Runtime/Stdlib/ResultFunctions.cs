@@ -3,7 +3,7 @@ using static Scripts.Runtime.ArgumentAccess;
 
 namespace Scripts.Runtime;
 
-/// <summary>The 4 result methods (SPEC-STDLIB 7.9).</summary>
+/// <summary>The 5 result methods (SPEC-STDLIB 7.9).</summary>
 internal static class ResultFunctions
 {
     public static void Register(Dictionary<string, StdlibImplementation> table)
@@ -12,6 +12,7 @@ internal static class ResultFunctions
         table["result<T,E>.value_or"] = UnwrapOr;
         table["result<T,E>.value_or_fail"] = Unwrap;
         table["result<T,E>.transform_error"] = MapError;
+        table["result<T,E>.ignore_error"] = (context, arguments) => UnitValue.Instance;
     }
 
     private static Value UnwrapOr(RuntimeContext context, Value[] arguments)

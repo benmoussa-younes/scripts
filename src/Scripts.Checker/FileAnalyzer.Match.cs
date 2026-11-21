@@ -122,6 +122,11 @@ internal sealed partial class FileAnalyzer
     {
         if (arm.BodyBlock is not null)
         {
+            if (!isStatement)
+            {
+                return TypeOfValueBlock(arm.BodyBlock, expectedArmType);
+            }
+
             return CheckBlock(arm.BodyBlock).Diverges ? ScriptTypes.Never : ScriptTypes.Unit;
         }
 
@@ -138,6 +143,48 @@ internal sealed partial class FileAnalyzer
         }
 
         return expectedArmType is not null ? CheckAgainst(body, expectedArmType) : TypeOf(body, null);
+    }
+
+    /// <summary>
+    /// L1: in a `match` expression, the value of a block arm is its last line, which must be an expression; the lines
+    /// before it are ordinary statements scoped to the block. A block that always diverges yields `never`; a block that
+    /// ends with a statement is SCRIPTS-TYPE-0072. A statement-position `match` on the last line is a statement too.
+    /// </summary>
+    private ScriptType TypeOfValueBlock(BlockStatement block, ScriptType? expectedArmType)
+    {
+        var statements = block.Statements;
+        var enclosingScope = currentScope;
+        currentScope = new Scope(enclosingScope);
+        MarkPendingDeclarations(statements, includeFunctions: true);
+        var value = statements.Count > 0
+            && statements[^1] is ExpressionStatement { Expression: not MatchExpression { IsStatement: true } } last
+            ? last.Expression
+            : null;
+        ScriptType type;
+        if (value is null)
+        {
+            var flow = CheckStatementList(statements, isFileLevel: false);
+            if (!flow.Diverges)
+            {
+                Report(ErrorCodes.Type0072, new Span(block.Span.End - 1, block.Span.End));
+            }
+
+            type = flow.Diverges ? ScriptTypes.Never : ErrorType.Instance;
+        }
+        else
+        {
+            var flow = CheckStatementList(statements.Take(statements.Count - 1).ToArray(), isFileLevel: false);
+            if (flow.Diverges)
+            {
+                Report(ErrorCodes.Type0053, statements[^1].Span, ("statement", flow.Description));
+            }
+
+            var valueType = expectedArmType is not null ? CheckAgainst(value, expectedArmType) : TypeOf(value, null);
+            type = flow.Diverges ? ScriptTypes.Never : valueType;
+        }
+
+        currentScope = enclosingScope;
+        return type;
     }
 
     /// <summary>Without a full expected type, the first non-diverging arm fixes the type and the others must equal it (TYPE-0028).</summary>
@@ -165,7 +212,9 @@ internal sealed partial class FileAnalyzer
         return firstType ?? ScriptTypes.Never;
     }
 
-    private static Span ArmExpressionSpan(MatchArm arm) => arm.BodyExpression?.Span ?? arm.Span;
+    private static Span ArmExpressionSpan(MatchArm arm) =>
+        arm.BodyExpression?.Span
+        ?? (arm.BodyBlock is { Statements: [.., ExpressionStatement last] } ? last.Expression.Span : arm.Span);
 
     private void CheckArmPattern(Pattern pattern, Expression scrutinee, ScriptType scrutineeType, PatternCoverage coverage)
     {

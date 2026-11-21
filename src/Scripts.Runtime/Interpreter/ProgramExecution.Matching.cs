@@ -8,12 +8,45 @@ internal sealed partial class ProgramExecution
     {
         var scrutinee = Evaluate(match.Scrutinee, scope);
         var arm = SelectArm(match, scrutinee, scope, out var armScope);
+        if (arm.BodyBlock is not null)
+        {
+            return EvaluateValueBlock(arm.BodyBlock.Statements, armScope ?? new Scope(scope, scope.FileEnvironment));
+        }
+
         if (arm.BodyExpression is null)
         {
             throw InternalError("match expression arm without an expression body");
         }
 
         return EvaluateOwned(arm.BodyExpression, armScope ?? scope);
+    }
+
+    /// <summary>Block arm of a `match` expression (L1): the statements run in order and the last line gives the value.</summary>
+    private Value EvaluateValueBlock(IReadOnlyList<Statement> statements, Scope blockScope)
+    {
+        for (var position = 0; position < statements.Count - 1; position++)
+        {
+            var status = ExecuteStatement(statements[position], blockScope);
+            if (status != ExecutionStatus.Normal)
+            {
+                throw new ControlSignal(status);
+            }
+        }
+
+        if (statements.Count > 0 && statements[^1] is ExpressionStatement { Expression: not MatchExpression { IsStatement: true } } last)
+        {
+            State.CurrentSpan = last.Span;
+            return EvaluateOwned(last.Expression, blockScope);
+        }
+
+        // The checker accepts any other last line only when it diverges (`never`).
+        var lastStatus = statements.Count > 0 ? ExecuteStatement(statements[^1], blockScope) : ExecutionStatus.Normal;
+        if (lastStatus == ExecutionStatus.Normal)
+        {
+            throw InternalError("match block arm without a value");
+        }
+
+        throw new ControlSignal(lastStatus);
     }
 
     private ExecutionStatus ExecuteMatchStatement(MatchExpression match, Scope scope)

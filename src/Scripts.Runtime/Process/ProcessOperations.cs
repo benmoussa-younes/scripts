@@ -2,33 +2,9 @@ using Scripts.Runtime.Platform;
 
 namespace Scripts.Runtime.Processes;
 
-/// <summary>process.run/process.run_inherit/process.run_shell, process.spawn, process.wait_for_process, process.terminate (SPEC-STDLIB §7.3). Expected failures are ProcessFailureException.</summary>
+/// <summary>process.run/process.run_inherit, process.spawn, process.wait_for_process, process.terminate (SPEC-STDLIB §7.3). Expected failures are ProcessFailureException.</summary>
 internal static class ProcessOperations
 {
-    private static readonly double MaximumTimeoutMilliseconds = TimeSpan.MaxValue.TotalMilliseconds;
-
-    /// <summary>process.run_shell: captured run; standardInput null closes stdin immediately.</summary>
-    public static RecordValue Execute(
-        RuntimeContext context,
-        string program,
-        IReadOnlyList<string> arguments,
-        string? standardInput,
-        long? timeoutMilliseconds)
-    {
-        TimeSpan? timeout = null;
-        if (timeoutMilliseconds is { } milliseconds)
-        {
-            if (milliseconds < 1)
-            {
-                throw ProcessFailureException.InvalidArgument(program, "the timeout must be at least 1 ms");
-            }
-
-            timeout = milliseconds >= MaximumTimeoutMilliseconds ? null : TimeSpan.FromMilliseconds(milliseconds);
-        }
-
-        return RunCaptured(context, program, arguments, standardInput, string.Empty, timeout, timeoutMilliseconds, ProcessLaunchContext.Inherit);
-    }
-
     /// <summary>
     /// process.run: captures one run_request in its own working directory and environment. A zero deadline means no
     /// deadline, a negative one is invalid_argument (DESIGN §7.3).
@@ -268,7 +244,7 @@ internal static class ProcessOperations
         // P8d: posix_spawn with an explicit envp and (for every captured child) its own process group created
         // before exec. process.run_inherit inherits stdin in both modes, so it must keep scripts's foreground group:
         // a background group reading the terminal would stop with SIGTTIN. `redirectInput` is the discriminant:
-        // it is true for run/spawn/process.run_shell/pipeline stages, false for run_inherit.
+        // it is true for run/spawn/pipeline stages, false for run_inherit.
         var ownProcessGroup = redirectInput;
         var spec = new SpawnSpec(
             program,

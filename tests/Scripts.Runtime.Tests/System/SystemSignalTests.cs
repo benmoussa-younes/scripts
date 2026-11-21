@@ -169,6 +169,12 @@ public sealed class SystemInterruptionMonitorTests
     [Fact]
     public void A_real_sighup_delivered_to_the_process_is_recorded_without_killing_it()
     {
+        // `nohup` and a non-interactive job start the process with SIGHUP ignored; the convention keeps it ignored, so
+        // there is no delivery to observe (the gate runs under nohup in some harnesses).
+        Assert.SkipUnless(
+            !SignalDispositions.IsIgnored(Libc.SignalHangUp),
+            "SIGHUP is ignored at startup (nohup or a background job), so it is never delivered");
+
         var forcedExits = new List<int>();
         using var context = ContextWithRecordedForcedExit(forcedExits, TimeSpan.FromSeconds(30));
         context.Interruption.ListenForSignals();
@@ -178,6 +184,24 @@ public sealed class SystemInterruptionMonitorTests
         Assert.True(WaitUntil(() => context.Interruption.IsInterrupted, 5000));
         Assert.Equal("SIGHUP", context.Interruption.Pending!.SignalName);
         Assert.Equal(InterruptionMonitor.HangUpExitCode, context.Interruption.Pending.ExitCode);
+        Assert.Empty(forcedExits);
+    }
+
+    [Fact]
+    public void An_ignored_sighup_is_kept_ignored_instead_of_being_handled()
+    {
+        Assert.SkipUnless(
+            SignalDispositions.IsIgnored(Libc.SignalHangUp),
+            "SIGHUP is not ignored at startup, so the inherited-disposition path cannot be exercised");
+
+        var forcedExits = new List<int>();
+        using var context = ContextWithRecordedForcedExit(forcedExits, TimeSpan.FromSeconds(30));
+        context.Interruption.ListenForSignals();
+
+        Assert.Equal(0, Libc.Kill(Environment.ProcessId, Libc.SignalHangUp));
+
+        Assert.False(WaitUntil(() => context.Interruption.IsInterrupted, 200));
+        Assert.Null(context.Interruption.Pending);
         Assert.Empty(forcedExits);
     }
 

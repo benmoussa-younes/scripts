@@ -46,7 +46,7 @@ internal sealed partial class FileAnalyzer
         HoistImportsAndDeclarations();
         DeclareConstants();
         CheckTopLevelStatements();
-        ReportUnreadResultBindings();
+        ReportUnreadBindings();
         ReportUncalledMain();
         return exports;
     }
@@ -120,10 +120,13 @@ internal sealed partial class FileAnalyzer
         return text.Length > maximumLength ? text[..maximumLength] + "…" : text;
     }
 
-    private void ReportUnreadResultBindings()
+    private void ReportUnreadBindings()
     {
+        // L5: in a file that does not check, an unread binding is mostly a consequence of the error, not news.
+        var fileHasErrors = sink.Errors.Any(error => error.File == source);
         foreach (var binding in trackedBindings)
         {
+            var reportedBefore = sink.Errors.Count + sink.Warnings.Count;
             if (!binding.IsRead && !binding.Name.StartsWith('_') && TypeRelations.ContainsResult(binding.Type))
             {
                 Report(ErrorCodes.Type0049, binding.NameSpan, ("name", binding.Name));
@@ -162,6 +165,56 @@ internal sealed partial class FileAnalyzer
             {
                 Report(ErrorCodes.Lint0011, binding.NameSpan, ("name", binding.Name));
             }
+
+            // SCRIPTS-LINT-0013 (L5): any other binding never read, unless a rule above already named it or the file has errors.
+            if (!fileHasErrors && sink.Errors.Count + sink.Warnings.Count == reportedBefore && IsUnreadLintedBinding(binding))
+            {
+                Report(ErrorCodes.Lint0013, binding.NameSpan, UnreadBindingFix(binding), ("name", binding.Name));
+            }
         }
     }
+
+    /// <summary>
+    /// L5: a script, local, `for` or pattern binding that is never read. Parameters and lambda parameters (the signature
+    /// belongs to the caller), constants (module `public let` are always constants), `_`-prefixed names and bindings already
+    /// typed as an error are not reported.
+    /// </summary>
+    private static bool IsUnreadLintedBinding(VariableSymbol binding) =>
+        !binding.IsRead
+        && !binding.Name.StartsWith('_')
+        && binding.Type is not ErrorType
+        && binding.Kind switch
+        {
+            VariableKind.ScriptVariable or VariableKind.LocalVariable or VariableKind.ForVariable or VariableKind.PatternBinding => true,
+            _ => false,
+        };
+
+    /// <summary>
+    /// Renaming the declaration to `_name` is safe when nothing else names the binding (no write, since a read does not
+    /// exist) and `_name` appears nowhere in the file, so the rename cannot capture or shadow another binding.
+    /// </summary>
+    private Fix? UnreadBindingFix(VariableSymbol binding)
+    {
+        var replacement = "_" + binding.Name;
+        return binding.IsWritten || ContainsIdentifier(source.Text, replacement)
+            ? null
+            : new Fix($"rename to `{replacement}`", source, binding.NameSpan, replacement);
+    }
+
+    private static bool ContainsIdentifier(string text, string identifier)
+    {
+        for (var index = text.IndexOf(identifier, StringComparison.Ordinal); index >= 0;
+             index = text.IndexOf(identifier, index + 1, StringComparison.Ordinal))
+        {
+            var end = index + identifier.Length;
+            if ((index == 0 || !IsIdentifierPart(text[index - 1])) && (end == text.Length || !IsIdentifierPart(text[end])))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsIdentifierPart(char character) => character == '_' || char.IsAsciiLetterOrDigit(character);
 }

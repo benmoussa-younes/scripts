@@ -1,0 +1,5 @@
+stdout:
+nettoyage
+exit: 3
+stderr:
+pas un entier: invalid_integer

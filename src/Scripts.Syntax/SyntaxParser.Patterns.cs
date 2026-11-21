@@ -4,7 +4,7 @@ namespace Scripts.Syntax;
 
 internal sealed partial class SyntaxParser
 {
-    /// <param name="isStatement">A statement-position match has block arms (`=&gt; {`); an expression-position match has expression arms.</param>
+    /// <param name="isStatement">True for a statement-position match; in both positions `=&gt; {` opens a block arm.</param>
     private MatchExpression ParseMatch(bool isStatement)
     {
         var matchToken = Advance();
@@ -45,9 +45,11 @@ internal sealed partial class SyntaxParser
 
         Expression? bodyExpression = null;
         BlockStatement? bodyBlock = null;
-        if (isStatementMatch && Current.Kind == TokenKind.LeftBrace)
+        if (Current.Kind == TokenKind.LeftBrace)
         {
-            bodyBlock = ParseBlock("=>");
+            RejectMapLiteralArm();
+            // Inside the block arm of a `match` expression, a nested `match` may turn out to be its value line (see ParseMatchStatement).
+            bodyBlock = ParseBlock("=>", isValueBlock: !isStatementMatch || inValueBlock);
         }
         else
         {
@@ -58,6 +60,21 @@ internal sealed partial class SyntaxParser
         FinishArm();
         LeaveNesting();
         return new MatchArm(span, pattern, bodyExpression, bodyBlock);
+    }
+
+    /// <summary>After `=>`, `{` opens a block (L1): `{name: …` or `{"key": …` is a map literal, which must be parenthesized.</summary>
+    private void RejectMapLiteralArm()
+    {
+        var index = position + 1;
+        while (Fetch(index).Kind == TokenKind.NewLine)
+        {
+            index++;
+        }
+
+        if (Fetch(index).Kind is TokenKind.Identifier or TokenKind.String && Fetch(index + 1).Kind == TokenKind.Colon)
+        {
+            throw Unexpected(Fetch(index + 1), "a statement: after `=>`, `{` opens a block — write a map literal as `({…})`");
+        }
     }
 
     private void FinishArm()

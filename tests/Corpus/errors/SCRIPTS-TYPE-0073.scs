@@ -1,0 +1,7 @@
+# expect: SCRIPTS-TYPE-0073 4:16
+for item in [1, 2] {
+    let _half = (n: integer) => match n % 2 {
+        1 => { continue }
+        _ => n / 2
+    }
+}

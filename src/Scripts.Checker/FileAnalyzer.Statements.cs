@@ -253,6 +253,7 @@ internal sealed partial class FileAnalyzer
         {
             case VariableSymbol variable:
                 isMutable = variable.IsMutable;
+                variable.IsWritten = true;
                 if (!variable.IsMutable)
                 {
                     Report(ErrorCodes.Type0039, assignment.TargetSpan, ("name", variable.Name));
@@ -343,7 +344,7 @@ internal sealed partial class FileAnalyzer
     {
         if (loopStack.Count == 0)
         {
-            Report(ErrorCodes.Type0050, span, ("keyword", keyword));
+            Report(lambdaDepth > 0 ? ErrorCodes.Type0073 : ErrorCodes.Type0050, span, ("keyword", keyword));
         }
         else if (marksBreak)
         {
@@ -353,6 +354,17 @@ internal sealed partial class FileAnalyzer
 
     private void CheckReturn(ReturnStatement returnStatement)
     {
+        if (lambdaDepth > 0)
+        {
+            Report(ErrorCodes.Type0073, new Span(returnStatement.Span.Start, returnStatement.Span.Start + "return".Length), ("keyword", "return"));
+            if (returnStatement.Value is not null)
+            {
+                TypeOf(returnStatement.Value, ErrorType.Instance);
+            }
+
+            return;
+        }
+
         if (currentFunction is null)
         {
             CheckTopLevelReturn(returnStatement);

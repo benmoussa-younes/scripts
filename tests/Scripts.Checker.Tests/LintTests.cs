@@ -41,10 +41,10 @@ public sealed class LintTests
     public void Exec_request_checks_its_program_argument()
     {
         Checking.AssertMarkedWarnings(
-            "let request = process.request(‸\"sh\", [\"-c\", \"x\"])",
+            "let _request = process.request(‸\"sh\", [\"-c\", \"x\"])",
             "SCRIPTS-LINT-0001");
         Checking.AssertMarkedWarnings(
-            "let program = \"true\"\nlet request = process.request(‸program, [])",
+            "let program = \"true\"\nlet _request = process.request(‸program, [])",
             "SCRIPTS-LINT-0004");
     }
 
@@ -164,17 +164,11 @@ public sealed class LintTests
     }
 
     [Fact]
-    public void Exec_shell_is_flagged_on_the_function_name()
-    {
-        Checking.AssertMarkedWarnings("let outcome = process.‸run_shell(\"echo a\")?\nio.write_standard_output_line(outcome.standard_output)", "SCRIPTS-LINT-0002");
-    }
-
-    [Fact]
     public void Warnings_are_ordered_and_never_count_as_errors()
     {
         var result = Checking.AssertMarkedWarnings(
-            "let a = process.‸run_shell(\"x\")?\nlet b = process.run(process.request(‸\"sh\", []))?\nio.write_standard_output_line(a.standard_output + b.standard_output)",
-            "SCRIPTS-LINT-0002",
+            "let name = \"echo\"\nlet a = process.run(process.request(‸name, []))?\nlet b = process.run(process.request(‸\"sh\", []))?\nio.write_standard_output_line(a.standard_output + b.standard_output)",
+            "SCRIPTS-LINT-0004",
             "SCRIPTS-LINT-0001");
         Assert.Empty(result.Errors);
     }
@@ -273,9 +267,9 @@ public sealed class LintTests
     [Fact]
     public void Warnings_are_still_reported_next_to_errors()
     {
-        var result = Checking.Check("let a = process.run_shell(\"x\")?\nlet n: integer = \"a\"\nio.write_standard_output_line(a.standard_output)");
+        var result = Checking.Check("let a = process.run(process.request(\"sh\", []))?\nlet n: integer = \"a\"\nio.write_standard_output_line(a.standard_output)");
         Assert.Equal(["SCRIPTS-TYPE-0012 2:18"], Checking.ErrorPositions(result));
-        Assert.Equal(["SCRIPTS-LINT-0002 1:17"], Checking.WarningPositions(result));
+        Assert.Equal(["SCRIPTS-LINT-0001 1:37"], Checking.WarningPositions(result));
     }
 
     [Fact]
@@ -542,7 +536,7 @@ public sealed class LintTests
     {
         // Declared outside the innermost loop body, the string accumulates across its iterations: still quadratic.
         Checking.AssertMarkedWarnings("""
-            for outer in ["a", "b"] {
+            for _outer in ["a", "b"] {
                 let mutable s = ""
                 for inner in ["x", "y"] {
                     ‸s = s + inner
@@ -593,11 +587,90 @@ public sealed class LintTests
         Assert.DoesNotContain(result.Warnings, warning => warning.Code == "SCRIPTS-LINT-0012");
     }
 
+    [Theory]
+    // L5: a local, `for`, pattern or non-public script binding never read is SCRIPTS-LINT-0013.
+    [InlineData("let ‸unused = \"a\".trim_whitespace()\nio.write_standard_output_line(\"ok\")")]
+    [InlineData("for ‸index in range(0, 2) {\n    io.write_standard_output_line(\"t\")\n}")]
+    [InlineData("match \"7\".parse_integer() {\n    ok(‸value) => io.write_standard_output_line(\"e\")\n    error(_) => io.write_standard_output_line(\"n\")\n}")]
+    [InlineData("function f() -> integer {\n    let ‸inner = 1\n    return 2\n}\nio.write_standard_output_line(\"{f()}\")")]
+    [InlineData("let mutable ‸total = 0\nfor n in [1, 2] {\n    total += n\n}")]
+    public void An_unread_binding_is_LINT_0013(string marked) =>
+        Checking.AssertMarkedWarnings(marked, "SCRIPTS-LINT-0013");
+
+    [Theory]
+    [InlineData("let mutable items = [1]\nitems.append(2)")]
+    [InlineData("let _kept = \"a\".trim_whitespace()")]
+    [InlineData("function f(unused: integer) -> integer {\n    return 1\n}\nio.write_standard_output_line(\"{f(2)}\")")]
+    [InlineData("let doubled = [1].transform(n => 2)\nio.write_standard_output_line(\"{doubled.length()}\")")]
+    public void Reads_parameters_constants_and_underscore_names_are_not_LINT_0013(string source) =>
+        AssertNoErrorsOrWarnings(source);
+
+    [Fact]
+    public void An_unread_result_binding_is_TYPE_0049_only()
+    {
+        var result = Checking.Check("let parsed = \"1\".parse_integer()");
+        Assert.Equal(["SCRIPTS-TYPE-0049"], result.Errors.Select(error => error.Code));
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void The_LINT_0013_fix_renames_the_declaration_only_when_safe()
+    {
+        var fix = Checking.Check("let unused = \"a\".trim_whitespace()").Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("_unused", fix.Replacement);
+        Assert.Equal((4, 10), (fix.Span.Start, fix.Span.End));
+
+        // A write would be left behind by a declaration-only rename, and an existing `_unused` could be shadowed.
+        Assert.Null(Checking.Check("let mutable total = \"a\".length()\ntotal = 1").Warnings.Single().Fix);
+        Assert.Null(Checking.Check("let unused = \"a\".trim_whitespace()\nlet _unused = \"b\".trim_whitespace()").Warnings.Single().Fix);
+    }
+
     private static void AssertNoErrorsOrWarnings(string source)
     {
         var result = Checking.Check(source);
         Assert.Empty(result.Errors);
         Assert.Empty(result.Warnings);
+    }
+
+    [Theory]
+    // L3: two consecutive `path` parameters receiving positional arguments are SCRIPTS-LINT-0014.
+    [InlineData("filesystem.copy_file(‸p\"a\", p\"b\")?")]
+    [InlineData("let a = p\"a\"\nfilesystem.make_hard_link(‸a, p\"b\")?")]
+    [InlineData("function move(from: path, to: path) -> unit {\n    io.write_standard_output_line(\"{from} {to}\")\n}\nmove(‸p\"a\", p\"b\")")]
+    public void Consecutive_paths_passed_by_position_are_LINT_0014(string marked) =>
+        Checking.AssertMarkedWarnings(marked, "SCRIPTS-LINT-0014");
+
+    [Theory]
+    [InlineData("let source_path = p\"a\"\nlet destination_path = p\"b\"\nfilesystem.copy_file(source_path, destination_path)?")]
+    [InlineData("filesystem.copy_file(source_path = p\"a\", destination_path = p\"b\")?")]
+    [InlineData("io.write_standard_output_line(\"a-b\".replace(\"-\", \"+\"))")]
+    [InlineData("let copy = (a: path, b: path) => \"{a}{b}\"\nio.write_standard_output_line(copy(p\"a\", p\"b\"))")]
+    public void Named_self_describing_string_and_function_value_arguments_are_not_LINT_0014(string source) =>
+        AssertNoErrorsOrWarnings(source);
+
+    [Fact]
+    public void The_LINT_0014_fix_names_every_argument_and_keeps_their_order()
+    {
+        const string text = "filesystem.copy_file(p\"a\" ,  p\"b\")?";
+        var fix = Checking.Check(text).Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("source_path = p\"a\" ,  destination_path = p\"b\"", fix.Replacement);
+        Assert.Equal((21, 33), (fix.Span.Start, fix.Span.End));
+    }
+
+    [Fact]
+    public void The_LINT_0014_fix_keeps_a_comment_between_the_arguments()
+    {
+        const string text = "filesystem.copy_file(p\"a\", # keep\n    p\"b\")?";
+        var fix = Checking.Check(text).Warnings.Single().Fix;
+        Assert.NotNull(fix);
+        Assert.Equal("source_path = p\"a\", # keep\n    destination_path = p\"b\"", fix.Replacement);
+
+        var fixedText = text[..fix.Span.Start] + fix.Replacement + text[fix.Span.End..];
+        var checkedAfterFix = Checking.Check(fixedText);
+        Assert.Empty(checkedAfterFix.Errors);
+        Assert.Empty(checkedAfterFix.Warnings);
     }
 
     private static void AssertType0070WithoutWarnings(string marked)

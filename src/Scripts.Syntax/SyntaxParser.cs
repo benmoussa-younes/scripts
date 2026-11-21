@@ -18,6 +18,9 @@ internal sealed partial class SyntaxParser
     private int position;
     private int previousEnd;
 
+    // True while parsing the statements of a block arm of a `match` expression, whose last line may be any expression (L1).
+    private bool inValueBlock;
+
     /// <summary>Depth of the node being parsed; the program itself is level 1.</summary>
     private int nestingDepth = 1;
 
