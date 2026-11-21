@@ -15,10 +15,11 @@ function do_work(work_directory: path) -> result<unit, string> {
 }
 
 let temporary_directory = filesystem.make_temporary_directory("scripts-migration-15")?
+# Deferred actions run in LIFO order, whatever the termination: the removal first, then the message.
+process.defer(() => io.write_standard_output_line("nettoyage termine"))
+process.defer(() => filesystem.remove_directory_tree(temporary_directory).ignore_error())
 let work_outcome = do_work(temporary_directory)
 match work_outcome {
     ok(_) => io.write_standard_output_line("travail termine")
     error(work_reason) => io.write_standard_output_line("echec: {work_reason}")
 }
-filesystem.remove_directory_tree(temporary_directory)?
-io.write_standard_output_line("nettoyage termine")

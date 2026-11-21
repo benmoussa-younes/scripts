@@ -134,6 +134,7 @@ public static class ErrorCodes
     public const string Type0068 = "SCRIPTS-TYPE-0068";
     public const string Type0069 = "SCRIPTS-TYPE-0069";
     public const string Type0070 = "SCRIPTS-TYPE-0070";
+    public const string Type0071 = "SCRIPTS-TYPE-0071";
     public const string Module0001 = "SCRIPTS-MODULE-0001";
     public const string Module0002 = "SCRIPTS-MODULE-0002";
     public const string Module0003 = "SCRIPTS-MODULE-0003";

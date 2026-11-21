@@ -410,6 +410,13 @@ public class PureResultFunctionsTests
     }
 
     [Fact]
+    public void IgnoreErrorDropsBothOutcomes()
+    {
+        Assert.Same(UnitValue.Instance, Call("result<T,E>.ignore_error", ResultValue.Ok(UnitValue.Instance)));
+        Assert.Same(UnitValue.Instance, Call("result<T,E>.ignore_error", ResultValue.Error(ErrorValues.Error("not_found", "/x", "introuvable"))));
+    }
+
+    [Fact]
     public void MapErrorConvertsOnlyTheError()
     {
         var kindOf = Function(1, arguments => ((RecordValue)arguments[0]).Get("kind"));

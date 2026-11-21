@@ -1052,6 +1052,13 @@ public static class StdlibCatalogData
             "extracts the value of {receiver} (fatal stop on error)",
             "the value of `ok(v)`; on `error(x)` execution stops with a fatal error whose message includes the type, the eventual `kind` and the `message` of the error; best reserved for cases where failure is impossible."),
         new(
+            "result<T,E>.ignore_error", StdlibKind.Method, "result<T,E>", null, "ignore_error",
+            [], "unit", "result<T,E>.ignore_error() -> unit", "filesystem.remove_file(p\"absent.txt\").ignore_error()\nio.write_standard_output_line(\"ok\")", "ok",
+            "drops both `ok(())` and `error(e)`",
+            [], ["none"], false, false, false, true,
+            "explicitly drops the outcome of {receiver}",
+            "drops both `ok(())` and `error(e)`: the explicit, visible way to give up on a cleanup failure, e.g. `process.defer(() => filesystem.remove_directory_tree(root).ignore_error())`. Only for `result<unit, E>`: on any other result it would also drop the computed value (`SCRIPTS-TYPE-0071`); keep it with `value_or`, `?` or `match`."),
+        new(
             "result<T,E>.transform_error", StdlibKind.Method, "result<T,E>", null, "transform_error",
             [new("converter", "function(E) -> F")], "result<T, F>", "result<T,E>.transform_error(converter: function(E) -> F) -> result<T,F>", "let converted = \"x\".parse_integer().transform_error(failure => failure.kind)\nmatch converted {\n    ok(value) => io.write_standard_output_line(\"{value}\")\n    error(kind_text) => io.write_standard_output_line(kind_text)\n}", "invalid_integer",
             "`ok(v)` is returned unchanged (the `converter` is not called)",

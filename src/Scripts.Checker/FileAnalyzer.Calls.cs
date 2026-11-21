@@ -359,6 +359,15 @@ internal sealed partial class FileAnalyzer
             }
         }
 
+        // SCRIPTS-TYPE-0071 (L2): `ignore_error` must never drop a computed value along with the error.
+        if (entry.QualifiedName == "result<T,E>.ignore_error"
+            && bindings.Apply(new TypeVariable("T")) is var valueType
+            && valueType is not (TypeVariable or ErrorType)
+            && !TypeRelations.IsUnit(valueType))
+        {
+            Report(ErrorCodes.Type0071, site.NameSpan, ("type", valueType.ToString()));
+        }
+
         if (site.Callee is not null)
         {
             site.Callee.ResolvedType = TypeRelations.ReplaceTypeVariablesWithError(bindings.Apply(signature.ToFunctionType()));

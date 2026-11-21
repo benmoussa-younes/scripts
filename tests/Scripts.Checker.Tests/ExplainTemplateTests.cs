@@ -249,6 +249,7 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "result<T,E>.value_or")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.value_or(0)",
         [SnippetKey(StdlibKind.Method, "result<T,E>.value_or_fail")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.value_or_fail()",
         [SnippetKey(StdlibKind.Method, "result<T,E>.transform_error")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.transform_error(e => e)?",
+        [SnippetKey(StdlibKind.Method, "result<T,E>.ignore_error")] = "filesystem.remove_file(p\"absent.txt\").ignore_error()",
 
         // --- process_result method ---
         [SnippetKey(StdlibKind.Method, "process_result.require_success")] = "let _p = process.run(process.request(\"true\", []))?\nlet _r = _p.require_success()?",
@@ -270,7 +271,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(206, StdlibCatalog.All.Count);
+        Assert.Equal(207, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -307,7 +308,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(206, reached.Count);
+        Assert.Equal(207, reached.Count);
     }
 
     /// <summary>

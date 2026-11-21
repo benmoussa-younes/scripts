@@ -220,8 +220,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var functions = document.RootElement.GetProperty("functions").EnumerateArray().ToList();
 
-        Assert.Equal(206, StdlibCatalog.All.Count);
-        Assert.Equal(206, functions.Count);
+        Assert.Equal(207, StdlibCatalog.All.Count);
+        Assert.Equal(207, functions.Count);
         Assert.Equal(
             StdlibCatalog.All.Select(entry => entry.QualifiedName),
             functions.Select(item => item.GetProperty("qualified_name").GetString()!));
@@ -322,7 +322,7 @@ public sealed class DescribeDocumentTests
         var byName = document.RootElement.GetProperty("functions").EnumerateArray()
             .ToDictionary(item => item.GetProperty("kind").GetString() + ":" + item.GetProperty("qualified_name").GetString()!);
         // The pair `(kind, qualified_name)` is unique: no collision in the construction above.
-        Assert.Equal(206, byName.Count);
+        Assert.Equal(207, byName.Count);
 
         Assert.Equal(JsonValueKind.Null, byName["module_function:filesystem.read_file"].GetProperty("receiver").ValueKind);
         Assert.Equal("module_function", byName["module_function:filesystem.read_file"].GetProperty("kind").GetString());
@@ -405,8 +405,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var errorCodes = document.RootElement.GetProperty("error_codes").EnumerateArray().ToList();
 
-        Assert.Equal(189, ErrorCatalog.All.Count);
-        Assert.Equal(189, errorCodes.Count);
+        Assert.Equal(190, ErrorCatalog.All.Count);
+        Assert.Equal(190, errorCodes.Count);
         for (var errorIndex = 0; errorIndex < errorCodes.Count; errorIndex++)
         {
             var expected = ErrorCatalog.All[errorIndex];

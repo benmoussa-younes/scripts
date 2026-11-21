@@ -257,4 +257,21 @@ public sealed class CallTests
             """, "SCRIPTS-TYPE-0067");
         Assert.Contains("function value", result.Errors[0].Message, StringComparison.Ordinal);
     }
+
+    [Theory]
+    // L2: `ignore_error` gives up on a `result<unit, E>` only, and is a `unit` expression usable by `process.defer`.
+    [InlineData("filesystem.remove_file(p\"a\").ignore_error()")]
+    [InlineData("let r: result<unit, string> = error(\"x\")\nr.ignore_error()")]
+    [InlineData("process.defer(() => filesystem.remove_directory_tree(p\"d\").ignore_error())")]
+    public void Ignore_error_is_accepted_on_a_unit_result(string source) =>
+        Checking.AssertErrors(source);
+
+    [Theory]
+    [InlineData("\"1\".parse_integer().‸ignore_error()", "integer")]
+    [InlineData("[\"1\"].transform(s => s.parse_integer()).collect().‸ignore_error()", "list<integer>")]
+    public void Ignore_error_on_a_value_result_is_TYPE_0071(string marked, string type)
+    {
+        var result = Checking.AssertMarked(marked, "SCRIPTS-TYPE-0071");
+        Assert.Contains($"value of type `{type}`", result.Errors[0].Message, StringComparison.Ordinal);
+    }
 }
