@@ -3,7 +3,7 @@
 # Run from anywhere: scripts run tools/scripts/binaries/test-scripts.scs
 #
 # The version comes from git when it is available and from the 0.1.0 fallback
-# otherwise. There is no Core checkout and no core pin to test.
+# otherwise; the exact tag mapping is pinned on a synthetic tag.
 let repo = process.script_path().parent().parent().parent().parent()
 
 function run_version(repo: path, search_path: string) -> process_result {
@@ -33,6 +33,20 @@ function git_run(repo: path, arguments: list<string>) -> process_result {
     }
 }
 
+function is_release_version(full_text: string) -> boolean {
+    let base = full_text.split("+")[0].replace("_dirty", "")
+    let parts = base.split(".")
+    if parts.length() != 3 {
+        return false
+    }
+    for part in parts {
+        if part.parse_integer().value_or(-1) < 0 {
+            return false
+        }
+    }
+    return true
+}
+
 function expect_exit(label: string, outcome: process_result, expected: integer, root: path) -> unit {
     if outcome.exit_code != expected {
         io.write_standard_error_line("test-scripts: FAIL {label}: expected exit {expected}, got {outcome.exit_code}")
@@ -48,14 +62,15 @@ function expect_exit(label: string, outcome: process_result, expected: integer, 
 
 let root = filesystem.make_temporary_directory("scripts-script-tests-")?
 
-# 1. git available: the computed version starts with the 0.1.2 line.
+# 1. git available: the computed version has the release shape. The exact tag
+#    mapping is case 3, so a future release line cannot break this test.
 let computed = run_version(repo, "/usr/local/bin:/usr/bin:/bin")
 if computed.exit_code != 0 {
     fail(root, "version git", "exit {computed.exit_code}: {computed.standard_error.trim_whitespace()}")
 }
 let computed_text = computed.standard_output.trim_whitespace()
-if not computed_text.starts_with("0.1.2") {
-    fail(root, "version git", "expected a 0.1.2 version, got '{computed_text}'")
+if not is_release_version(computed_text) {
+    fail(root, "version git", "expected X.Y.Z, got '{computed_text}'")
 }
 io.write_standard_output_line("ok   version git is {computed_text}")
 
@@ -88,19 +103,22 @@ expect_exit("version repo commit", git_run(version_repo, [
     "-c", "commit.gpgsign=false",
     "commit", "-q", "-m", "init",
 ]), 0, root)
+expect_exit("version repo tag", git_run(version_repo, ["-c", "tag.gpgsign=false", "tag", "v9.8.7"]), 0, root)
 
 let clean_version = run_version(version_repo, "/usr/local/bin:/usr/bin:/bin")
 if clean_version.exit_code != 0 {
     fail(root, "version clean", "exit {clean_version.exit_code}: {clean_version.standard_error.trim_whitespace()}")
 }
-if clean_version.standard_output.contains("_dirty") {
-    fail(root, "version clean", "unexpected _dirty: {clean_version.standard_output.trim_whitespace()}")
+let clean_text = clean_version.standard_output.trim_whitespace()
+if clean_text != "9.8.7" {
+    fail(root, "version clean", "expected '9.8.7', got '{clean_text}'")
 }
 
 filesystem.write_file_overwrite("two\n", version_repo / "README.md")?
 let dirty_version = run_version(version_repo, "/usr/local/bin:/usr/bin:/bin")
-if not dirty_version.standard_output.contains("_dirty") {
-    fail(root, "version dirty", "expected _dirty, got '{dirty_version.standard_output.trim_whitespace()}'")
+let dirty_text = dirty_version.standard_output.trim_whitespace()
+if dirty_text != "9.8.7_dirty" {
+    fail(root, "version dirty", "expected '9.8.7_dirty', got '{dirty_text}'")
 }
 expect_exit("version repo restore", git_run(version_repo, ["checkout", "--", "README.md"]), 0, root)
 
@@ -114,8 +132,12 @@ expect_exit("version repo commit sums", git_run(version_repo, [
 ]), 0, root)
 filesystem.write_file_overwrite("changed\n", version_repo / "packaging/SHA256SUMS")?
 let artifact_version = run_version(version_repo, "/usr/local/bin:/usr/bin:/bin")
-if artifact_version.standard_output.contains("_dirty") {
-    fail(root, "version artifact", "packaging/SHA256SUMS must be ignored: {artifact_version.standard_output.trim_whitespace()}")
+let artifact_text = artifact_version.standard_output.trim_whitespace()
+if artifact_text.contains("_dirty") {
+    fail(root, "version artifact", "packaging/SHA256SUMS must be ignored: {artifact_text}")
+}
+if not artifact_text.starts_with("9.8.7+1.") {
+    fail(root, "version ahead", "expected '9.8.7+1.<hash>', got '{artifact_text}'")
 }
 io.write_standard_output_line("ok   version dirty detection (tracked file, artifact excluded)")
 
