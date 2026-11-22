@@ -9,8 +9,9 @@
 #   1. build                dotnet build Scripts.slnx -c Release
 #   2. AOT app              dotnet publish src/Scripts.App -r linux-x64
 #   3. script helpers       scripts run tools/scripts/binaries/test-scripts.scs
-#   4. AOT tests            publish + run the six Native AOT xUnit executables
-#   5. licences             reuse lint on the tree
+#   4. packaging metadata   scripts run tools/scripts/binaries/check-packaging.scs
+#   5. AOT tests            publish + run the six Native AOT xUnit executables
+#   6. licences             reuse lint on the tree
 #
 # Tests only run as Native AOT executables: there is no `dotnet test` step and
 # no VSTest host. The step count is asserted below: a silently skipped corpus
@@ -33,10 +34,10 @@ for argument in "$@"; do
   esac
 done
 
-# Five steps with the build, four without it (the AOT app publish always runs).
-expected_steps=5
+# Six steps with the build, five without it (the AOT app publish always runs).
+expected_steps=6
 if [ "$do_build" -eq 0 ]; then
-  expected_steps=4
+  expected_steps=5
 fi
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -136,12 +137,17 @@ fi
 run_step "script helpers (version fallback)" \
   "$scripts_binary" run tools/scripts/binaries/test-scripts.scs || fail_fast "script helpers"
 
-# 4. AOT tests: each xUnit project is published as a Native AOT executable and
+# 4. Packaging metadata: the version named by the Debian files, CHANGELOG and
+#    README is one value (and the tag, when HEAD is tagged).
+run_step "packaging metadata (Debian, CHANGELOG, README)" \
+  "$scripts_binary" run tools/scripts/binaries/check-packaging.scs || fail_fast "packaging metadata"
+
+# 5. AOT tests: each xUnit project is published as a Native AOT executable and
 #    run directly by aot-tests.sh (E2E and corpus receive the AOT app binary).
 run_step "AOT tests (xUnit Native AOT)" \
   bash tools/scripts/binaries/aot-tests.sh --all || fail_fast "AOT tests"
 
-# 5. Licences: `reuse lint` on the tracked tree.
+# 6. Licences: `reuse lint` on the tracked tree.
 run_licences() {
   local work list status
   work="$(mktemp -d)" || return 1

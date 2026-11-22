@@ -78,9 +78,9 @@ bash tools/scripts/binaries/gate
 
 Tests run only as Native AOT executables, published by
 `tools/scripts/binaries/aot-tests.sh`; there is no `dotnet test` path. The gate
-runs `check-all` with the build (5 steps: build, AOT app, helpers, AOT tests,
-licences); `check-all --no-build` runs the 4 remaining steps (the AOT publishes
-still compile). It prints one `VERDICT` line and does not change tracked files.
+runs `check-all` with the build (6 steps: build, AOT app, helpers, packaging
+metadata, AOT tests, licences); `check-all --no-build` runs the 5 remaining
+steps (the AOT publishes still compile). It prints one `VERDICT` line and does not change tracked files.
 `gate-static` is the lighter gate. `reuse` 5.0.2 is needed for the
 licence step.
 
