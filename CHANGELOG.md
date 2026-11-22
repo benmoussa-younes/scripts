@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-11-22
+
+### Changed
+
+- `scripts fmt` is renamed `scripts format`; `fmt` still runs and prints a
+  deprecation warning, and will be removed in 0.3.0.
+- The README is rewritten for a first-time reader: why the language exists, a
+  verified quick start with its output, the install steps with their checksum,
+  a security policy with private reporting, and the licence last. External
+  contributions are not accepted; a fork is the supported way to build on the
+  work, and no warranty is provided beyond the licences.
+
+### Fixed
+
+- The Debian package is built with `xz` compression (`dpkg-deb -Zxz`), so it
+  installs on a dpkg older than 1.21.18 (Ubuntu 22.04) and is identical across
+  build hosts.
+
 ## [0.2.0] - 2026-11-21
 
 ### Added
@@ -105,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; the JSON codecs
   are local GPL-3.0-or-later adaptations.
 
+[0.2.1]: https://github.com/benmoussa-younes/scripts/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.2.0
 [0.1.2]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.2
 [0.1.1]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.1
