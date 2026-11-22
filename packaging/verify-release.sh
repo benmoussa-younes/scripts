@@ -17,9 +17,15 @@
 #      (every tracked file; the injected VERSION is removed before the comparison);
 #   5. without --write, every field of RELEASE-EVIDENCE matches the recomputed value.
 #
-# What it cannot prove: without a signature, a forged binary that prints the release
-# version passes --require-tag. The gate proves coherence (tree, names, checksums),
-# not authorship; signing SHA256SUMS is the remaining step.
+# What it cannot prove: a forged binary that prints the release version passes
+# --require-tag. The gate proves coherence (tree, names, checksums) and that the
+# artefacts name a tag signed by the maintainer key; it says nothing about which
+# machine built them. Build provenance comes from the attestation the release
+# workflow attaches (gh attestation verify); the workflow publishes no detached
+# OpenPGP signature.
+#
+# --require-tag verifies the tag signature with gpg: import the maintainer public
+# key first, `gpg --import packaging/maintainer-key.asc`.
 #
 # Exit codes: 0 OK; 2 usage; 3 missing artefact; 4 not runnable or checksum mismatch;
 # 5 source mismatch; 6 evidence mismatch; 7 --require-tag failed.
@@ -54,8 +60,10 @@ while [ "$#" -gt 0 ]; do
 done
 
 die() {
-    echo "verify-release: $*" >&2
-    exit "${2:-1}"
+    local message="$1"
+    local status="${2:-1}"
+    echo "verify-release: ${message}" >&2
+    exit "${status}"
 }
 
 [ -f "${release_directory}/SHA256SUMS" ] || die "missing ${release_directory}/SHA256SUMS" 3
@@ -180,20 +188,13 @@ if [ "${require_tag}" -eq 1 ]; then
     tagged_commit="$(git -C "${project_root}" rev-parse --short "refs/tags/${tag}^{commit}")"
     [ "${built_from}" = "${tagged_commit}" ] \
         || die "--require-tag: built from ${built_from}, tag ${tag} is ${tagged_commit}" 7
-    # A coherent release without a signature is not an authored release: a forged binary that prints the
-    # version passes every check above. The tag gate therefore requires the signed checksums.
-    git -C "${project_root}" verify-tag "${tag}" >/dev/null 2>&1 \
-        || die "--require-tag: ${tag} is not a verified signed tag" 7
-    [ -f "${release_directory}/SHA256SUMS.asc" ] \
-        || die "--require-tag: SHA256SUMS.asc is missing (sign SHA256SUMS with the release key)" 7
-    [ -f "${release_directory}/tarballs.sha256.asc" ] \
-        || die "--require-tag: tarballs.sha256.asc is missing (sign the tarball checksums with the release key)" 7
+    # A coherent release is still not an authored release: a forged binary that prints the version
+    # passes every check above. The tag gate therefore requires the signed tag — the commit is the
+    # maintainer's, and the release workflow attests the bytes it built from that commit.
     command -v gpg >/dev/null 2>&1 \
-        || die "--require-tag: gpg is required to verify the signatures" 7
-    gpg --verify "${release_directory}/SHA256SUMS.asc" "${release_directory}/SHA256SUMS" >/dev/null 2>&1 \
-        || die "--require-tag: SHA256SUMS.asc does not verify SHA256SUMS" 7
-    gpg --verify "${release_directory}/tarballs.sha256.asc" "${release_directory}/tarballs.sha256" >/dev/null 2>&1 \
-        || die "--require-tag: tarballs.sha256.asc does not verify tarballs.sha256" 7
+        || die "--require-tag: gpg is required to verify the signed tag" 7
+    git -C "${project_root}" verify-tag "${tag}" >/dev/null 2>&1 \
+        || die "--require-tag: ${tag} is not a verified signed tag (import packaging/maintainer-key.asc)" 7
     [ "${binary_name}" = "scripts_${version}_linux-x64.tar.gz" ] \
         || die "--require-tag: the binary tarball name does not carry ${version}" 7
     [ "${source_name}" = "scripts_${version}_src.tar.gz" ] \
