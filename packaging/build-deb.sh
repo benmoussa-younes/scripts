@@ -97,8 +97,12 @@ esac
 CHANGELOG_SOURCE="${DOSSIER_PACKAGING}/debian/changelog"
 if [ -f "${CHANGELOG_SOURCE}" ]; then
     CHANGELOG_VERSION="$(sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' "${CHANGELOG_SOURCE}")"
-    [ "${CHANGELOG_VERSION}" = "${VERSION}" ] \
-        || die "debian/changelog starts at ${CHANGELOG_VERSION}, the tree is ${VERSION}: add the release entry first."
+    if [ "${CHANGELOG_VERSION}" != "${VERSION}" ]; then
+        if [ "${VERSION_COMPLETE}" = "${VERSION}" ]; then
+            die "debian/changelog starts at ${CHANGELOG_VERSION}, the tagged tree is ${VERSION}: add the release entry first."
+        fi
+        die "debian/changelog starts at ${CHANGELOG_VERSION}, the tree is ${VERSION_COMPLETE} (base ${VERSION}): the package is built on its release tag."
+    fi
 fi
 
 info "version=${DEB_VERSION} (base ${VERSION}) architecture=${ARCHITECTURE} SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}"
