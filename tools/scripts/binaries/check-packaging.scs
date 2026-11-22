@@ -77,14 +77,17 @@ if announced != version {
     failures.append("CHANGELOG.md: top release '{announced}' != changelog '{version}'")
 }
 
-if not readme.contains("scripts_{version}_amd64.deb") {
-    failures.append("README.md: no 'scripts_{version}_amd64.deb'")
+if not readme.contains("sudo apt install ./scripts_{version}_amd64.deb") {
+    failures.append("README.md: no 'sudo apt install ./scripts_{version}_amd64.deb'")
 }
-if not readme.contains("scripts_{version}_linux-x64.tar.gz") {
-    failures.append("README.md: no 'scripts_{version}_linux-x64.tar.gz'")
+if not readme.contains("tar -xzf scripts_{version}_linux-x64.tar.gz") {
+    failures.append("README.md: no 'tar -xzf scripts_{version}_linux-x64.tar.gz'")
 }
-if not readme.contains("scripts-{version}/scripts") {
-    failures.append("README.md: no 'scripts-{version}/scripts'")
+if not readme.contains("sudo install -m 755 scripts-{version}/scripts /usr/local/bin/scripts") {
+    failures.append("README.md: no install line for scripts-{version}/scripts")
+}
+if not readme.contains("Scripts {version} is the current release") {
+    failures.append("README.md: no 'Scripts {version} is the current release'")
 }
 
 let lines = changelog.split("\n")
