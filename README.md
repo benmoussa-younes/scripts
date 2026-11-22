@@ -18,7 +18,7 @@ no build step for the script.
 - [Build and test](#build-and-test)
 - [Layout](#layout)
 - [Documentation](#documentation)
-- [Contributing](#contributing)
+- [Contributing and warranty](#contributing-and-warranty)
 - [Changelog](#changelog)
 - [Licence](#licence)
 
@@ -183,14 +183,13 @@ filesystem corpus is generated at test time.
 - `scripts explain <file>`: an explanation of one script.
 - [`CHANGELOG.md`](CHANGELOG.md): notable changes, per release.
 
-## Contributing
+## Contributing and warranty
 
-Issues and pull requests are welcome. Work on a `work/<slug>` branch, sign your
-commits, and run `bash tools/scripts/binaries/gate`: a change lands only with a
-green gate and its tests. Keep the language small: a new feature needs a
-failing test, its runtime or corpus proof, and an entry in `scripts describe`
-when it is part of the standard library. Root markdown is limited to
-`README.md`, `AGENTS.md` and `CHANGELOG.md`.
+External contributions are **not accepted**; unsolicited pull requests or
+patches may be closed without review. A fork is the supported way to build on
+this work; the maintainer workflow is in [`AGENTS.md`](AGENTS.md). The project
+is maintained by one author: no support contract, service level or warranty,
+express or implied, is provided beyond the licences.
 
 ## Changelog
 
