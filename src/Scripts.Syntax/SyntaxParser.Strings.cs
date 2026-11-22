@@ -87,10 +87,7 @@ internal sealed partial class SyntaxParser
         return new SyntaxErrorException(Diagnostics.Create(ErrorCodes.Parse0059, source, span, fix));
     }
 
-    /// <summary>
-    /// The string token rewritten with `{{` → `\{` and `}}` → `\}` outside escapes, or null when the token is not a
-    /// single-line normal string closed on its line (a nested string or an unterminated one is not rewritten).
-    /// </summary>
+    /// <summary>The string token rewritten with `{{` → `\{` and `}}` → `\}` outside escapes, or null when the rewrite is unsafe.</summary>
     private string? EscapedBraces(StringToken token)
     {
         if (token.Style != StringStyle.Normal || token.End - token.Start < 2 || text[token.Start] != '"' || text[token.End - 1] != '"')
@@ -106,6 +103,7 @@ internal sealed partial class SyntaxParser
 
         var builder = new System.Text.StringBuilder(content.Length + 2);
         builder.Append('"');
+        var doubledOpenings = 0;
         for (var index = 0; index < content.Length; index++)
         {
             var current = content[index];
@@ -124,6 +122,11 @@ internal sealed partial class SyntaxParser
             }
             else if (current is '{' or '}' && index + 1 < content.Length && content[index + 1] == current)
             {
+                if (current == '{')
+                {
+                    doubledOpenings++;
+                }
+
                 builder.Append('\\').Append(current);
                 index++;
             }
@@ -133,7 +136,8 @@ internal sealed partial class SyntaxParser
             }
         }
 
-        return builder.Append('"').ToString();
+        // WHY: a second `{{` may open a valid map interpolation, and escaping the whole token would turn it into text.
+        return doubledOpenings == 1 ? builder.Append('"').ToString() : null;
     }
 
     /// <summary>Parses the tokens collected by the lexer for one `{…}`; the surrounding token stream is restored afterwards.</summary>

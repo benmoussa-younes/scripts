@@ -446,6 +446,16 @@ public sealed class SyntaxErrorTests
         Assert.Equal(ErrorCodes.Parse0053, Parsing.Fail("let p = p\"a{{b}}\"").Code);
     }
 
+    [Theory]
+    [InlineData("let s = \"{{a: 1}.length()} {{y}}\"")]
+    [InlineData("let s = \"{{y}} {{a: 1}.length()}\"")]
+    public void A_double_brace_next_to_a_valid_map_interpolation_has_no_fix(string source)
+    {
+        var error = Parsing.Fail(source);
+        Assert.Equal(ErrorCodes.Parse0059, error.Code);
+        Assert.Null(error.Fix);
+    }
+
     [Fact]
     public void Path_is_a_declarable_identifier()
     {

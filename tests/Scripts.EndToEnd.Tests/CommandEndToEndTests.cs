@@ -287,6 +287,27 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Check_fix_leaves_a_mixed_double_brace_string_untouched()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            const string source = "let a = 1\nlet n = \"{{a: 1}.length()} {{y}}\"\nio.write_standard_output_line(\"{n}\")\n";
+            var script = ScriptsProcess.WriteScript(directory, "mixed.scs", source);
+            var result = ScriptsProcess.Run("check", "--fix", script);
+
+            Assert.Equal(251, result.ExitCode);
+            Assert.Equal(string.Empty, result.StandardOutput);
+            Assert.Contains("SCRIPTS-PARSE-0059", result.StandardError, StringComparison.Ordinal);
+            Assert.Equal(source, File.ReadAllText(script));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_fix_resolves_a_name_without_extension_and_names_the_file_it_wrote()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();
