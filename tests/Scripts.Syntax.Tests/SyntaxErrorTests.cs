@@ -441,19 +441,32 @@ public sealed class SyntaxErrorTests
     }
 
     [Fact]
+    public void A_double_brace_with_a_lexical_error_inside_has_no_fix()
+    {
+        var error = Parsing.Fail("let s = \"{{x \\q}}\"");
+        Assert.Equal(ErrorCodes.Parse0006, error.Code);
+        Assert.Null(error.Fix);
+    }
+
+    [Fact]
     public void A_double_brace_in_a_path_literal_keeps_PARSE_0053()
     {
         Assert.Equal(ErrorCodes.Parse0053, Parsing.Fail("let p = p\"a{{b}}\"").Code);
     }
 
     [Theory]
-    [InlineData("let s = \"{{a: 1}.length()} {{y}}\"")]
-    [InlineData("let s = \"{{y}} {{a: 1}.length()}\"")]
-    public void A_double_brace_next_to_a_valid_map_interpolation_has_no_fix(string source)
+    [InlineData("let s = \"{{a: 1}.length()} {{y}}\"", "\"{{a: 1}.length()} \\{y\\}\"")]
+    [InlineData("let s = \"{{y}} {{a: 1}.length()}\"", "\"\\{y\\} {{a: 1}.length()}\"")]
+    [InlineData("let s = \"{{a}} {{b}}\"", "\"\\{a\\} {{b}}\"")]
+    [InlineData("let s = \"{{{x}}}\"", "\"\\{\\{x\\}\\}\"")]
+    [InlineData("let s = \"{{{a} x}}\"", "\"\\{\\{a\\} x\\}\"")]
+    [InlineData("let s = \"{{{cleanup()} x}}\"", "\"\\{\\{cleanup()\\} x\\}\"")]
+    [InlineData("let s = \"{{\"", "\"\\{\"")]
+    public void A_double_brace_fix_escapes_only_the_failing_segment(string source, string replacement)
     {
-        var error = Parsing.Fail(source);
-        Assert.Equal(ErrorCodes.Parse0059, error.Code);
-        Assert.Null(error.Fix);
+        var fix = Parsing.Fail(source).Fix;
+        Assert.NotNull(fix);
+        Assert.Equal(replacement, fix.Replacement);
     }
 
     [Fact]

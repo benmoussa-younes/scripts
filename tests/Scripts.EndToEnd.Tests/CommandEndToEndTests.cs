@@ -287,19 +287,47 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
-    public void Check_fix_leaves_a_mixed_double_brace_string_untouched()
+    public void Check_fix_escapes_only_the_failing_double_brace_segment()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();
         try
         {
-            const string source = "let a = 1\nlet n = \"{{a: 1}.length()} {{y}}\"\nio.write_standard_output_line(\"{n}\")\n";
-            var script = ScriptsProcess.WriteScript(directory, "mixed.scs", source);
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "mixed.scs",
+                "let a = 1\nlet n = \"{{a: 1}.length()} {{y}}\"\nio.write_standard_output_line(\"{n}\")\n");
             var result = ScriptsProcess.Run("check", "--fix", script);
 
-            Assert.Equal(251, result.ExitCode);
-            Assert.Equal(string.Empty, result.StandardOutput);
-            Assert.Contains("SCRIPTS-PARSE-0059", result.StandardError, StringComparison.Ordinal);
-            Assert.Equal(source, File.ReadAllText(script));
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal($"applied 1 fix(es) to {script}\n", result.StandardOutput);
+            Assert.Equal(
+                "let a = 1\nlet n = \"{{a: 1}.length()} \\{y\\}\"\nio.write_standard_output_line(\"{n}\")\n",
+                File.ReadAllText(script));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Check_fix_turns_a_stray_single_brace_into_text()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "stray.scs",
+                "let a = 1\nlet s = \"{{{a} x}}\"\nio.write_standard_output_line(\"{a} {s}\")\n");
+            var result = ScriptsProcess.Run("check", "--fix", script);
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal($"applied 1 fix(es) to {script}\n", result.StandardOutput);
+            Assert.Equal(
+                "let a = 1\nlet s = \"\\{\\{a\\} x\\}\"\nio.write_standard_output_line(\"{a} {s}\")\n",
+                File.ReadAllText(script));
+            Assert.Equal("1 {{a} x}\n", ScriptsProcess.Run("run", script).StandardOutput);
         }
         finally
         {

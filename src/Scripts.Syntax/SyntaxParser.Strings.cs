@@ -81,14 +81,14 @@ internal sealed partial class SyntaxParser
     private SyntaxErrorException DoubleBrace(StringToken token, int openBrace)
     {
         var span = new Span(openBrace, openBrace + 2);
-        var fix = EscapedBraces(token) is { } replacement
+        var fix = EscapedBraces(token, openBrace) is { } replacement
             ? new Fix("write literal braces as `\\{` and `\\}`", source, new Span(token.Start, token.End), replacement)
             : null;
         return new SyntaxErrorException(Diagnostics.Create(ErrorCodes.Parse0059, source, span, fix));
     }
 
-    /// <summary>The string token rewritten with `{{` → `\{` and `}}` → `\}` outside escapes, or null when the rewrite is unsafe.</summary>
-    private string? EscapedBraces(StringToken token)
+    /// <summary>The token with every brace of the failing segment escaped (`{{` collapses to `\{`), or null when the rewrite is unsafe.</summary>
+    private string? EscapedBraces(StringToken token, int openBrace)
     {
         if (token.Style != StringStyle.Normal || token.End - token.Start < 2 || text[token.Start] != '"' || text[token.End - 1] != '"')
         {
@@ -101,43 +101,51 @@ internal sealed partial class SyntaxParser
             return null;
         }
 
+        var failing = token.Segments.FirstOrDefault(segment => segment is InterpolationSegment && segment.Start == openBrace);
+        if (failing is null)
+        {
+            return null;
+        }
+
         var builder = new System.Text.StringBuilder(content.Length + 2);
         builder.Append('"');
-        var doubledOpenings = 0;
+        foreach (var segment in token.Segments)
+        {
+            var end = Math.Min(segment.End, token.End - 1);
+            var raw = text.AsSpan(segment.Start, Math.Max(0, end - segment.Start));
+            if (segment == failing)
+            {
+                AppendEscapedBraces(builder, raw);
+            }
+            else
+            {
+                builder.Append(raw);
+            }
+        }
+
+        builder.Append('"');
+        return builder.ToString();
+    }
+
+    private static void AppendEscapedBraces(System.Text.StringBuilder builder, ReadOnlySpan<char> content)
+    {
         for (var index = 0; index < content.Length; index++)
         {
             var current = content[index];
-            if (current == '\\' && index + 1 < content.Length)
+            if (current is '{' or '}')
             {
-                // `\u{…}` keeps its braces; any other escape is two characters.
-                var escapeEnd = index + 1;
-                if (content[escapeEnd] == 'u' && escapeEnd + 1 < content.Length && content[escapeEnd + 1] == '{')
-                {
-                    var close = content[escapeEnd..].IndexOf('}');
-                    escapeEnd = close < 0 ? content.Length - 1 : escapeEnd + close;
-                }
-
-                builder.Append(content[index..(escapeEnd + 1)]);
-                index = escapeEnd;
-            }
-            else if (current is '{' or '}' && index + 1 < content.Length && content[index + 1] == current)
-            {
-                if (current == '{')
-                {
-                    doubledOpenings++;
-                }
-
+                // WHY: a single brace left in the segment would open an interpolation after the rewrite.
                 builder.Append('\\').Append(current);
-                index++;
+                if (index + 1 < content.Length && content[index + 1] == current)
+                {
+                    index++;
+                }
             }
             else
             {
                 builder.Append(current);
             }
         }
-
-        // WHY: a second `{{` may open a valid map interpolation, and escaping the whole token would turn it into text.
-        return doubledOpenings == 1 ? builder.Append('"').ToString() : null;
     }
 
     /// <summary>Parses the tokens collected by the lexer for one `{…}`; the surrounding token stream is restored afterwards.</summary>
