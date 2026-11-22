@@ -4,6 +4,8 @@
 #
 # The version comes from git when it is available and from the 0.1.0 fallback
 # otherwise; the exact tag mapping is pinned on a synthetic tag.
+import "../modules/versions.scs" as versions
+
 let repo = process.script_path().parent().parent().parent().parent()
 
 function run_version(repo: path, search_path: string) -> process_result {
@@ -33,20 +35,6 @@ function git_run(repo: path, arguments: list<string>) -> process_result {
     }
 }
 
-function is_release_version(full_text: string) -> boolean {
-    let base = full_text.split("+")[0].replace("_dirty", "")
-    let parts = base.split(".")
-    if parts.length() != 3 {
-        return false
-    }
-    for part in parts {
-        if part.parse_integer().value_or(-1) < 0 {
-            return false
-        }
-    }
-    return true
-}
-
 function expect_exit(label: string, outcome: process_result, expected: integer, root: path) -> unit {
     if outcome.exit_code != expected {
         io.write_standard_error_line("test-scripts: FAIL {label}: expected exit {expected}, got {outcome.exit_code}")
@@ -69,10 +57,31 @@ if computed.exit_code != 0 {
     fail(root, "version git", "exit {computed.exit_code}: {computed.standard_error.trim_whitespace()}")
 }
 let computed_text = computed.standard_output.trim_whitespace()
-if not is_release_version(computed_text) {
+if not versions.is_tool_version(computed_text) {
     fail(root, "version git", "expected X.Y.Z, got '{computed_text}'")
 }
 io.write_standard_output_line("ok   version git is {computed_text}")
+
+# The shape guard accepts a release line and rejects what version.sh never emits:
+# a signed, zero-padded or incomplete component.
+for rejected in ["1.2.+2", "1.2.-0", "1.2.03", "1.2", "1.2.3.4"] {
+    if versions.is_tool_version(rejected) {
+        fail(root, "version shape", "'{rejected}' must be rejected")
+    }
+}
+for accepted in ["0.2.0", "10.0.15", "0.1.2+25.abc_dirty", "9.8.7_dirty"] {
+    if not versions.is_tool_version(accepted) {
+        fail(root, "version shape", "'{accepted}' must be accepted")
+    }
+}
+for rejected in ["1.2.+2", "1.2.-0", "1.2.03", "1.2.3_dirty5"] {
+    if versions.is_release_version(rejected) {
+        fail(root, "version shape", "'{rejected}' must be rejected by the strict shape")
+    }
+}
+if not versions.is_release_version("9.8.7") {
+    fail(root, "version shape", "'9.8.7' must be accepted by the strict shape")
+}
 
 # 2. git unavailable: PATH holds only the programs version.sh needs before it
 #    looks for git, and the fallback is exactly 0.1.0.
