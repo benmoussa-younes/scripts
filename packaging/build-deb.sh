@@ -5,8 +5,8 @@
 #   1. publish the Native AOT binary (dotnet publish -c Release -r linux-x64);
 #   2. assemble a package tree (usr/bin/scripts, mode 755);
 #   3. generate DEBIAN/control (packaging/debian/control, or built-in fallback);
-#   4. build the .deb with dpkg-deb --build --root-owner-group (no dh/debuild);
-#   5. normalize timestamps (SOURCE_DATE_EPOCH) for a reproducible build;
+#   4. normalize timestamps (SOURCE_DATE_EPOCH) for a reproducible build;
+#   5. build the .deb with dpkg-deb -Zxz --build --root-owner-group (no dh/debuild);
 #   6. write packaging/SHA256SUMS.
 #
 # No dependency on Debhelper: a package assembled by hand with dpkg-deb is enough.
@@ -202,9 +202,12 @@ find "${DOSSIER_TRAVAIL}/racine" -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} + 
     || find "${DOSSIER_TRAVAIL}/racine" -exec touch -h -t "$(date -u -d "@${SOURCE_DATE_EPOCH}" +%Y%m%d%H%M.%S)" {} +
 
 # --- 5. Build the .deb ------------------------------------------------------
-info "building the .deb (dpkg-deb --build --root-owner-group)…"
+# xz is pinned: dpkg 1.22 (Ubuntu 24.04) defaults to zstd, which a dpkg older
+# than 1.21.18 cannot read, and the default would make the package differ
+# between build hosts.
+info "building the .deb (dpkg-deb -Zxz --build --root-owner-group)…"
 DEB_TEMP="${DOSSIER_TRAVAIL}/${PAQUET}_${DEB_VERSION}_${ARCHITECTURE}.deb"
-dpkg-deb --build --root-owner-group "${DOSSIER_TRAVAIL}/racine" "${DEB_TEMP}" >/dev/null
+dpkg-deb -Zxz --build --root-owner-group "${DOSSIER_TRAVAIL}/racine" "${DEB_TEMP}" >/dev/null
 
 # dpkg-deb 1.22.x does not honor SOURCE_DATE_EPOCH for the timestamp of the "ar"
 # archive headers (mtime fields of the members debian-binary, control.tar.*,
