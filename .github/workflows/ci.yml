@@ -4,27 +4,56 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test-licence:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v4
+          persist-credentials: false
+
+      - name: Set up .NET (global.json)
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
-          dotnet-version: 10.0.x
-          dotnet-quality: ga
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('Directory.Packages.props', 'global.json', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
       - name: Native AOT prerequisites
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
       - name: Install reuse
         run: |
           pipx install reuse==5.0.2
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Gate (build, AOT app, helpers, packaging, AOT tests, licences)
-        run: bash tools/scripts/binaries/check-all.sh
+        run: |
+          set -o pipefail
+          bash tools/scripts/binaries/check-all.sh 2>&1 | tee gate.log
+
+      - name: Upload gate log
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: gate-log
+          path: gate.log
+          if-no-files-found: ignore
