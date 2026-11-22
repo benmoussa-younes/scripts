@@ -141,6 +141,13 @@ if [ -f "${DOSSIER_PACKAGING}/debian/changelog" ]; then
     chmod 0644 "${DOSSIER_TRAVAIL}/racine/usr/share/doc/${PAQUET}/changelog.gz"
 fi
 
+if [ -f "${DOSSIER_PACKAGING}/debian/scripts.1" ]; then
+    install -d "${DOSSIER_TRAVAIL}/racine/usr/share/man/man1"
+    gzip -n -9 -c "${DOSSIER_PACKAGING}/debian/scripts.1" \
+        > "${DOSSIER_TRAVAIL}/racine/usr/share/man/man1/scripts.1.gz"
+    chmod 0644 "${DOSSIER_TRAVAIL}/racine/usr/share/man/man1/scripts.1.gz"
+fi
+
 # md5sums: lets `dpkg -V` and `debsums` verify the installed files.
 (
     cd "${DOSSIER_TRAVAIL}/racine"

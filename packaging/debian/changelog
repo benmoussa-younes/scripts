@@ -12,6 +12,8 @@ scripts (0.2.0) unstable; urgency=medium
     November 2026 .NET runtime security fixes.
   * A `SIGINT` or `SIGHUP` ignored at startup stays ignored (POSIX convention);
     fixed a lost wake-up that could hang `parallel.run_all`.
+  * Ship a `scripts(1)` manual page; the gate checks that the Debian,
+    CHANGELOG and README metadata name one version before the tag.
 
  -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Sat, 21 Nov 2026 00:22:20 +0000
 
