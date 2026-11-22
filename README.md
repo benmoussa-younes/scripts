@@ -131,7 +131,7 @@ io.write_standard_output_line(outcome.standard_output)
 | `scripts run <file> [argument…]` | check, then run; arguments are exposed as `process.arguments` |
 | `scripts check <file>` | static analysis without running; `--fix` applies the safe fixes |
 | `scripts explain <file>` | check, then explain each statement in English |
-| `scripts fmt --check <file>` | report whether the layout is canonical |
+| `scripts format --check <file>` | report whether the layout is canonical |
 | `scripts describe --format json` | the machine-readable language reference |
 | `scripts --version`, `scripts --help` | version and usage |
 

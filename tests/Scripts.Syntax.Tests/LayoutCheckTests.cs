@@ -1,6 +1,6 @@
 namespace Scripts.Syntax.Tests;
 
-/// <summary><c>scripts fmt --check</c> (P9c): the canonical layout rules, checked without rewriting tokens.</summary>
+/// <summary><c>scripts format --check</c> (P9c): the canonical layout rules, checked without rewriting tokens.</summary>
 public sealed class LayoutCheckTests
 {
     private const string Canonical = """"

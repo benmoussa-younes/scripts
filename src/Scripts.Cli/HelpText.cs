@@ -20,7 +20,7 @@ public static class HelpText
         lines.Add("  scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]");
         lines.Add("  scripts check [--errors-json] [--deny-warnings] [--fix] <script.scs>|-");
         lines.Add("  scripts explain [--json-out] <script.scs>");
-        lines.Add("  scripts fmt --check <script.scs>|-");
+        lines.Add("  scripts format --check <script.scs>|-");
         lines.Add("  scripts describe --format json [--name NAME]");
         lines.Add("  scripts --version");
         lines.Add("  scripts --help");
@@ -32,7 +32,7 @@ public static class HelpText
         lines.Add("  check     Analyzes the script without running it: syntax, types, calls, imports,");
         lines.Add("            visibility, mutability, returns, exhaustiveness and warnings. Code 0 if");
         lines.Add("            valid, 251 otherwise.");
-        lines.Add("  fmt       Checks the canonical layout without rewriting a token: LF, final newline,");
+        lines.Add("  format    Checks the canonical layout without rewriting a token: LF, final newline,");
         lines.Add("            no BOM/tab/trailing space, four spaces per open brace. 0 if canonical, 251");
         lines.Add("            otherwise.");
         lines.Add("  explain   Checks the script (same diagnostics as check), then describes it in");
@@ -59,7 +59,7 @@ public static class HelpText
         lines.Add("  -               (run, check) Reads the script from the standard input, up to the end of");
         lines.Add("                  the stream: scripts run - < script.scs.");
         lines.Add("  --format json   (describe) Only format available; mandatory.");
-        lines.Add("  --check         (fmt) Required; check the layout, never rewrite the file.");
+        lines.Add("  --check         (format) Required; check the layout, never rewrite the file.");
         lines.Add("  --name NAME     (describe) Keeps the entries of a namespace, a module, a receiver type");
         lines.Add("                  or a fully qualified name: --name process, --name list,");
         lines.Add("                  --name filesystem.read_file.");
@@ -89,7 +89,7 @@ public static class HelpText
         lines.Add("  scripts check --errors-json script.scs   Checks and writes diagnostics as JSON on stdout");
         lines.Add("  scripts run --json-out script.scs        Runs and writes the full result as JSON");
         lines.Add("  scripts explain script.scs               Describes in English what the script does");
-        lines.Add("  scripts fmt --check script.scs           Exit 251 if the layout is not canonical");
+        lines.Add("  scripts format --check script.scs        Exit 251 if the layout is not canonical");
         lines.Add(string.Empty);
         lines.Add("REFERENCE");
         lines.Add("  scripts describe --format json provides the machine-readable reference.");

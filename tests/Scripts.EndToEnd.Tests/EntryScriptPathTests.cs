@@ -39,7 +39,7 @@ public sealed class EntryScriptPathTests : IDisposable
     {
         var fifo = MakeFifo("entry-fmt.fifo");
 
-        var result = RunBounded("fmt", "--check", fifo);
+        var result = RunBounded("format", "--check", fifo);
 
         Assert.Equal(252, result.ExitCode);
         Assert.Contains("SCRIPTS-CLI-0009", result.StandardError, StringComparison.Ordinal);

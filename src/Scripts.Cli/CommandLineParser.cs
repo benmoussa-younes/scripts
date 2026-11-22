@@ -37,7 +37,8 @@ public static class CommandLineParser
             "check" => ParseScriptCommand(commandLineArguments, "check", CheckOptions),
             "explain" => ParseScriptCommand(commandLineArguments, "explain", ExplainOptions),
             "describe" => ParseDescribe(commandLineArguments),
-            "fmt" => ParseFmt(commandLineArguments),
+            "format" => ParseFormat(commandLineArguments, legacyAlias: false),
+            "fmt" => ParseFormat(commandLineArguments, legacyAlias: true),
             "--version" => ParseStandalone(commandLineArguments, new VersionCommand()),
             "--help" or "help" => ParseStandalone(commandLineArguments, new HelpCommand()),
             _ => Reject(ErrorCodes.Cli0002, ("command", commandName)),
@@ -165,10 +166,10 @@ public static class CommandLineParser
     }
 
     /// <summary>
-    /// <c>scripts fmt --check script|-</c> (P9c): the layout check takes one script or the standard input and the
-    /// mandatory <c>--check</c>; it never rewrites the file.
+    /// <c>scripts format --check script|-</c> (P9c): the layout check takes one script or the standard input and the
+    /// mandatory <c>--check</c>; it never rewrites the file. <c>fmt</c> is the deprecated alias of the same command.
     /// </summary>
-    private static CommandLineParseResult ParseFmt(IReadOnlyList<string> commandLineArguments)
+    private static CommandLineParseResult ParseFormat(IReadOnlyList<string> commandLineArguments, bool legacyAlias)
     {
         var checkSeen = false;
         string? scriptPath = null;
@@ -190,7 +191,7 @@ public static class CommandLineParser
             }
             else if (token.StartsWith('-'))
             {
-                return RejectUnacceptedOption(token, "fmt", [CheckOption]);
+                return RejectUnacceptedOption(token, "format", [CheckOption]);
             }
             else if (scriptPath is null)
             {
@@ -208,8 +209,8 @@ public static class CommandLineParser
         }
 
         return scriptPath is null
-            ? Reject(ErrorCodes.Cli0005, ("command", "fmt"))
-            : Accept(new FmtCommand(scriptPath, scriptPath == StandardInputPath));
+            ? Reject(ErrorCodes.Cli0005, ("command", "format"))
+            : Accept(new FormatCommand(scriptPath, scriptPath == StandardInputPath, legacyAlias));
     }
 
     /// <summary>
