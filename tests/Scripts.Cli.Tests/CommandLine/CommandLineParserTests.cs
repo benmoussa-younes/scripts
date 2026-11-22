@@ -404,16 +404,23 @@ public sealed class CommandLineParserTests
     }
 
     [Fact]
-    public void Fmt_requires_check_and_accepts_one_script_or_the_standard_input()
+    public void Format_requires_check_and_accepts_one_script_or_the_standard_input()
     {
-        Assert.Equal(new FmtCommand("s.scs", false), Accepted("fmt", "--check", "s.scs"));
-        Assert.Equal(new FmtCommand("-", true), Accepted("fmt", "--check", "-"));
-        Assert.Equal(new FmtCommand("s.scs", false), Accepted("fmt", "s.scs", "--check"));
+        Assert.Equal(new FormatCommand("s.scs", false), Accepted("format", "--check", "s.scs"));
+        Assert.Equal(new FormatCommand("-", true), Accepted("format", "--check", "-"));
+        Assert.Equal(new FormatCommand("s.scs", false), Accepted("format", "s.scs", "--check"));
+        Assert.Equal("SCRIPTS-CLI-0015", Rejected("format", "s.scs").Code);
+        Assert.Equal("SCRIPTS-CLI-0005", Rejected("format", "--check").Code);
+        Assert.Equal("SCRIPTS-CLI-0008", Rejected("format", "--check", "--check", "s.scs").Code);
+        Assert.Equal("SCRIPTS-CLI-0003", Rejected("format", "--json-out", "--check", "s.scs").Code);
+        Assert.Equal("SCRIPTS-CLI-0007", Rejected("format", "--check", "a", "b").Code);
+    }
+
+    [Fact]
+    public void Fmt_is_the_deprecated_alias_of_format()
+    {
+        Assert.Equal(new FormatCommand("s.scs", false, LegacyAlias: true), Accepted("fmt", "--check", "s.scs"));
         Assert.Equal("SCRIPTS-CLI-0015", Rejected("fmt", "s.scs").Code);
-        Assert.Equal("SCRIPTS-CLI-0005", Rejected("fmt", "--check").Code);
-        Assert.Equal("SCRIPTS-CLI-0008", Rejected("fmt", "--check", "--check", "s.scs").Code);
-        Assert.Equal("SCRIPTS-CLI-0003", Rejected("fmt", "--json-out", "--check", "s.scs").Code);
-        Assert.Equal("SCRIPTS-CLI-0007", Rejected("fmt", "--check", "a", "b").Code);
     }
 
     [Fact]

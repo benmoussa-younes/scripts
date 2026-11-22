@@ -378,9 +378,9 @@ public sealed class CommandEndToEndTests
             var check = ScriptsProcess.Run("check", script);
             Assert.Equal(0, check.ExitCode);
 
-            var fmt = ScriptsProcess.Run("fmt", "--check", script);
-            Assert.Equal(251, fmt.ExitCode);
-            Assert.Contains("UTF-8 byte-order mark is forbidden", fmt.StandardError, StringComparison.Ordinal);
+            var format = ScriptsProcess.Run("format", "--check", script);
+            Assert.Equal(251, format.ExitCode);
+            Assert.Contains("UTF-8 byte-order mark is forbidden", format.StandardError, StringComparison.Ordinal);
         }
         finally
         {

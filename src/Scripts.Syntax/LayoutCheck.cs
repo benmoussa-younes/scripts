@@ -7,7 +7,7 @@ namespace Scripts.Syntax;
 public sealed record LayoutIssue(int Line, int Column, string Message);
 
 /// <summary>
-/// <c>scripts fmt --check</c> (DESIGN §9): the canonical **layout** of a scripts source, checked without rewriting any token.
+/// <c>scripts format --check</c> (DESIGN §9): the canonical **layout** of a scripts source, checked without rewriting any token.
 /// The rules are deliberately local so the formatter never changes meaning: UTF-8 without BOM, LF only, a final
 /// newline, no tab in layout (a tab in string data — a normal, raw or path literal, including a nested string inside an
 /// interpolation — is data; a tab in an interpolation expression or a comment is layout), no trailing whitespace

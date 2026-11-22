@@ -2,9 +2,33 @@ using System.Text;
 
 namespace Scripts.EndToEnd.Tests;
 
-/// <summary><c>scripts fmt --check</c> (P9c): canonical layout only, no rewriting, one line per violation.</summary>
-public sealed class FmtEndToEndTests
+/// <summary><c>scripts format --check</c> (P9c): canonical layout only, no rewriting, one line per violation.</summary>
+public sealed class FormatEndToEndTests
 {
+    [Fact]
+    public void The_fmt_alias_runs_the_check_and_warns_on_the_standard_error()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "canonical.scs",
+                "io.write_standard_output_line(\"x\")\n");
+
+            var result = ScriptsProcess.Run("fmt", "--check", script);
+
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal(string.Empty, result.StandardOutput);
+            Assert.Contains("`scripts fmt` is deprecated", result.StandardError, StringComparison.Ordinal);
+            Assert.Contains("use `scripts format`", result.StandardError, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     [Fact]
     public void A_canonical_script_exits_zero_with_no_output()
     {
@@ -16,7 +40,7 @@ public sealed class FmtEndToEndTests
                 "canonical.scs",
                 "function twice(n: integer) -> integer {\n    return n * 2\n}\n\nio.write_standard_output_line(\"{twice(2)}\")\n");
 
-            var result = ScriptsProcess.Run("fmt", "--check", script);
+            var result = ScriptsProcess.Run("format", "--check", script);
 
             Assert.Equal(0, result.ExitCode);
             Assert.Equal(string.Empty, result.StandardOutput);
@@ -36,7 +60,7 @@ public sealed class FmtEndToEndTests
         {
             var script = ScriptsProcess.WriteScript(directory, "bad.scs", "function f() -> unit {\n   io.write_standard_output_line(\"x\")\n}\n");
 
-            var result = ScriptsProcess.Run("fmt", "--check", script);
+            var result = ScriptsProcess.Run("format", "--check", script);
 
             Assert.Equal(251, result.ExitCode);
             Assert.Equal(string.Empty, result.StandardOutput);
@@ -61,7 +85,7 @@ public sealed class FmtEndToEndTests
                 "tab.scs",
                 "let x =\t1\nio.write_standard_output_line(\"{x}\")\n");
 
-            var fmt = ScriptsProcess.Run("fmt", "--check", script);
+            var fmt = ScriptsProcess.Run("format", "--check", script);
             var check = ScriptsProcess.Run("check", script);
 
             Assert.Equal(251, fmt.ExitCode);
@@ -85,7 +109,7 @@ public sealed class FmtEndToEndTests
                 "raw.scs",
                 "let text = r\"\"\"\r\nline with spaces  \r\n\"\"\"\nio.write_standard_output_line(\"{text.length()}\")\n");
 
-            var result = ScriptsProcess.Run("fmt", "--check", script);
+            var result = ScriptsProcess.Run("format", "--check", script);
 
             Assert.Equal(0, result.ExitCode);
             Assert.Equal(string.Empty, result.StandardError);
@@ -107,7 +131,7 @@ public sealed class FmtEndToEndTests
                 "nested-raw.scs",
                 "function identity(value: string) -> string {\n    return value\n}\n\nlet text = \"{identity(r\"\"\"  \r\nline with spaces  \r\n\t\"\"\")}\"\nio.write_standard_output_line(\"{text.length()}\")\n");
 
-            var fmt = ScriptsProcess.Run("fmt", "--check", script);
+            var fmt = ScriptsProcess.Run("format", "--check", script);
             var check = ScriptsProcess.Run("check", script);
 
             Assert.Equal(0, fmt.ExitCode);
@@ -123,7 +147,7 @@ public sealed class FmtEndToEndTests
     [Fact]
     public void Standard_input_is_checked_under_the_stdin_name()
     {
-        var result = ScriptsProcess.RunWithStandardInput("function f() -> unit {\n io.write_standard_output_line(\"x\")\n}\n", "fmt", "--check", "-");
+        var result = ScriptsProcess.RunWithStandardInput("function f() -> unit {\n io.write_standard_output_line(\"x\")\n}\n", "format", "--check", "-");
 
         Assert.Equal(251, result.ExitCode);
         Assert.Equal("<stdin>:2:1: not canonical: expected 4 spaces of indentation, found 1\n", result.StandardError);
@@ -138,7 +162,7 @@ public sealed class FmtEndToEndTests
             var path = Path.Combine(directory, "bom.scs");
             File.WriteAllBytes(path, [0xEF, 0xBB, 0xBF, (byte)'l', (byte)'e', (byte)'t', (byte)' ', (byte)'x', (byte)' ', (byte)'=', (byte)' ', (byte)'1', (byte)'\r', (byte)'\n']);
 
-            var result = ScriptsProcess.Run("fmt", "--check", path);
+            var result = ScriptsProcess.Run("format", "--check", path);
 
             Assert.Equal(251, result.ExitCode);
             Assert.Contains("1:1: not canonical: UTF-8 byte-order mark is forbidden", result.StandardError, StringComparison.Ordinal);
@@ -156,8 +180,8 @@ public sealed class FmtEndToEndTests
         var directory = ScriptsProcess.NewTemporaryDirectory();
         try
         {
-            var missing = ScriptsProcess.Run("fmt", "--check", Path.Combine(directory, "absent.scs"));
-            var asDirectory = ScriptsProcess.Run("fmt", "--check", directory);
+            var missing = ScriptsProcess.Run("format", "--check", Path.Combine(directory, "absent.scs"));
+            var asDirectory = ScriptsProcess.Run("format", "--check", directory);
 
             Assert.Equal(252, missing.ExitCode);
             Assert.Contains("SCRIPTS-CLI-0009", missing.StandardError, StringComparison.Ordinal);
@@ -173,7 +197,7 @@ public sealed class FmtEndToEndTests
     [Fact]
     public void Without_check_the_command_is_a_usage_error()
     {
-        var result = ScriptsProcess.Run("fmt", "script.scs");
+        var result = ScriptsProcess.Run("format", "script.scs");
 
         Assert.Equal(250, result.ExitCode);
         Assert.Contains("SCRIPTS-CLI-0015", result.StandardError, StringComparison.Ordinal);

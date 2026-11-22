@@ -77,7 +77,7 @@ public static class ScriptsApplication
             VersionCommand => WriteTextAndReturn(HelpText.VersionLine + "\n", ExitCodes.Success),
             HelpCommand => WriteTextAndReturn(HelpText.Full, ExitCodes.Success),
             DescribeCommand describe => WriteTextAndReturn(DescribeDocument.Render(describe.Name), ExitCodes.Success),
-            FmtCommand fmt => RunFmt(fmt),
+            FormatCommand format => RunFormat(format),
             CheckCommand check => RunCheck(check),
             RunCommand run => RunScript(run),
             ExplainCommand explain => RunExplain(explain),
@@ -173,12 +173,17 @@ public static class ScriptsApplication
 
     // ----------------------------------------------------------------- check
     /// <summary>
-    /// <c>scripts fmt --check</c> (P9c): layout only, no code rewriting. Exit 0 when canonical, 251 otherwise, with one
-    /// <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
+    /// <c>scripts format --check</c> (P9c): layout only, no code rewriting. Exit 0 when canonical, 251 otherwise, with
+    /// one <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
     /// (SourceReading strips it silently); lexical and source-size errors use the normal 251/252 rendering.
     /// </summary>
-    private static int RunFmt(FmtCommand command)
+    private static int RunFormat(FormatCommand command)
     {
+        if (command.LegacyAlias)
+        {
+            WriteStandardError("warning: `scripts fmt` is deprecated; use `scripts format`\n");
+        }
+
         byte[] bytes;
         string path;
         if (command.StandardInput)
@@ -195,7 +200,7 @@ public static class ScriptsApplication
         else
         {
             var scriptPath = ResolveScriptPath(command.ScriptPath);
-            // BUG-020: `fmt` reads the entry file directly; a FIFO or a socket must fail fast like run/check/explain.
+            // BUG-020: `format` reads the entry file directly; a FIFO or a socket must fail fast like run/check/explain.
             if (RefuseNonRegularEntry(scriptPath) is { } refusal)
             {
                 return ReportLoadError(refusal);

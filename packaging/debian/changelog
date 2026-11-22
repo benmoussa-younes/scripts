@@ -1,3 +1,14 @@
+scripts (0.2.1) unstable; urgency=medium
+
+  * `scripts fmt` is renamed `scripts format`; `fmt` still runs with a
+    deprecation warning until 0.3.0.
+  * Build the Debian package with xz compression, so it installs on dpkg older
+    than 1.21.18 (Ubuntu 22.04) and is identical across build hosts.
+  * README rewritten (why, quick start, security policy); contributions are
+    declined and a fork is the supported path.
+
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Sun, 22 Nov 2026 15:00:00 +0000
+
 scripts (0.2.0) unstable; urgency=medium
 
   * Block arms in a `match` expression (`=> { ...; value }`); a map literal

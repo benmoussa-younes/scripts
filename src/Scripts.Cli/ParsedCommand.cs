@@ -26,9 +26,10 @@ public sealed record ExplainCommand(string ScriptPath, bool JsonOut = false) : P
 public sealed record DescribeCommand(string? Name = null) : ParsedCommand;
 
 /// <summary>
-/// <c>scripts fmt --check script|-</c> (P9c): check the canonical layout of one source file; never rewrites it.
+/// <c>scripts format --check script|-</c> (P9c): check the canonical layout of one source file; never rewrites it.
+/// <c>fmt</c> is the deprecated alias, marked so the run can warn.
 /// </summary>
-public sealed record FmtCommand(string ScriptPath, bool StandardInput) : ParsedCommand;
+public sealed record FormatCommand(string ScriptPath, bool StandardInput, bool LegacyAlias = false) : ParsedCommand;
 
 public sealed record VersionCommand : ParsedCommand;
 

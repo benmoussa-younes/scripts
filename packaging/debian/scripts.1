@@ -21,7 +21,7 @@ scripts \- statically typed system scripting language
 .I script
 .br
 .B scripts
-.B fmt
+.B format
 .B \-\-check
 .I script
 .br
@@ -50,7 +50,7 @@ an explicit request, never through a shell string.
 .BR run ,
 .B check
 and
-.B fmt
+.B format
 accept
 .B \-
 as the script name to read the script from the standard input.
@@ -65,7 +65,7 @@ Arguments after the script are exposed to it through
 Reports syntax, type, call, import, visibility, mutability, return and
 exhaustiveness diagnostics, plus warnings, without running the script.
 .TP
-.B fmt
+.B format
 With
 .BR \-\-check ,
 reports whether the layout is canonical (LF, final newline, no BOM, tab or
@@ -112,7 +112,7 @@ cannot be applied safely is not offered.
 .TP
 .B \-\-check
 (
-.B fmt )
+.B format )
 Reports whether the layout is canonical; it never rewrites the script.
 .TP
 .B \-\-format json
