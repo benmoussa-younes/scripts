@@ -3,23 +3,23 @@
 # crash the interpreter (exit 253); it is a clean invalid_syntax. A valid
 # pair must always decode.
 match json.decode("\"\\ud800\"") {
-    ok(parsed) => io.write_standard_output_line("d800: ok")
+    ok(_parsed) => io.write_standard_output_line("d800: ok")
     error(e) => io.write_standard_output_line("d800: {e.kind}")
 }
 match json.decode("\"\\udc00\"") {
-    ok(parsed) => io.write_standard_output_line("dc00: ok")
+    ok(_parsed) => io.write_standard_output_line("dc00: ok")
     error(e) => io.write_standard_output_line("dc00: {e.kind}")
 }
 match json.decode("\"\\ud800x\"") {
-    ok(parsed) => io.write_standard_output_line("d800x: ok")
+    ok(_parsed) => io.write_standard_output_line("d800x: ok")
     error(e) => io.write_standard_output_line("d800x: {e.kind}")
 }
 match json.decode("\"a\\udc00b\"") {
-    ok(parsed) => io.write_standard_output_line("low: ok")
+    ok(_parsed) => io.write_standard_output_line("low: ok")
     error(e) => io.write_standard_output_line("low: {e.kind}")
 }
 match json.decode("[1,\"\\ud800\"]") {
-    ok(parsed) => io.write_standard_output_line("nested: ok")
+    ok(_parsed) => io.write_standard_output_line("nested: ok")
     error(e) => io.write_standard_output_line("nested: {e.kind}")
 }
 match json.decode("\"\\ud83d\\ude00\"") {

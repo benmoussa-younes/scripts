@@ -1,0 +1,29 @@
+function first_even_half(items: list<integer>) -> integer {
+    for item in items {
+        let half = match item % 2 {
+            0 => item / 2
+            _ => {
+                if item > 100 {
+                    return -1
+                }
+                continue
+            }
+        }
+        return half
+    }
+    return 0
+}
+let code = 3
+let label = match code {
+    3 => {
+        let doubled = code * 2
+        "six={doubled}"
+    }
+    _ => "other"
+}
+io.write_standard_output_line(label)
+let table = match code {
+    3 => ({"three": 3})
+    _ => ({})
+}
+io.write_standard_output_line("{table.length()} {first_even_half([1, 3, 8])} {first_even_half([1, 101, 4])}")

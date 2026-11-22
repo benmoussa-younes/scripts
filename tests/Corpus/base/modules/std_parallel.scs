@@ -12,15 +12,15 @@ io.write_standard_output_line("identique={par == seq}")
 
 # out-of-range workers: rejected, never clamped
 match parallel.transform([1], 0, n => n) {
-    ok(values) => io.write_standard_output_line("ok")
+    ok(_values) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("zero={e.kind}")
 }
 match parallel.transform([1], 257, n => n) {
-    ok(values) => io.write_standard_output_line("ok")
+    ok(_values) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("trop={e.kind}")
 }
 match parallel.transform([1], -1, n => n) {
-    ok(values) => io.write_standard_output_line("ok")
+    ok(_values) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("negatif={e.kind}")
 }
 
@@ -60,6 +60,6 @@ for p in parallel_walk {
 
 # walk: rejected bounds
 match parallel.walk_directory(root, 0, ignore) {
-    ok(paths) => io.write_standard_output_line("ok")
+    ok(_paths) => io.write_standard_output_line("ok")
     error(e) => io.write_standard_output_line("walk borne={e.kind}")
 }

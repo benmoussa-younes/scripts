@@ -1,3 +1,4 @@
+using System.Text;
 using static Scripts.Runtime.Tests.Pure.PureTestSupport;
 
 namespace Scripts.Runtime.Tests.Pure;
@@ -5,6 +6,45 @@ namespace Scripts.Runtime.Tests.Pure;
 /// <summary>`encoding` (DESIGN §1.5): RFC 4648 base64 vectors, lowercase hex vectors, strict decodes.</summary>
 public class EncodingTests
 {
+    // Everything RFC 3986 treats specially, the unreserved set, a BOM, a NUL, an astral character and a space;
+    // a deterministic generator keeps the campaign reproducible from its seed.
+    private static readonly string[] UrlAlphabet =
+        ["a", "b", "Z", "0", "9", " ", "-", ".", "_", "~", "!", "*", "'", "(", ")", "%", "+", "/", "?", "#", "[", "]",
+         "@", ":", "$", ",", ";", "=", "&", "é", "\uFEFF", "\0", "\r", "\n", "\t", "\U0001F600"];
+
+    private static string RandomText(SeededRandom random, int maximumLength)
+    {
+        var builder = new StringBuilder();
+        var length = random.Next(maximumLength);
+        for (var index = 0; index < length; index++)
+        {
+            builder.Append(random.NextItem(UrlAlphabet));
+        }
+
+        return builder.ToString();
+    }
+
+    private static bool IsRfc3986Encoded(string text)
+    {
+        for (var index = 0; index < text.Length; index++)
+        {
+            var character = text[index];
+            if (char.IsAsciiLetterOrDigit(character) || character is '-' or '_' or '.' or '~')
+            {
+                continue;
+            }
+
+            if (character != '%' || index + 2 >= text.Length
+                || !char.IsAsciiHexDigitUpper(text[index + 1]) || !char.IsAsciiHexDigitUpper(text[index + 2]))
+            {
+                return false;
+            }
+
+            index += 2;
+        }
+
+        return true;
+    }
     [Theory]
     [InlineData("", "")]
     [InlineData("f", "Zg==")]
@@ -111,5 +151,78 @@ public class EncodingTests
     {
         var error = ErrorRecord(Call(function, Text(text)));
         Assert.Equal(string.Empty, error.GetText("subject"));
+    }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("ABCxyz0129-_.~", "ABCxyz0129-_.~")]
+    [InlineData("hello world", "hello%20world")]
+    [InlineData("a+b=c&d/e?f#g%h", "a%2Bb%3Dc%26d%2Fe%3Ff%23g%25h")]
+    [InlineData("café", "caf%C3%A9")]
+    [InlineData("\U0001F600", "%F0%9F%98%80")]
+    public void Url_encode_follows_rfc3986_with_uppercase_hex_and_never_uses_plus(string text, string expected) =>
+        Assert.Equal(Text(expected), Call("encoding.url_encode", Text(text)));
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("hello%20world", "hello world")]
+    [InlineData("a+b", "a+b")]
+    [InlineData("caf%c3%a9", "café")]
+    [InlineData("caf%C3%A9", "café")]
+    [InlineData("%F0%9F%98%80", "\U0001F600")]
+    [InlineData("%EF%BB%BFa", "\uFEFFa")]
+    [InlineData("caf\u00E9", "caf\u00E9")]
+    [InlineData("a+b%20c", "a+b c")]
+    public void Url_decode_decodes_both_cases_keeps_plus_preserves_bom_and_copies_raw_text(string text, string expected) =>
+        Assert.Equal(expected, OkText(Call("encoding.url_decode", Text(text))));
+
+    [Theory]
+    [InlineData("%")]
+    [InlineData("%2")]
+    [InlineData("abc%2")]
+    [InlineData("%ZZ")]
+    [InlineData("%2G")]
+    public void Url_decode_rejects_malformed_percent_sequences(string text) =>
+        AssertValueError(Call("encoding.url_decode", Text(text)), "invalid_argument");
+
+    [Theory]
+    [InlineData("%FF")]
+    [InlineData("%C0%AF")]
+    [InlineData("%C3")]
+    [InlineData("%ED%A0%80")]
+    public void Url_decode_rejects_invalid_utf8_bytes(string text) =>
+        AssertValueError(Call("encoding.url_decode", Text(text)), "invalid_encoding");
+
+    [Fact]
+    public void Url_encode_and_decode_round_trip_seeded_random_text_and_encode_only_unreserved_bytes()
+    {
+        var random = new SeededRandom(20261121);
+        for (var iteration = 0; iteration < 300; iteration++)
+        {
+            var text = RandomText(random, 12);
+            var encoded = ((StringValue)Call("encoding.url_encode", Text(text))).Text;
+            Assert.True(IsRfc3986Encoded(encoded), encoded);
+            Assert.Equal(text, OkText(Call("encoding.url_decode", Text(encoded))));
+        }
+    }
+
+    [Fact]
+    public void Url_decode_either_fails_typed_or_round_trips_its_result()
+    {
+        var random = new SeededRandom(90210);
+        for (var iteration = 0; iteration < 300; iteration++)
+        {
+            var text = RandomText(random, 12);
+            var decoded = Call("encoding.url_decode", Text(text));
+            if (!((ResultValue)decoded).IsOk)
+            {
+                var kind = ErrorRecord(decoded).GetText("kind");
+                Assert.True(kind is "invalid_argument" or "invalid_encoding", kind);
+                continue;
+            }
+
+            var value = OkText(decoded);
+            Assert.Equal(value, OkText(Call("encoding.url_decode", Call("encoding.url_encode", Text(value)))));
+        }
     }
 }

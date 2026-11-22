@@ -1,3 +1,22 @@
+scripts (0.2.0) unstable; urgency=medium
+
+  * Block arms in a `match` expression (`=> { ...; value }`); a map literal
+    arm is written `({ ... })` (breaking syntax).
+  * New `process.exit_with_message`, `result.ignore_error`,
+    `SCRIPTS-LINT-0013` and `SCRIPTS-LINT-0014` with `check --fix`,
+    integer/float math methods, `string.find_all_regex`,
+    `encoding.url_encode`/`url_decode`, `list<T>.chunked`, and the
+    intrinsic `csv` module.
+  * Removed `process.run_shell` (rejected statically with `SCRIPTS-TYPE-0068`).
+  * .NET SDK 10.0.404 (runtime and Native AOT ILCompiler 10.0.15) with the
+    November 2026 .NET runtime security fixes.
+  * A `SIGINT` or `SIGHUP` ignored at startup stays ignored (POSIX convention);
+    fixed a lost wake-up that could hang `parallel.run_all`.
+  * Ship a `scripts(1)` manual page; the gate checks that the Debian,
+    CHANGELOG and README metadata name one version before the tag.
+
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Sat, 21 Nov 2026 00:22:20 +0000
+
 scripts (0.1.2) unstable; urgency=medium
 
   * Make the release gate portable on GitHub Actions: CPU-count-aware parallel

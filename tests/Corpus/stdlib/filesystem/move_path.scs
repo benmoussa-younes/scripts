@@ -2,11 +2,11 @@ let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
 let source_file = work_directory / "a.txt"
 let moved_file = work_directory / "b.txt"
 filesystem.write_file_overwrite("contenu", source_file)?
-filesystem.move_path(source_file, moved_file)?
+filesystem.move_path(source_path = source_file, destination_path = moved_file)?
 io.write_standard_output_line("{filesystem.path_exists(source_file)}")
 io.write_standard_output_line(filesystem.read_file(moved_file)?)
 filesystem.write_file_overwrite("autre", source_file)?
-match filesystem.move_path(source_file, moved_file) {
+match filesystem.move_path(source_path = source_file, destination_path = moved_file) {
     ok(_) => io.write_standard_output_line("déplacé")
     error(failure) => io.write_standard_output_line(failure.kind)
 }

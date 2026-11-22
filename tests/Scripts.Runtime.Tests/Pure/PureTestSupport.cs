@@ -77,3 +77,20 @@ internal static class PureTestSupport
     public static string ArgumentValue(RuntimeFailure failure, string name) =>
         failure.Arguments.Single(argument => argument.Name == name).Value;
 }
+
+/// <summary>
+/// Deterministic generator for the property tests (a 64-bit LCG, Numerical Recipes constants): a failing case is
+/// reproducible from its seed, so a fuzz finding becomes a fixed test instead of a flaky one.
+/// </summary>
+internal sealed class SeededRandom(ulong seed)
+{
+    private ulong state = seed;
+
+    public int Next(int bound)
+    {
+        state = (state * 6364136223846793005UL) + 1442695040888963407UL;
+        return (int)((state >> 33) % (ulong)bound);
+    }
+
+    public string NextItem(string[] items) => items[Next(items.Length)];
+}

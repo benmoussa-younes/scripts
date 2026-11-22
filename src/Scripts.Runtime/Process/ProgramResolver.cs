@@ -2,7 +2,7 @@ using Scripts.Runtime.Platform;
 
 namespace Scripts.Runtime.Processes;
 
-/// <summary>Program resolution shared by process.run/process.run_inherit/process.run_shell/process.spawn and which (DESIGN §6): PATH only, never the current directory.</summary>
+/// <summary>Program resolution shared by process.run/process.run_inherit/process.spawn and which (DESIGN §6): PATH only, never the current directory.</summary>
 internal static class ProgramResolver
 {
     private const uint AnyExecuteBit = 0x49;

@@ -12,37 +12,45 @@ internal sealed partial class ProgramExecution
         state.CurrentEnvironment = scope.FileEnvironment;
         state.CurrentSpan = statement.Span;
         context.ThrowIfInterrupted();
-        switch (statement)
+        // A block arm of a `match` expression leaves through ControlSignal (L1); the statement evaluating it completes with its status.
+        try
         {
-            case ExpressionStatement { Expression: MatchExpression { IsStatement: true } match }:
-                return ExecuteMatchStatement(match, scope);
-            case ExpressionStatement expressionStatement:
-                return TryEvaluateStatementValue(expressionStatement.Expression, scope, CopyMode.None, out _)
-                    ? ExecutionStatus.Normal
-                    : ExecutionStatus.Return;
-            case LetStatement letStatement:
-                return ExecuteLet(letStatement, scope);
-            case AssignmentStatement assignment:
-                return ExecuteAssignment(assignment, scope);
-            case IfStatement ifStatement:
-                return ExecuteIf(ifStatement, scope);
-            case ReturnStatement returnStatement:
-                return ExecuteReturn(returnStatement, scope);
-            case ForStatement forStatement:
-                return ExecuteFor(forStatement, scope);
-            case WhileStatement whileStatement:
-                return ExecuteWhile(whileStatement, scope);
-            case BreakStatement:
-                return ExecutionStatus.Break;
-            case ContinueStatement:
-                return ExecutionStatus.Continue;
-            case FunctionDeclaration declaration:
-                scope.Declare(declaration.Name, new Binding(new UserFunctionValue(declaration.Name, declaration.Parameters, declaration.Body, scope), false));
-                return ExecutionStatus.Normal;
-            case BlockStatement block:
-                return ExecuteBlock(block, scope);
-            default:
-                throw InternalError($"unsupported statement {statement.GetType().Name}");
+            switch (statement)
+            {
+                case ExpressionStatement { Expression: MatchExpression { IsStatement: true } match }:
+                    return ExecuteMatchStatement(match, scope);
+                case ExpressionStatement expressionStatement:
+                    return TryEvaluateStatementValue(expressionStatement.Expression, scope, CopyMode.None, out _)
+                        ? ExecutionStatus.Normal
+                        : ExecutionStatus.Return;
+                case LetStatement letStatement:
+                    return ExecuteLet(letStatement, scope);
+                case AssignmentStatement assignment:
+                    return ExecuteAssignment(assignment, scope);
+                case IfStatement ifStatement:
+                    return ExecuteIf(ifStatement, scope);
+                case ReturnStatement returnStatement:
+                    return ExecuteReturn(returnStatement, scope);
+                case ForStatement forStatement:
+                    return ExecuteFor(forStatement, scope);
+                case WhileStatement whileStatement:
+                    return ExecuteWhile(whileStatement, scope);
+                case BreakStatement:
+                    return ExecutionStatus.Break;
+                case ContinueStatement:
+                    return ExecutionStatus.Continue;
+                case FunctionDeclaration declaration:
+                    scope.Declare(declaration.Name, new Binding(new UserFunctionValue(declaration.Name, declaration.Parameters, declaration.Body, scope), false));
+                    return ExecutionStatus.Normal;
+                case BlockStatement block:
+                    return ExecuteBlock(block, scope);
+                default:
+                    throw InternalError($"unsupported statement {statement.GetType().Name}");
+            }
+        }
+        catch (ControlSignal signal)
+        {
+            return signal.Status;
         }
     }
 

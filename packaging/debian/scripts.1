@@ -1,0 +1,185 @@
+.\" Man page for scripts(1); every statement comes from `scripts --help` and
+.\" `scripts describe --format json`, which are generated from the same tables.
+.TH SCRIPTS 1 "2026-11-22" "scripts" "User Commands"
+.SH NAME
+scripts \- statically typed system scripting language
+.SH SYNOPSIS
+.B scripts
+.B run
+.RI [ options ]
+.I script
+.RI [ argument ...]
+.br
+.B scripts
+.B check
+.RI [ options ]
+.I script
+.br
+.B scripts
+.B explain
+.RI [ options ]
+.I script
+.br
+.B scripts
+.B fmt
+.B \-\-check
+.I script
+.br
+.B scripts
+.B describe
+.B \-\-format json
+.RI [ \-\-name " NAME" ]
+.br
+.B scripts
+.B \-\-version
+.br
+.B scripts
+.B \-\-help
+.br
+.B scripts
+.B help
+.SH DESCRIPTION
+.B scripts
+is a statically typed scripting language for Linux system automation. One
+native binary (Native AOT, .NET 10) checks, explains and interprets a
+.I .scs
+file, and needs no .NET runtime at run time. A script is checked before it
+runs, data is never re-parsed as code, and a process is launched only through
+an explicit request, never through a shell string.
+.PP
+.BR run ,
+.B check
+and
+.B fmt
+accept
+.B \-
+as the script name to read the script from the standard input.
+.SH COMMANDS
+.TP
+.B run
+Checks the script, then runs it; nothing runs when a static error exists.
+Arguments after the script are exposed to it through
+.BR process.arguments .
+.TP
+.B check
+Reports syntax, type, call, import, visibility, mutability, return and
+exhaustiveness diagnostics, plus warnings, without running the script.
+.TP
+.B fmt
+With
+.BR \-\-check ,
+reports whether the layout is canonical (LF, final newline, no BOM, tab or
+trailing space, four spaces per open brace) and rewrites nothing.
+.TP
+.B explain
+Checks the script, then describes it in English, one sentence per statement,
+and flags destructive operations.
+.TP
+.B describe
+Writes the complete language description as one JSON document: keywords,
+types, functions, groups, error codes, exit codes, limits and grammar.
+.TP
+.B help
+Prints the usage text, like
+.BR \-\-help .
+.SH OPTIONS
+.TP
+.B \-\-errors\-json
+(
+.BR run ,
+.BR check )
+Diagnostics as JSON on one line: on standard output for
+.BR check ,
+on standard error for
+.BR run .
+.TP
+.B \-\-json\-out
+(
+.BR run ,
+.BR explain )
+No human output; a single JSON document on standard output.
+.TP
+.B \-\-deny\-warnings
+(
+.BR check )
+Exit 251 as soon as the script has a warning.
+.TP
+.B \-\-fix
+(
+.BR check )
+Applies the safe fixes carried by the diagnostics to the script; a fix that
+cannot be applied safely is not offered.
+.TP
+.B \-\-check
+(
+.B fmt )
+Reports whether the layout is canonical; it never rewrites the script.
+.TP
+.B \-\-format json
+(
+.B describe )
+Required: the output is one JSON document.
+.TP
+.B \-\-name " NAME"
+(
+.B describe )
+Keeps the function entries of a namespace, a module, a receiver type or a
+fully qualified name.
+.TP
+.B \-\-
+(
+.B run )
+Ends the options before the script name, so the name may start with a dash.
+.TP
+.B \-\-version
+Prints the version and exits.
+.TP
+.B \-\-help
+Prints the usage text and exits.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1\-255
+The code the script passed to
+.BR process.exit_with_code ;
+when
+.B scripts
+itself fails it uses 250\-254.
+.TP
+.B 250
+Command-line usage error.
+.TP
+.B 251
+Static error (syntax, types, modules), or a warning under
+.BR \-\-deny\-warnings .
+.TP
+.B 252
+Unreadable or missing script.
+.TP
+.B 253
+Fatal runtime error, or an unhandled error at the top level.
+.TP
+.B 254
+Internal error: a defect in
+.BR scripts .
+.TP
+.B 129, 130, 143
+Interrupted by SIGHUP, SIGINT or SIGTERM.
+.TP
+.B 141
+The reader of an output closed the pipe (EPIPE); the exit is silent.
+.SH FILES
+.TP
+.I /usr/bin/scripts
+The interpreter.
+.TP
+.I /usr/share/doc/scripts
+Licences, third-party notices and the Debian changelog.
+.SH SEE ALSO
+The README at
+.IR https://github.com/benmoussa-younes/scripts .
+.SH LICENSE
+GPL\-3\-0\-or\-later. The vendored Core subset is LGPL\-3\-0\-or\-later; see
+.IR /usr/share/doc/scripts .

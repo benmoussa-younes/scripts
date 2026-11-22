@@ -1,0 +1,18 @@
+# versions — the release version shape shared by the gate helpers.
+public function is_release_version(text: string) -> boolean {
+    let parts = text.split(".")
+    if parts.length() != 3 {
+        return false
+    }
+    for part in parts {
+        let number = part.parse_integer().value_or(-1)
+        if number < 0 or "{number}" != part {
+            return false
+        }
+    }
+    return true
+}
+
+public function is_tool_version(text: string) -> boolean {
+    return is_release_version(text.split("+")[0].strip_suffix("_dirty"))
+}

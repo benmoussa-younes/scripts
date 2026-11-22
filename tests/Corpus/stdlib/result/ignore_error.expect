@@ -1,0 +1,4 @@
+stdout:
+false
+absent ignored
+exit: 0

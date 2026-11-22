@@ -2,13 +2,13 @@ let work_directory = filesystem.make_temporary_directory("scripts-stdlib-")?
 let source_file = work_directory / "a.txt"
 let copy_target = work_directory / "b.txt"
 filesystem.write_file_overwrite("contenu", source_file)?
-filesystem.copy_file(source_file, copy_target)?
+filesystem.copy_file(source_path = source_file, destination_path = copy_target)?
 io.write_standard_output_line(filesystem.read_file(copy_target)?)
-match filesystem.copy_file(source_file, copy_target) {
+match filesystem.copy_file(source_path = source_file, destination_path = copy_target) {
     ok(_) => io.write_standard_output_line("copié")
     error(failure) => io.write_standard_output_line(failure.kind)
 }
-match filesystem.copy_file(source_file, source_file) {
+match filesystem.copy_file(source_path = source_file, destination_path = source_file) {
     ok(_) => io.write_standard_output_line("copié")
     error(failure) => io.write_standard_output_line(failure.kind)
 }

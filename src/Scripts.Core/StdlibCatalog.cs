@@ -56,7 +56,7 @@ public static class StdlibCatalog
 
     /// <summary>Intrinsic namespaces, in a stable order (used by error messages and describe).</summary>
     public static IReadOnlyList<string> IntrinsicModuleNames =>
-        ["environment", "io", "process", "json", "filesystem", "parallel", "time", "system", "encoding", "random"];
+        ["environment", "io", "process", "json", "filesystem", "parallel", "time", "system", "encoding", "random", "csv"];
 
     public static bool IsGlobalFunctionName(string name) => Data.Value.Globals.ContainsKey(name);
 

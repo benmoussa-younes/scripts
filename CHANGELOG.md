@@ -5,7 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-11-21
+
+### Added
+
+- `process.exit_with_message(exit_code, message)`: exit with a message on
+  stderr (`SCRIPTS-RUNTIME-0016` for a code outside 1..255).
+- `result<unit, E>.ignore_error()`, the explicit way to drop a cleanup failure
+  (`SCRIPTS-TYPE-0071` on a result that carries a value).
+- A block as a `match` arm expression (`=> { …; value }`, `SCRIPTS-TYPE-0072`
+  when it does not end with a value; `SCRIPTS-TYPE-0073` for `break`,
+  `continue` or `return` leaving a lambda).
+- Warnings `SCRIPTS-LINT-0013` (binding never read, fixed by `check --fix`)
+  and `SCRIPTS-LINT-0014` (two paths passed by position, `check --fix` names
+  them); `SCRIPTS-PARSE-0059` explains that `{{` is not an escape and
+  `check --fix` applies syntax fixes on the entry script.
+- Numeric and math methods: `integer.power`, `integer.clamp`, `integer.minimum`,
+  `integer.maximum`; `float.floor`, `float.ceiling`, `float.round`,
+  `float.truncate`, `float.power`, `float.square_root`, `float.natural_log`,
+  `float.log2`, `float.log10`, `float.exponential`, `float.clamp`,
+  `float.minimum`, `float.maximum`; `list<float>.sum_floats`.
+- `string.find_all_regex(pattern)` (NonBacktracking engine),
+  `encoding.url_encode`/`encoding.url_decode` (RFC 3986, strict UTF-8),
+  `list<T>.chunked(size)`, and intrinsic `csv` module (`csv.parse`,
+  `csv.parse_row`, `csv.encode_row`, `csv.encode`, RFC 4180).
+
+### Changed
+
+- **Breaking (syntax):** a `{` after `=>` in a `match` now opens a block, so a
+  map literal arm is written `({ … })`; `SCRIPTS-PARSE-0023` names the
+  parenthesised form. A block arm of a `match` expression takes the value of
+  its last line (`SCRIPTS-TYPE-0072` when it has none).
+- Updated pinned .NET SDK to `10.0.404` (Native AOT runtime and ILCompiler
+  `10.0.15`), which carries the November 2026 .NET runtime security fixes,
+  among them `CVE-2026-109475` (denial of service) and `CVE-2026-105544` /
+  `CVE-2026-114155` (elevation of privilege). `CVE-2026-118747` is in the
+  standalone `System.Formats.Cbor` package, which this project does not
+  reference.
+
+### Removed
+
+- Removed `process.run_shell` (moved to `RetiredNames`, rejected with
+  `SCRIPTS-TYPE-0068` pointing to `process.run(process.request(program, arguments))`,
+  and retired `SCRIPTS-LINT-0002`).
+
+### Fixed
+
+- `parallel.run_all` and process waits could hang forever after a lost wake-up
+  caused by concurrent `Dispose` on wait handles.
+- A `SIGINT` or `SIGHUP` ignored when `scripts` started (a background job,
+  `nohup`) is kept ignored, per POSIX convention: no handler is installed, so
+  the inherited disposition is not overridden.
+- The `system.get_information` catalogue entry named itself instead of
+  `uname(2)`.
 
 ## [0.1.2] - 2026-11-17
 
@@ -53,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; the JSON codecs
   are local GPL-3.0-or-later adaptations.
 
-[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.1.2...HEAD
+[0.2.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.2.0
 [0.1.2]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.2
 [0.1.1]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.1
 [0.1.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.0

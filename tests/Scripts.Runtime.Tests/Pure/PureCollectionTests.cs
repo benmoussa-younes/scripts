@@ -410,6 +410,13 @@ public class PureResultFunctionsTests
     }
 
     [Fact]
+    public void IgnoreErrorDropsBothOutcomes()
+    {
+        Assert.Same(UnitValue.Instance, Call("result<T,E>.ignore_error", ResultValue.Ok(UnitValue.Instance)));
+        Assert.Same(UnitValue.Instance, Call("result<T,E>.ignore_error", ResultValue.Error(ErrorValues.Error("not_found", "/x", "introuvable"))));
+    }
+
+    [Fact]
     public void MapErrorConvertsOnlyTheError()
     {
         var kindOf = Function(1, arguments => ((RecordValue)arguments[0]).Get("kind"));
@@ -425,6 +432,23 @@ public class PureResultFunctionsTests
     {
         var failing = Function(1, _ => throw new RuntimeFailure(ErrorCodes.Runtime0011, ("function", "f")));
         AssertFailure(ErrorCodes.Runtime0011, () => Call("result<T,E>.transform_error", Failure("invalid_integer"), failing));
+    }
+
+    [Fact]
+    public void List_chunked_splits_into_contiguous_sublists_and_rejects_non_positive_sizes()
+    {
+        var source = List(Integer(1), Integer(2), Integer(3), Integer(4), Integer(5));
+        var chunks = (ListValue)OkPayload(Call("list<T>.chunked", source, Integer(2)));
+        Assert.Equal(3, chunks.Items.Count);
+        Assert.Equal(List(Integer(1), Integer(2)), chunks.Items[0]);
+        Assert.Equal(List(Integer(3), Integer(4)), chunks.Items[1]);
+        Assert.Equal(List(Integer(5)), chunks.Items[2]);
+
+        var emptyChunks = (ListValue)OkPayload(Call("list<T>.chunked", List(), Integer(3)));
+        Assert.Empty(emptyChunks.Items);
+
+        AssertValueError(Call("list<T>.chunked", source, Integer(0)), "invalid_argument");
+        AssertValueError(Call("list<T>.chunked", source, Integer(-1)), "invalid_argument");
     }
 }
 

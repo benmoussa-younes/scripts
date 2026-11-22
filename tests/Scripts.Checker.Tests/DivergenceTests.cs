@@ -23,6 +23,7 @@ public sealed class DivergenceTests
     [InlineData("function f(flag: boolean) -> integer {\n    if flag {\n        return 1\n    } else {\n        return 2\n    }\n}")]
     [InlineData("function f(n: integer) -> integer {\n    if n > 1 {\n        return 1\n    } else if n > 0 {\n        return 2\n    } else {\n        return 3\n    }\n}")]
     [InlineData("function f() -> integer {\n    process.exit_with_code(2)\n}")]
+    [InlineData("function f(n: integer) -> integer {\n    match n {\n        1 => process.exit_with_message(1, \"one\")\n        _ => {\n            return 2\n        }\n    }\n}")]
     [InlineData("function f() -> integer {\n    while true {\n    }\n}")]
     [InlineData("function f() -> integer {\n    while true {\n        if true {\n            return 1\n        }\n    }\n}")]
     [InlineData("function f() -> integer {\n    while true {\n        for item in [1] {\n            break\n        }\n    }\n}")]
@@ -46,6 +47,7 @@ public sealed class DivergenceTests
     [InlineData("function f(n: integer) {\n    match n {\n        1 => process.exit_with_code(1)\n        _ => {\n            return\n        }\n    }\n    ‸io.write_standard_output_line(\"a\")\n}")]
     [InlineData("return\n‸io.write_standard_output_line(\"a\")")]
     [InlineData("process.exit_with_code(3)\n‸let x = 1")]
+    [InlineData("process.exit_with_message(3, \"stop\")\n‸let x = 1")]
     [InlineData("function f() {\n    return\n    ‸let x = 1\n}")]
     public void Statements_after_a_divergent_statement_are_unreachable(string marked)
     {

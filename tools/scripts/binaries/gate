@@ -2,7 +2,7 @@
 # gate — read-only full verification of this repository.
 #
 #   tools/scripts/binaries/gate [--no-build]
-# It runs check-all.sh (5 steps with the build, 4 with --no-build; tests run
+# It runs check-all.sh (6 steps with the build, 5 with --no-build; tests run
 # only as Native AOT executables), streams its output, and ends with exactly
 # one VERDICT line. It does not change tracked files.
 set -u

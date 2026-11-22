@@ -63,6 +63,7 @@ public static class ErrorCodes
     public const string Parse0056 = "SCRIPTS-PARSE-0056";
     public const string Parse0057 = "SCRIPTS-PARSE-0057";
     public const string Parse0058 = "SCRIPTS-PARSE-0058";
+    public const string Parse0059 = "SCRIPTS-PARSE-0059";
     public const string Type0001 = "SCRIPTS-TYPE-0001";
     public const string Type0002 = "SCRIPTS-TYPE-0002";
     public const string Type0003 = "SCRIPTS-TYPE-0003";
@@ -133,6 +134,9 @@ public static class ErrorCodes
     public const string Type0068 = "SCRIPTS-TYPE-0068";
     public const string Type0069 = "SCRIPTS-TYPE-0069";
     public const string Type0070 = "SCRIPTS-TYPE-0070";
+    public const string Type0071 = "SCRIPTS-TYPE-0071";
+    public const string Type0072 = "SCRIPTS-TYPE-0072";
+    public const string Type0073 = "SCRIPTS-TYPE-0073";
     public const string Module0001 = "SCRIPTS-MODULE-0001";
     public const string Module0002 = "SCRIPTS-MODULE-0002";
     public const string Module0003 = "SCRIPTS-MODULE-0003";
@@ -192,4 +196,6 @@ public static class ErrorCodes
     public const string Lint0010 = "SCRIPTS-LINT-0010";
     public const string Lint0011 = "SCRIPTS-LINT-0011";
     public const string Lint0012 = "SCRIPTS-LINT-0012";
+    public const string Lint0013 = "SCRIPTS-LINT-0013";
+    public const string Lint0014 = "SCRIPTS-LINT-0014";
 }

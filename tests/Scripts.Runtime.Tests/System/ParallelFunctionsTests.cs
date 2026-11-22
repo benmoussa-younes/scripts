@@ -133,6 +133,27 @@ public sealed class ParallelFunctionsTests
         Assert.Equal("0 sh [first]\n0 sh [second]\n1 false []\n", output);
     }
 
+    /// <summary>
+    /// R0 regression: an awaited completion event was disposed concurrently and the waiter never woke up (16 hangs
+    /// out of 20 runs of 400 immediate children). The guard turns a hang into a failure instead of a stuck suite.
+    /// </summary>
+    [Fact]
+    public async Task Run_all_of_two_thousand_immediate_children_never_loses_a_wake_up()
+    {
+        var run = Task.Run(() => Output(
+            """
+            let mutable requests: list<run_request> = []
+            for i in range(0, 2000) {
+                requests.append(process.request("true", []))
+            }
+            let results = parallel.run_all(requests, 8)?
+            io.write_standard_output_line("{results.length()}")
+            """));
+
+        // WaitAsync throws TimeoutException on a hang (lost wake-up) instead of blocking the suite.
+        Assert.Equal("2000\n", await run.WaitAsync(TimeSpan.FromSeconds(120)));
+    }
+
     [Fact]
     public void Exec_all_reports_spawn_failed_and_no_partial_list()
     {

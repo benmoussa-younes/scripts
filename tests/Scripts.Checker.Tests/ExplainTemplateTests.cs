@@ -135,6 +135,7 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.ModuleFunction, "process.script_path")] = "let _r = process.script_path()",
         [SnippetKey(StdlibKind.ModuleFunction, "process.find_program_path")] = "let _r = process.find_program_path(\"sh\")?",
         [SnippetKey(StdlibKind.ModuleFunction, "process.exit_with_code")] = "process.exit_with_code(0)",
+        [SnippetKey(StdlibKind.ModuleFunction, "process.exit_with_message")] = "process.exit_with_message(2, \"absent\")",
         [SnippetKey(StdlibKind.ModuleFunction, "process.identifier")] = "let _r = process.identifier()",
         [SnippetKey(StdlibKind.ModuleFunction, "process.set_umask")] = "let _r = process.set_umask(0o022)?",
         [SnippetKey(StdlibKind.ModuleFunction, "encoding.base64_encode")] = "let _r = encoding.base64_encode(\"a\")",
@@ -144,7 +145,6 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.ModuleFunction, "random.bytes_hex")] = "let _r = random.bytes_hex(1)?",
         [SnippetKey(StdlibKind.ModuleFunction, "random.bytes_base64")] = "let _r = random.bytes_base64(1)?",
         [SnippetKey(StdlibKind.ModuleFunction, "random.integer_below")] = "let _r = random.integer_below(2)?",
-        [SnippetKey(StdlibKind.ModuleFunction, "process.run_shell")] = "let _r = process.run_shell(\"true\")?",
         [SnippetKey(StdlibKind.ModuleFunction, "process.arguments")] = "let _r = process.arguments()",
         [SnippetKey(StdlibKind.ModuleFunction, "json.null_value")] = "let _r = json.null_value()",
         [SnippetKey(StdlibKind.ModuleFunction, "json.from_string")] = "let _r = json.from_string(\"a\")",
@@ -249,6 +249,7 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "result<T,E>.value_or")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.value_or(0)",
         [SnippetKey(StdlibKind.Method, "result<T,E>.value_or_fail")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.value_or_fail()",
         [SnippetKey(StdlibKind.Method, "result<T,E>.transform_error")] = "let parsed = \"1\".parse_integer()\nlet _r = parsed.transform_error(e => e)?",
+        [SnippetKey(StdlibKind.Method, "result<T,E>.ignore_error")] = "filesystem.remove_file(p\"absent.txt\").ignore_error()",
 
         // --- process_result method ---
         [SnippetKey(StdlibKind.Method, "process_result.require_success")] = "let _p = process.run(process.request(\"true\", []))?\nlet _r = _p.require_success()?",
@@ -258,6 +259,34 @@ public sealed class ExplainTemplateTests
         [SnippetKey(StdlibKind.Method, "run_request.with_working_directory")] = "let _r = process.request(\"true\", []).with_working_directory(p\"/tmp\")",
         [SnippetKey(StdlibKind.Method, "run_request.with_environment")] = "let _r = process.request(\"true\", []).with_environment({\"GREETING\": \"hi\"})",
         [SnippetKey(StdlibKind.Method, "run_request.with_timeout")] = "let _r = process.request(\"true\", []).with_timeout(1000)",
+
+        // --- numeric & list<float> math methods ---
+        [SnippetKey(StdlibKind.Method, "integer.power")] = "let _r = 2.power(3)?",
+        [SnippetKey(StdlibKind.Method, "integer.clamp")] = "let _r = 5.clamp(0, 10)?",
+        [SnippetKey(StdlibKind.Method, "integer.minimum")] = "let _r = 3.minimum(7)",
+        [SnippetKey(StdlibKind.Method, "integer.maximum")] = "let _r = 3.maximum(7)",
+        [SnippetKey(StdlibKind.Method, "float.floor")] = "let _r = 1.5.floor()",
+        [SnippetKey(StdlibKind.Method, "float.ceiling")] = "let _r = 1.5.ceiling()",
+        [SnippetKey(StdlibKind.Method, "float.round")] = "let _r = 1.5.round()",
+        [SnippetKey(StdlibKind.Method, "float.truncate")] = "let _r = 1.5.truncate()",
+        [SnippetKey(StdlibKind.Method, "float.power")] = "let _r = 2.0.power(3.0)?",
+        [SnippetKey(StdlibKind.Method, "float.square_root")] = "let _r = 9.0.square_root()?",
+        [SnippetKey(StdlibKind.Method, "float.natural_log")] = "let _r = 1.0.natural_log()?",
+        [SnippetKey(StdlibKind.Method, "float.log2")] = "let _r = 8.0.log2()?",
+        [SnippetKey(StdlibKind.Method, "float.log10")] = "let _r = 100.0.log10()?",
+        [SnippetKey(StdlibKind.Method, "float.exponential")] = "let _r = 0.0.exponential()?",
+        [SnippetKey(StdlibKind.Method, "float.clamp")] = "let _r = 0.5.clamp(0.0, 1.0)?",
+        [SnippetKey(StdlibKind.Method, "float.minimum")] = "let _r = 1.0.minimum(2.0)",
+        [SnippetKey(StdlibKind.Method, "float.maximum")] = "let _r = 1.0.maximum(2.0)",
+        [SnippetKey(StdlibKind.Method, "list<float>.sum_floats")] = "let _r = [1.0, 2.0].sum_floats()?",
+        [SnippetKey(StdlibKind.Method, "string.find_all_regex")] = "let _r = \"a1b2\".find_all_regex(\"\\\\d+\")?",
+        [SnippetKey(StdlibKind.Method, "list<T>.chunked")] = "let _r = [1, 2, 3].chunked(2)?",
+        [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_encode")] = "let _r = encoding.url_encode(\"a b\")",
+        [SnippetKey(StdlibKind.ModuleFunction, "encoding.url_decode")] = "let _r = encoding.url_decode(\"a%20b\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.parse")] = "let _r = csv.parse(\"a,b\\n1,2\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.parse_row")] = "let _r = csv.parse_row(\"a,b\")?",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.encode_row")] = "let _r = csv.encode_row([\"a\", \"b\"])",
+        [SnippetKey(StdlibKind.ModuleFunction, "csv.encode")] = "let _r = csv.encode([[\"a\", \"b\"]])",
     };
 
     /// <summary>`(kind, qualified_name)` — unique across the catalogue.</summary>
@@ -270,7 +299,7 @@ public sealed class ExplainTemplateTests
     [Fact]
     public void There_are_the_catalog_entries()
     {
-        Assert.Equal(206, StdlibCatalog.All.Count);
+        Assert.Equal(233, StdlibCatalog.All.Count);
     }
 
     [Fact]
@@ -307,7 +336,7 @@ public sealed class ExplainTemplateTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
         var unreached = StdlibCatalog.All.Select(SnippetKeyOf).Where(name => !reached.Contains(name)).Order(StringComparer.Ordinal).ToList();
         Assert.True(unreached.Count == 0, "Templates never reached: " + string.Join(", ", unreached));
-        Assert.Equal(206, reached.Count);
+        Assert.Equal(233, reached.Count);
     }
 
     /// <summary>

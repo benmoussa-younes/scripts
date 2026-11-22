@@ -1,0 +1,8 @@
+let root = filesystem.make_temporary_directory("ignore-error-")?
+let file = root / "a.txt"
+filesystem.write_file_overwrite("x", file)?
+filesystem.remove_file(file).ignore_error()
+io.write_standard_output_line("{filesystem.path_exists(file)}")
+filesystem.remove_file(file).ignore_error()
+io.write_standard_output_line("absent ignored")
+filesystem.remove_directory_tree(root)?

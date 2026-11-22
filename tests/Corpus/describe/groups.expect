@@ -1,6 +1,6 @@
 exit: 0
 stream: stdout
-check: {g["name"] for g in doc["groups"] if g["kind"] == "module"} >= {"filesystem", "process", "environment", "system", "io", "json", "parallel", "encoding", "random"}
+check: {g["name"] for g in doc["groups"] if g["kind"] == "module"} >= {"filesystem", "process", "environment", "system", "io", "json", "parallel", "encoding", "random", "csv"}
 check: {g["name"] for g in doc["groups"] if g["kind"] == "type"} >= {"path", "string", "list", "map", "json_value", "file_lock", "process_result"}
 check: all(g["notes"] != "" for g in doc["groups"])
 check: next(g for g in doc["groups"] if g["name"] == "filesystem" and g["kind"] == "module")["notes"].startswith("Common rules")

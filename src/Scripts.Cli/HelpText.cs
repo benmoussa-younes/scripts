@@ -36,8 +36,8 @@ public static class HelpText
         lines.Add("            no BOM/tab/trailing space, four spaces per open brace. 0 if canonical, 251");
         lines.Add("            otherwise.");
         lines.Add("  explain   Checks the script (same diagnostics as check), then describes it in");
-        lines.Add("            English, one sentence per statement; flags destructive operations and");
-        lines.Add("            process.run_shell. --json-out writes the same steps as one JSON document.");
+        lines.Add("            English, one sentence per statement; flags destructive operations.");
+        lines.Add("            --json-out writes the same steps as one JSON document.");
         lines.Add("  describe  Writes the complete language description as JSON to stdout: keywords,");
         lines.Add("            types, functions, error codes, exit codes, limits, grammar.");
         lines.Add("  help      Prints this help (like --help).");

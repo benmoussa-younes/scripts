@@ -10,7 +10,7 @@ match filesystem.read_file_no_follow(file_path) {
 
 # A final symbolic link to a regular file is refused.
 let file_link = work_directory / "file-link"
-filesystem.make_symbolic_link(file_path, file_link)?
+filesystem.make_symbolic_link(target_path = file_path, link_path = file_link)?
 match filesystem.read_file_no_follow(file_link) {
     ok(content) => io.write_standard_output_line("link {content}")
     error(failure) => io.write_standard_output_line(failure.kind)
@@ -18,7 +18,7 @@ match filesystem.read_file_no_follow(file_link) {
 
 # A dangling final symbolic link is refused, not reported missing.
 let dangling_link = work_directory / "dangling-link"
-filesystem.make_symbolic_link(work_directory / "absent.txt", dangling_link)?
+filesystem.make_symbolic_link(target_path = work_directory / "absent.txt", link_path = dangling_link)?
 match filesystem.read_file_no_follow(dangling_link) {
     ok(content) => io.write_standard_output_line("dangling {content}")
     error(failure) => io.write_standard_output_line(failure.kind)
@@ -32,7 +32,7 @@ match filesystem.read_file_no_follow((file_link.to_string() + "/").to_path()) {
 
 # An intermediate symbolic link to a directory is followed.
 let directory_link = work_directory / "directory-link"
-filesystem.make_symbolic_link(work_directory, directory_link)?
+filesystem.make_symbolic_link(target_path = work_directory, link_path = directory_link)?
 match filesystem.read_file_no_follow(directory_link / "note.txt") {
     ok(content) => io.write_standard_output_line("intermediate {content}")
     error(failure) => io.write_standard_output_line(failure.kind)

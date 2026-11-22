@@ -64,9 +64,8 @@ public sealed partial class CorpusTests
     {
         var entry = StdlibCatalog.All[entryIndex];
         var result = Checking.Check(entry.ExampleCode);
-        var expectedWarnings = entry is { ModuleName: "process", Name: "run_shell" } ? new[] { "SCRIPTS-LINT-0002" } : [];
         Assert.True(
-            result.Errors.Count == 0 && result.Warnings.Select(warning => warning.Code).SequenceEqual(expectedWarnings),
+            result.Errors.Count == 0 && result.Warnings.Count == 0,
             $"{signature}: {Checking.Describe(result)}");
     }
 

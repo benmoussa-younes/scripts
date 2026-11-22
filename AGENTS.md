@@ -10,7 +10,7 @@ never re-parsed as code.
 ```sh
 dotnet build Scripts.slnx -c Release
 reuse lint
-tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, AOT tests, licences
+tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, packaging, AOT tests, licences
 tools/scripts/binaries/gate-static     # the lighter gate: build, fast AOT tests, tree hygiene
 ```
 

@@ -23,7 +23,6 @@ internal sealed class ChildProcess : IDisposable
     private int waitError;
     private int released;
     private int streamsReleased;
-    private int eventsDisposed;
     private bool pumpsStarted;
     private bool noPumpsExpected;
 
@@ -106,12 +105,6 @@ internal sealed class ChildProcess : IDisposable
 
             pumpsCompleted.Set();
             TryRelease();
-            // The observer is the only waiter on the per-pump events; releasing them here closes the lazy
-            // WaitHandle descriptors that a failed pipeline otherwise leaks until the GC (runtime audit #1).
-            foreach (var pump in pumps)
-            {
-                pump.Dispose();
-            }
         }) { IsBackground = true, Name = "scripts-pumps-completed" }.Start();
     }
 
@@ -228,7 +221,7 @@ internal sealed class ChildProcess : IDisposable
             return;
         }
 
-        // One combined event: the per-pump events are released by the observer as soon as both pumps reach EOF.
+        // One combined event, set by the observer once every pump reached EOF.
         pumpsCompleted.Wait(budget);
     }
 
@@ -351,7 +344,7 @@ internal sealed class ChildProcess : IDisposable
                 noPumpsExpected = true;
                 releaseUnstarted = true;
             }
-            else if (eventsDisposed == 0 && !pumpsCompleted.IsSet)
+            else if (!pumpsCompleted.IsSet)
             {
                 // The call is over: a pump still blocked on a detached writer is asked to stop, so the read ends
                 // are released at its next poll tick instead of waiting for that writer (P8e).
@@ -363,40 +356,11 @@ internal sealed class ChildProcess : IDisposable
         {
             ReleaseStreams();
             // The pipeline/failure path has killed the child; wait for the waiter so TryRelease can mark the child
-            // released and the events can be disposed. A SIGKILLed child is reaped well within the grace period.
-            // The waiter may win the race and dispose the event first (audit M1): then the child is already released.
-            try
-            {
-                exited.Wait(ProcessTimings.KillGracePeriod);
-            }
-            catch (ObjectDisposedException)
-            {
-            }
+            // released. A SIGKILLed child is reaped well within the grace period.
+            exited.Wait(ProcessTimings.KillGracePeriod);
         }
 
         TryRelease();
-        DisposeEventsIfReleased();
-    }
-
-    /// <summary>Releases the lazy event handles once the child and its pumps are released; idempotent.</summary>
-    private void DisposeEventsIfReleased()
-    {
-        lock (disposalGate)
-        {
-            if (released == 0 || eventsDisposed != 0)
-            {
-                return;
-            }
-
-            eventsDisposed = 1;
-            foreach (var pump in pumps)
-            {
-                pump.Dispose();
-            }
-
-            exited.Dispose();
-            pumpsCompleted.Dispose();
-        }
     }
 
     /// <summary>
@@ -477,10 +441,6 @@ internal sealed class ChildProcess : IDisposable
         table.Unregister(this);
         exited.Set();
         TryRelease();
-        if (noPumpsExpected)
-        {
-            DisposeEventsIfReleased();
-        }
     }
 
     /// <summary>A waitpid failure is an invariant violation (no global reaper): report it as the catalogued other failure.</summary>
@@ -529,7 +489,11 @@ internal static class ProcessTimings
             : remaining > MaximumWaitChunk ? MaximumWaitChunk : remaining;
 }
 
-/// <summary>Blocking wait that returns early (by throwing) when a signal interruption is pending.</summary>
+/// <summary>
+/// Blocking wait that returns early (by throwing) when a signal interruption is pending. It waits on the event itself
+/// with the monitor's cancellation token, never on a lazily created <see cref="WaitHandle"/>: such a handle could miss
+/// the wake-up when the event was disposed concurrently (R0), and it is an OS object on Windows.
+/// </summary>
 internal static class InterruptibleWait
 {
     private static readonly TimeSpan LongestSlice = TimeSpan.FromHours(1);
@@ -558,16 +522,22 @@ internal static class InterruptibleWait
                 slice = remaining < slice ? remaining : slice;
             }
 
+            var interruption = monitor.CancellationToken;
+            if (interruption.IsCancellationRequested)
+            {
+                // The interruption is pending but suspended (deferred cleanup still runs): wait on the event alone
+                // instead of spinning on an already cancelled token.
+                signal.Wait(slice);
+                continue;
+            }
+
             try
             {
-                var signalHandle = signal.WaitHandle;
-                WaitHandle.WaitAny([signalHandle, monitor.WaitHandle], slice);
+                signal.Wait(slice, interruption);
             }
-            catch (ObjectDisposedException)
+            catch (OperationCanceledException)
             {
-                // The pumps observer disposes a pump's event only after that pump has completed (runtime audit #1);
-                // reaching the wait after the disposal therefore means the pump is done.
-                return true;
+                // The loop head reports the interruption (or keeps waiting while it is suspended).
             }
         }
     }

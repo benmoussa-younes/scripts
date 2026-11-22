@@ -184,7 +184,7 @@ public sealed class ConformanceTests
     {
         var names = ConformanceCases.AllNames();
         var expectedParse = RequiredParseCodes();
-        Assert.Equal(54, expectedParse.Count);
+        Assert.Equal(55, expectedParse.Count);
         Assert.Equal(
             ["SCRIPTS-PARSE-0036", "SCRIPTS-PARSE-0037", "SCRIPTS-PARSE-0038", "SCRIPTS-PARSE-0050"],
             SkippedCodes.Where(code => code.StartsWith("SCRIPTS-PARSE-", StringComparison.Ordinal)).Order(StringComparer.Ordinal).ToList());

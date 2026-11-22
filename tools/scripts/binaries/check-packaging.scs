@@ -1,0 +1,110 @@
+#!/usr/bin/env -S scripts run
+# Checks that the release metadata names one version before the tag is cut.
+# Run from anywhere: scripts run tools/scripts/binaries/check-packaging.scs
+#
+# Reads packaging/debian/{changelog,control}, CHANGELOG.md and README.md; the
+# tag check runs only when HEAD is exactly a tag.
+import "../modules/versions.scs" as versions
+
+let root = process.script_path().parent().parent().parent().parent()
+
+function read_text(root: path, relative: string) -> string {
+    return match filesystem.read_file(root / relative) {
+        ok(text) => text
+        error(failure) => process.exit_with_message(1, "check-packaging: {relative}: {failure.kind}")
+    }
+}
+
+function first_line(text: string) -> string {
+    return text.split("\n")[0].trim_whitespace()
+}
+
+function between(text: string, opening: string, closing: string) -> string {
+    let parts = text.split(opening)
+    if parts.length() < 2 {
+        return ""
+    }
+    return parts[1].split(closing)[0]
+}
+
+function exact_tag(root: path) -> string {
+    let request = process.request("git", ["describe", "--exact-match", "--tags", "HEAD"]).with_working_directory(root)
+    return match process.run(request) {
+        ok(outcome) => {
+            if outcome.exit_code != 0 {
+                return ""
+            }
+            return outcome.standard_output.trim_whitespace()
+        }
+        error(_) => ""
+    }
+}
+
+let mutable failures: list<string> = []
+let changelog = read_text(root, "packaging/debian/changelog")
+let control = read_text(root, "packaging/debian/control")
+let changelog_markdown = read_text(root, "CHANGELOG.md")
+let readme = read_text(root, "README.md")
+
+let version = between(first_line(changelog), "(", ")")
+if not versions.is_release_version(version) {
+    failures.append("packaging/debian/changelog: first line carries '{version}', expected X.Y.Z")
+}
+
+let mutable control_version = ""
+let mutable control_fields = 0
+for line in control.split("\n") {
+    if line.starts_with("Version:") {
+        control_fields = control_fields + 1
+        control_version = line.split(":")[1].trim_whitespace()
+    }
+}
+if control_fields != 1 {
+    failures.append("packaging/debian/control: {control_fields} Version lines, expected exactly one")
+}
+if control_version != version {
+    failures.append("packaging/debian/control: Version '{control_version}' != changelog '{version}'")
+}
+
+let mutable announced = ""
+for line in changelog_markdown.split("\n") {
+    let trimmed = line.trim_whitespace()
+    if announced == "" and trimmed.starts_with("## [") {
+        announced = between(trimmed, "[", "]")
+    }
+}
+if announced != version {
+    failures.append("CHANGELOG.md: top release '{announced}' != changelog '{version}'")
+}
+
+if not readme.contains("scripts_{version}_amd64.deb") {
+    failures.append("README.md: no 'scripts_{version}_amd64.deb'")
+}
+if not readme.contains("scripts_{version}_linux-x64.tar.gz") {
+    failures.append("README.md: no 'scripts_{version}_linux-x64.tar.gz'")
+}
+if not readme.contains("scripts-{version}/scripts") {
+    failures.append("README.md: no 'scripts-{version}/scripts'")
+}
+
+let lines = changelog.split("\n")
+for index in range(0, lines.length()) {
+    if lines[index].length() > 80 {
+        failures.append("packaging/debian/changelog:{index + 1}: {lines[index].length()} characters, Debian allows 80")
+    }
+}
+
+let tag = exact_tag(root)
+if tag != "" and tag != "v{version}" {
+    failures.append("git: HEAD is tagged '{tag}', the metadata names '{version}'")
+}
+
+if failures.length() > 0 {
+    for failure in failures {
+        io.write_standard_error_line("check-packaging: {failure}")
+    }
+    io.write_standard_error_line("packaging: FAIL ({failures.length()} finding(s))")
+    process.exit_with_code(1)
+}
+io.write_standard_output_line("packaging: PASS ({version})")
+process.exit_with_code(0)

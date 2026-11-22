@@ -28,6 +28,7 @@ public sealed class InterruptionMonitor : IDisposable
     private readonly Action<int> forceExit;
     private readonly TimeSpan watchdogDelay;
     private readonly ManualResetEventSlim interrupted = new(false);
+    private readonly CancellationTokenSource interruptedSource = new();
     private readonly List<PosixSignalRegistration> registrations = [];
     private InterruptionTermination? pending;
     private Timer? watchdog;
@@ -45,6 +46,9 @@ public sealed class InterruptionMonitor : IDisposable
 
     /// <summary>Signalled once an interruption is pending; blocking waits include it in their wait set.</summary>
     public WaitHandle WaitHandle => interrupted.WaitHandle;
+
+    /// <summary>Cancelled once an interruption is pending; event waits pass it instead of building a WaitHandle set (R0).</summary>
+    public CancellationToken CancellationToken => interruptedSource.Token;
 
     public bool IsInterrupted => pending is not null;
 
@@ -129,12 +133,15 @@ public sealed class InterruptionMonitor : IDisposable
             interrupted.Set();
         }
 
+        // Outside the gate: cancellation runs the waiters' registrations synchronously.
+        interruptedSource.Cancel();
         Interrupted?.Invoke();
     }
 
     /// <summary>
-    /// Installs SIGINT/SIGTERM/SIGHUP handlers that cancel the default termination. A SIGINT that was ignored when the
-    /// process started (non-interactive background job) stays ignored, per POSIX convention.
+    /// Installs SIGINT/SIGTERM/SIGHUP handlers that cancel the default termination. A SIGINT or SIGHUP that was ignored
+    /// when the process started (a background job, `nohup`) stays ignored, per POSIX convention: no handler is installed,
+    /// so the inherited disposition is kept instead of being overridden.
     /// </summary>
     public void ListenForSignals()
     {
@@ -144,7 +151,10 @@ public sealed class InterruptionMonitor : IDisposable
         }
 
         Listen(PosixSignal.SIGTERM, "SIGTERM", TerminateExitCode);
-        Listen(PosixSignal.SIGHUP, "SIGHUP", HangUpExitCode);
+        if (!SignalDispositions.IsIgnored(Libc.SignalHangUp))
+        {
+            Listen(PosixSignal.SIGHUP, "SIGHUP", HangUpExitCode);
+        }
     }
 
     public void Dispose()
