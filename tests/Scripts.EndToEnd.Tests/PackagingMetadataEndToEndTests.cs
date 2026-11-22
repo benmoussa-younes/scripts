@@ -11,7 +11,7 @@ public sealed class PackagingMetadataEndToEndTests
     private const string Control = "Package: scripts\nVersion: 0.2.0\nArchitecture: amd64\n";
     private const string ChangelogMarkdown = "# Changelog\n\n## [0.2.0] - 2026-11-21\n\n- A change.\n";
     private const string Readme =
-        "sudo apt install ./scripts_0.2.0_amd64.deb\ntar -xzf scripts_0.2.0_linux-x64.tar.gz\nsudo install -m 755 scripts-0.2.0/scripts /usr/local/bin/scripts\n";
+        "Scripts 0.2.0 is the current release.\n\nsudo apt install ./scripts_0.2.0_amd64.deb\ntar -xzf scripts_0.2.0_linux-x64.tar.gz\nsudo install -m 755 scripts-0.2.0/scripts /usr/local/bin/scripts\n";
 
     [Fact]
     public void The_packaging_checker_accepts_one_version_and_names_each_mismatch()
@@ -33,7 +33,7 @@ public sealed class PackagingMetadataEndToEndTests
                     "packaging/debian/control: Version '0.1.2' != changelog '0.2.0'"
                 ),
                 (Changelog, Control, "# Changelog\n\n## [0.1.2] - 2026-11-21\n", Readme, "CHANGELOG.md: top release '0.1.2' != changelog '0.2.0'"),
-                (Changelog, Control, ChangelogMarkdown, "sudo apt install ./scripts_0.1.2_amd64.deb\n", "README.md: no 'scripts_0.2.0_amd64.deb'"),
+                (Changelog, Control, ChangelogMarkdown, "sudo apt install ./scripts_0.1.2_amd64.deb\n", "README.md: no 'sudo apt install ./scripts_0.2.0_amd64.deb'"),
                 (
                     Changelog.Replace("  * A change.", "  * " + new string('x', 90), StringComparison.Ordinal),
                     Control,
@@ -48,6 +48,7 @@ public sealed class PackagingMetadataEndToEndTests
                     Readme,
                     "packaging/debian/control: 2 Version lines, expected exactly one"
                 ),
+                (Changelog, Control, ChangelogMarkdown, Readme.Replace("is the current release", "is the previous release", StringComparison.Ordinal), "README.md: no 'Scripts 0.2.0 is the current release'"),
             };
 
             foreach (var mismatch in mismatches)
