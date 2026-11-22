@@ -2,8 +2,10 @@
 # Checks that the release metadata names one version before the tag is cut.
 # Run from anywhere: scripts run tools/scripts/binaries/check-packaging.scs
 #
-# Reads packaging/debian/{changelog,control}, CHANGELOG.md and README.md; the
-# tag check runs only when HEAD is exactly a tag.
+# Reads packaging/debian/{changelog,control}, CHANGELOG.md, README.md,
+# packaging/verify-release.sh and .github/workflows/release.yml; the tag check
+# runs only when HEAD is exactly a tag. The workflow and checker checks are form
+# only: the gate cannot run a release.
 import "../modules/versions.scs" as versions
 
 let root = process.script_path().parent().parent().parent().parent()
@@ -25,6 +27,37 @@ function between(text: string, opening: string, closing: string) -> string {
         return ""
     }
     return parts[1].split(closing)[0]
+}
+
+function commands_outside_comments(text: string) -> list<string> {
+    let mutable kept: list<string> = []
+    for line in text.split("\n") {
+        let trimmed = line.trim_whitespace()
+        if trimmed != "" and not trimmed.starts_with("#") {
+            kept.append(trimmed)
+        }
+    }
+    return kept
+}
+
+function any_line_starts_with(lines: list<string>, prefix: string) -> boolean {
+    let mutable found = false
+    for line in lines {
+        if line.starts_with(prefix) {
+            found = true
+        }
+    }
+    return found
+}
+
+function any_line_contains(lines: list<string>, marker: string) -> boolean {
+    let mutable found = false
+    for line in lines {
+        if line.contains(marker) {
+            found = true
+        }
+    }
+    return found
 }
 
 function exact_tag(root: path) -> string {
@@ -69,7 +102,7 @@ if control_version != version {
 let mutable announced = ""
 for line in changelog_markdown.split("\n") {
     let trimmed = line.trim_whitespace()
-    if announced == "" and trimmed.starts_with("## [") {
+    if announced == "" and trimmed.starts_with("## [") and not trimmed.starts_with("## [Unreleased]") {
         announced = between(trimmed, "[", "]")
     }
 }
@@ -88,6 +121,35 @@ if not readme.contains("sudo install -m 755 scripts-{version}/scripts /usr/local
 }
 if not readme.contains("Scripts {version} is the current release") {
     failures.append("README.md: no 'Scripts {version} is the current release'")
+}
+
+let release_workflow = read_text(root, ".github/workflows/release.yml")
+let release_checker = read_text(root, "packaging/verify-release.sh")
+let workflow_commands = commands_outside_comments(release_workflow)
+let checker_commands = commands_outside_comments(release_checker)
+
+if not any_line_starts_with(workflow_commands, "gpg --batch --import packaging/maintainer-key.asc") {
+    failures.append(".github/workflows/release.yml: has no 'gpg --batch --import packaging/maintainer-key.asc' line")
+}
+if not any_line_starts_with(workflow_commands, "bash packaging/verify-release.sh --require-tag") {
+    failures.append(".github/workflows/release.yml: has no 'bash packaging/verify-release.sh --require-tag' line")
+}
+if not any_line_starts_with(workflow_commands, "uses: actions/attest-build-provenance@") {
+    failures.append(".github/workflows/release.yml: has no 'uses: actions/attest-build-provenance@' line")
+}
+for marker in ["SHA256SUMS.asc", "tarballs.sha256.asc", "packaging/*.asc"] {
+    if any_line_contains(workflow_commands, marker) {
+        failures.append(".github/workflows/release.yml: references {marker}, but no release publishes a signature")
+    }
+    if any_line_contains(checker_commands, marker) {
+        failures.append("packaging/verify-release.sh: references {marker}, but no release publishes a signature")
+    }
+}
+if not readme.contains("git verify-tag") {
+    failures.append("README.md: no 'git verify-tag' command")
+}
+if not readme.contains("gh attestation verify") {
+    failures.append("README.md: no 'gh attestation verify' command")
 }
 
 let lines = changelog.split("\n")
