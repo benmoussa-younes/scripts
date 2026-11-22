@@ -51,7 +51,27 @@ and libm; no .NET runtime is needed at run time.
 
 Download the assets from the
 [latest release](https://github.com/benmoussa-younes/scripts/releases/latest)
-and verify them with `sha256sum -c SHA256SUMS`.
+and verify them with `sha256sum -c SHA256SUMS`. The checksum proves integrity,
+not origin. Releases carry no detached OpenPGP signature of it: 0.1.2 had one,
+0.2.0 and 0.2.1 have none, and the release workflow produces none.
+
+Origin rests on two facts. The `vX.Y.Z` tag is signed by the maintainer key,
+whose public half is `packaging/maintainer-key.asc`, with the fingerprint
+`F3955A21FE39065BC6F1433203911AA81394689F`:
+
+```sh
+gpg --import packaging/maintainer-key.asc
+git verify-tag vX.Y.Z
+```
+
+And a release published after 0.2.1 carries a build provenance attestation for
+every asset the release workflow uploads:
+
+```sh
+gh attestation verify scripts_<version>_amd64.deb \
+  --repo benmoussa-younes/scripts \
+  --signer-workflow benmoussa-younes/scripts/.github/workflows/release.yml
+```
 
 ### Debian/Ubuntu package
 

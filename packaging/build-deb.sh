@@ -71,16 +71,6 @@ fi
 case "${VERSION_COMPLETE}" in
     *_*) die "the tree is dirty (${VERSION_COMPLETE}): commit before packaging, so the package matches the binary." ;;
 esac
-# The signed evidence in the output directory belongs to one release. Writing another version's
-# SHA256SUMS there would silently invalidate SHA256SUMS.asc: a development build on a clean tree is
-# exactly that case, so it is refused. Move the released artefacts away to cut a new release.
-if [ -f "${DOSSIER_PACKAGING}/SHA256SUMS.asc" ] && [ -f "${DOSSIER_PACKAGING}/SHA256SUMS" ]; then
-    signed_version="$(sed -nE 's/^[0-9a-f]{64}  '"${PAQUET}"'_(.+)_'"${ARCHITECTURE}"'\.deb$/\1/p' \
-        "${DOSSIER_PACKAGING}/SHA256SUMS" | head -n 1)"
-    if [ -n "${signed_version}" ] && [ "${signed_version}" != "${DEB_VERSION}" ]; then
-        die "packaging/ holds the signed ${signed_version} release; refusing to replace its SHA256SUMS with ${DEB_VERSION}. Move the released artefacts out of packaging/ first."
-    fi
-fi
 
 command -v dotnet    >/dev/null 2>&1 || die "\"dotnet\" was not found in PATH."
 command -v dpkg-deb  >/dev/null 2>&1 || die "\"dpkg-deb\" was not found (dpkg package required)."
