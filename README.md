@@ -96,7 +96,7 @@ dotnet publish src/Scripts.App/Scripts.App.csproj -c Release -r linux-x64
 # binary: src/Scripts.App/bin/Release/net10.0/linux-x64/publish/scripts
 ```
 
-## Quick start
+## Usage
 
 `hello.scs`:
 
@@ -165,7 +165,7 @@ io.write_standard_output_line(outcome.standard_output)
   guards.
 - Report a vulnerability privately through
   [GitHub private vulnerability reporting](https://github.com/benmoussa-younes/scripts/security/advisories/new);
-  never in a public issue.
+  never in a public issue. See [`SECURITY.md`](SECURITY.md).
 
 ## Build and test
 
@@ -210,6 +210,12 @@ patches may be closed without review. A fork is the supported way to build on
 this work; the maintainer workflow is in [`AGENTS.md`](AGENTS.md). The project
 is maintained by one author: no support contract, service level or warranty,
 express or implied, is provided beyond the licences.
+
+## Forking
+
+A fork is welcome. You maintain it: the licence grants use, study, change and
+redistribution, and the software is delivered **as is**, without warranty or
+support beyond the licence.
 
 ## Changelog
 
