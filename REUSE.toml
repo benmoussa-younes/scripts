@@ -1,5 +1,14 @@
 version = 1
 
+# Every path is GPL-3.0-or-later by default. The annotations below override the
+# paths that carry another id; they must stay after this one, because the last
+# matching table wins.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
 [[annotations]]
 path = ["src/**", "tests/**", "tools/**", "packaging/**"]
 SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
@@ -14,11 +23,6 @@ SPDX-License-Identifier = "CC-BY-SA-4.0"
 path = ["LICENSE"]
 SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
-
-[[annotations]]
-path = ["LICENSE.LGPL3"]
-SPDX-FileCopyrightText = "2026 Younes BENMOUSSA <younes.benmoussa@pm.me>"
-SPDX-License-Identifier = "LGPL-3.0-or-later"
 
 [[annotations]]
 path = ["LICENSES/GPL-3.0-or-later.txt"]
@@ -36,7 +40,7 @@ SPDX-FileCopyrightText = "Creative Commons"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
 [[annotations]]
-path = ["LICENSE.DOTNET", "THIRD-PARTY-DOTNET.txt"]
+path = ["THIRD-PARTY-DOTNET.txt"]
 SPDX-FileCopyrightText = ".NET Foundation and Contributors"
 SPDX-License-Identifier = "MIT"
 
