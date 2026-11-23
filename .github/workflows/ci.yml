@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-test-licence:
+  build-test:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -57,3 +57,30 @@ jobs:
           name: gate-log
           path: gate.log
           if-no-files-found: ignore
+
+  licence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install reuse
+        run: pipx install --force reuse==5.0.2
+      - name: Check the licence layout
+        run: reuse lint
+
+  aot-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+      - name: Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+      - name: Publish the AOT interpreter
+        run: dotnet publish src/Scripts.App/Scripts.App.csproj -c Release -r linux-x64 -m:1 -o out
+      - name: Prove the published binary
+        run: ./out/scripts --version
