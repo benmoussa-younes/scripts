@@ -97,6 +97,15 @@ public sealed class LintTests
     }
 
     [Fact]
+    public void A_program_argument_with_a_type_error_is_not_linted_again()
+    {
+        var result = Checking.AssertMarked(
+            "let _request = process.request(‸p\"/bin/bash\", [])",
+            "SCRIPTS-TYPE-0012");
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
     public void A_mixed_file_flags_only_the_undecidable_program()
     {
         Checking.AssertMarkedWarnings(

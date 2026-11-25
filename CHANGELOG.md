@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not determined syntactically (`"{prefix}ash"`, `"{dir}/{name}"`) still warns
   (`0004`). The `0004` suggestion now points to a `run_request` built where the
   program is literal.
+- `SCRIPTS-LINT-0004` no longer adds a warning when the program argument already
+  has a type error: `process.request(p"/bin/bash", …)` reports
+  `SCRIPTS-TYPE-0012` only.
 
 ## [0.2.1] - 2026-11-22
 
