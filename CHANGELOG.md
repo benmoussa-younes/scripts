@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   verified with the committed maintainer key. The README says what a reader can
   check with `git verify-tag` and `gh attestation verify`.
 
+### Fixed
+
+- `SCRIPTS-LINT-0004` no longer warns when the program's basename is written
+  literally inside an interpolated string (`"{out}/sextant-vault"`): a literal
+  launcher basename still warns (`SCRIPTS-LINT-0001`), and a basename that is
+  not determined syntactically (`"{prefix}ash"`, `"{dir}/{name}"`) still warns
+  (`0004`). The `0004` suggestion now points to a `run_request` built where the
+  program is literal.
+
 ## [0.2.1] - 2026-11-22
 
 ### Changed

@@ -23,8 +23,11 @@ generated at test time.
 ## Conventions
 
 - Sources are `.scs`; the command is `scripts`; error codes are `SCRIPTS-*`.
-- A program is a literal: a computed program breaks the launcher check
-  (`SCRIPTS-LINT-0004`) and the argument discipline.
+- A program's basename must be syntactically determinable: a program that is
+  not a string literal and is not an interpolated string with a literal,
+  non-empty basename after its last `/` emits `SCRIPTS-LINT-0004`; a known
+  launcher basename emits `SCRIPTS-LINT-0001`. A constant binding is not
+  propagated (`"{prefix}ash"` with `prefix = "b"` still warns).
 - The tree is `src/`, `tests/`, `tools/scripts/` and `packaging/`; no samples.
 - `tests/Scripts.Corpus.Tests` runs the corpus in xUnit, with the four
   black-box axes (fuzz, semantics, JSON, system) in the same project.

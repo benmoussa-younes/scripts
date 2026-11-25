@@ -805,11 +805,15 @@ internal sealed partial class FileAnalyzer
         var firstArgument = arguments[0];
         if (LintRules.LaunchesProgram(entry))
         {
-            if (LintRules.FindLauncherProgram(firstArgument) is { } program)
+            if (LintRules.StaticProgramBaseName(firstArgument) is { } baseName)
             {
-                Report(ErrorCodes.Lint0001, firstArgument.Span, ("program", program), ("target", LauncherTargetPlaceholder));
+                if (LintRules.IsLauncherBaseName(baseName))
+                {
+                    var display = firstArgument is StringLiteral literal ? literal.Value : baseName;
+                    Report(ErrorCodes.Lint0001, firstArgument.Span, ("program", display), ("target", LauncherTargetPlaceholder));
+                }
             }
-            else if (LintRules.IsComputedProgram(firstArgument))
+            else
             {
                 Report(ErrorCodes.Lint0004, firstArgument.Span, ("program", TextOf(firstArgument.Span)));
             }
