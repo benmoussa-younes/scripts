@@ -400,7 +400,7 @@ public static class ScriptsApplication
             }
         }
 
-        // `--deny-warnings` (DESIGN §8.5): a warning makes the check fail (65) like a static error, without
+        // `--deny-warnings` (DESIGN §8.5): a warning makes the check fail (251) like a static error, without
         // changing how it is rendered.
         var deniedWarning = command.DenyWarnings && result.Warnings.Count > 0;
         return result.Errors.Count == 0 && !deniedWarning ? ExitCodes.Success : ExitCodes.StaticError;
