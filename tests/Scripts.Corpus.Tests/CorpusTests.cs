@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 
 namespace Scripts.Corpus.Tests;
 
@@ -135,6 +136,90 @@ public sealed class CorpusTests
         }
 
         return (process.ExitCode, output.Result, error.Result);
+    }
+
+    /// <summary>
+    /// Every `check` warning of the corpus must be in tests/Corpus/warnings.txt. A new or removed warning
+    /// updates that file; the test fails otherwise, so no fixture warning can stay unasserted (D21).
+    /// </summary>
+    [Fact]
+    public void Every_corpus_warning_is_in_the_expected_set()
+    {
+        var root = Path.Combine(CorpusPaths.RepositoryRoot, "tests", "Corpus");
+        var baseline = File.ReadAllLines(Path.Combine(root, "warnings.txt"))
+            .Where(line => line.Length > 0 && !line.StartsWith('#'))
+            .ToArray();
+        var actual = new List<string>();
+        var binary = CorpusPaths.BinaryPath();
+
+        foreach (var entry in Directory.EnumerateFiles(root, "*.scs", SearchOption.AllDirectories).Order(StringComparer.Ordinal))
+        {
+            var relative = Path.GetRelativePath(root, entry).Replace('\\', '/');
+            if (relative.Split('/').Any(part => part.EndsWith(".files", StringComparison.Ordinal)))
+            {
+                continue;
+            }
+
+            var work = Directory.CreateTempSubdirectory("scripts-warning-audit-");
+            try
+            {
+                var entryName = Path.GetFileName(entry);
+                CopyTree(
+                    Path.Combine(Path.GetDirectoryName(entry)!, Path.GetFileNameWithoutExtension(entry) + ".files"),
+                    work.FullName);
+                File.Copy(entry, Path.Combine(work.FullName, entryName));
+
+                var startInfo = new ProcessStartInfo(binary)
+                {
+                    WorkingDirectory = work.FullName,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                };
+                startInfo.ArgumentList.Add("check");
+                startInfo.ArgumentList.Add("--errors-json");
+                startInfo.ArgumentList.Add(entryName);
+
+                using var process = Process.Start(startInfo)!;
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                Assert.True(process.ExitCode is 0 or 251, $"{relative}: check exit {process.ExitCode}\n{output}{error}");
+
+                JsonDocument document;
+                try
+                {
+                    document = JsonDocument.Parse(output);
+                }
+                catch (JsonException exception)
+                {
+                    Assert.Fail($"{relative}: check did not return JSON (exit {process.ExitCode})\nstdout: {output}\nstderr: {error}\n{exception.Message}");
+                    return;
+                }
+
+                using (document)
+                {
+                    foreach (var warning in document.RootElement.GetProperty("warnings").EnumerateArray())
+                    {
+                        actual.Add(
+                            $"{relative}|{warning.GetProperty("file").GetString()}|{warning.GetProperty("line").GetInt32()}|{warning.GetProperty("code").GetString()}");
+                    }
+                }
+            }
+            finally
+            {
+                work.Delete(recursive: true);
+            }
+        }
+
+        actual.Sort(StringComparer.Ordinal);
+        var missing = baseline.Except(actual, StringComparer.Ordinal).ToArray();
+        var unexpected = actual.Except(baseline, StringComparer.Ordinal).ToArray();
+        Assert.True(
+            missing.Length == 0 && unexpected.Length == 0,
+            "corpus warnings differ\nmissing:\n" + string.Join("\n", missing) + "\nunexpected:\n" + string.Join("\n", unexpected));
     }
 
     private static void CopyTree(string source, string destination)
