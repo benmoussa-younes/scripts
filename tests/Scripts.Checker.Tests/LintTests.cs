@@ -96,12 +96,15 @@ public sealed class LintTests
             "SCRIPTS-LINT-0001");
     }
 
-    [Fact]
-    public void A_program_argument_with_a_type_error_is_not_linted_again()
+    [Theory]
+    [InlineData("let _request = process.request(‸p\"/bin/bash\", [])")]
+    [InlineData("let _request = process.request(‸42, [])")]
+    [InlineData("let path_value = p\"/bin/bash\"\nlet _request = process.request(‸path_value, [])")]
+    [InlineData("let handle = process.spawn(‸p\"/bin/bash\", [])?\nmatch process.wait_for_process(handle, 1000) {\n    ok(_) => {}\n    error(_) => {}\n}")]
+    [InlineData("let value = json.from_string(\"bash\")\nlet _request = process.request(‸value, [])")]
+    public void A_program_argument_that_is_not_a_string_is_not_linted_again(string source)
     {
-        var result = Checking.AssertMarked(
-            "let _request = process.request(‸p\"/bin/bash\", [])",
-            "SCRIPTS-TYPE-0012");
+        var result = Checking.AssertMarked(source, "SCRIPTS-TYPE-0012");
         Assert.Empty(result.Warnings);
     }
 
