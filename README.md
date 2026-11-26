@@ -1,5 +1,7 @@
-# scripts — a statically typed language for Linux automation
+# Scripts
 
+[![Release](https://img.shields.io/badge/release-0.3.0-blue)](https://github.com/benmoussa-younes/scripts/releases/tag/v0.3.0)
+[![Licence](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue)](LICENSE)
 [![CI](https://github.com/benmoussa-younes/scripts/actions/workflows/ci.yml/badge.svg)](https://github.com/benmoussa-younes/scripts/actions/workflows/ci.yml)
 
 `scripts` is a statically typed scripting language for Linux system automation,
@@ -7,22 +9,7 @@ shipped as one native executable (Native AOT, .NET 10) with no runtime to
 install. A `.scs` file is loaded, statically checked and interpreted; there is
 no build step for the script.
 
-## Contents
-
-- [Why scripts](#why-scripts)
-- [Status](#status)
-- [Install](#install)
-- [Quick start](#quick-start)
-- [Commands](#commands)
-- [Security](#security)
-- [Build and test](#build-and-test)
-- [Layout](#layout)
-- [Documentation](#documentation)
-- [Contributing and warranty](#contributing-and-warranty)
-- [Changelog](#changelog)
-- [Licence](#licence)
-
-## Why scripts
+## What it does
 
 - **Data is never re-parsed as code.** A program is launched only through an
   explicit request, `process.run(process.request(program, arguments))`, never a
@@ -38,16 +25,13 @@ no build step for the script.
 - **A language description for machines.** `scripts describe --format json` is
   the authoritative reference, for tools and agents as well as humans.
 
-## Status
+## Requirements
 
-Scripts 0.3.0 is the current release. The language is usable; as a
-`0.y.z` release its API may still change. Supported platform: Linux x86-64,
-glibc 2.34 or newer.
+Linux x86-64, glibc 2.34 or newer. The binary links only against libc and
+libm; no .NET runtime is needed at run time. Building from source needs the
+.NET SDK 10.0.404 (see `global.json`), clang and zlib1g-dev.
 
 ## Install
-
-Requirements: Linux x86-64, glibc >= 2.34. The binary links only against libc
-and libm; no .NET runtime is needed at run time.
 
 Download the assets from the
 [latest release](https://github.com/benmoussa-younes/scripts/releases/latest)
@@ -88,8 +72,6 @@ sudo install -m 755 scripts-0.3.0/scripts /usr/local/bin/scripts
 ```
 
 ### From source
-
-Build requirements: .NET SDK 10.0.404 (see `global.json`), clang, zlib1g-dev.
 
 ```sh
 dotnet publish src/Scripts.App/Scripts.App.csproj -c Release -r linux-x64
@@ -155,6 +137,13 @@ io.write_standard_output_line(outcome.standard_output)
 | `scripts describe --format json` | the machine-readable language reference |
 | `scripts --version`, `scripts --help` | version and usage |
 
+## Project status
+
+Scripts 0.3.0 is the current release. The language is usable; as a `0.y.z`
+release its API may still change. The project is maintained by one author; no
+support contract, service level or warranty, express or implied, is provided
+beyond the licences.
+
 ## Security
 
 - No secret belongs in the tree, in a fixture or in a log.
@@ -201,26 +190,8 @@ filesystem corpus is generated at test time.
 - [`AGENTS.md`](AGENTS.md): how the repository is built, tested and released.
 - `scripts describe --format json`: the complete language and standard library.
 - `scripts explain <file>`: an explanation of one script.
-- [`CHANGELOG.md`](CHANGELOG.md): notable changes, per release.
-
-## Contributing and warranty
-
-External contributions are **not accepted**; unsolicited pull requests or
-patches may be closed without review. A fork is the supported way to build on
-this work; the maintainer workflow is in [`AGENTS.md`](AGENTS.md). The project
-is maintained by one author: no support contract, service level or warranty,
-express or implied, is provided beyond the licences.
-
-## Forking
-
-A fork is welcome. You maintain it: the licence grants use, study, change and
-redistribution, and the software is delivered **as is**, without warranty or
-support beyond the licence.
-
-## Changelog
-
-See [`CHANGELOG.md`](CHANGELOG.md); the project follows
-[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- [`CHANGELOG.md`](CHANGELOG.md): notable changes per release; the project
+  follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Licence
 
@@ -231,3 +202,17 @@ codecs are GPL-3.0-or-later; the .NET 10 runtime components are MIT. The prose
 documents (README, AGENTS, CHANGELOG, THIRD-PARTY) are CC-BY-SA-4.0. See
 [`LICENSE`](LICENSE), [`LICENSES/`](LICENSES/), [`LICENSE.DOTNET`](LICENSE.DOTNET)
 and [`THIRD-PARTY`](THIRD-PARTY) for the exact texts and provenance.
+
+## Forking
+
+A fork is welcome. You maintain it: the licence grants use, study, change and
+redistribution, and the software is delivered **as is**, without warranty or
+support beyond the licence.
+
+## Contributing and security
+
+External contributions are **not accepted at this time**; unsolicited pull
+requests or patches may be closed without review. No support, service level or
+warranty is provided beyond the licences. See [`AGENTS.md`](AGENTS.md) for the
+maintainer workflow and [`SECURITY.md`](SECURITY.md) for the private
+vulnerability report.
