@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('Directory.Packages.props', 'global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', 'global.json', '**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
@@ -45,7 +45,7 @@ jobs:
           pipx install reuse==5.0.2
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Gate (build, AOT app, helpers, packaging, AOT tests, licences)
+      - name: Gate (build, AOT app, helpers, packaging, shellcheck, AOT tests, licences)
         run: |
           set -o pipefail
           bash tools/scripts/binaries/check-all.sh 2>&1 | tee gate.log

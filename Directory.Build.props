@@ -31,7 +31,18 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <IsAotCompatible>true</IsAotCompatible>
-  </PropertyGroup>
+    <!--
+      Restore is locked by one packages.lock.json per project: the CI cache keys
+      on the locks and a stale lock fails the build with NU1004 instead of
+      silently resolving another version. The lock records the real graph,
+      linux-x64 runtime packages included, so a locked AOT publish needs no
+      special switch. After a PackageReference change, regenerate the locks with
+      `dotnet restore Scripts.slnx -p:RestoreLockedMode=false
+      -p:RestoreForceEvaluate=true`, then commit them with the change.
+    -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
+</PropertyGroup>
 
   <!-- Release identity. The fallback is only for a build without git; the current surface is 0.1.0 and a release adds the tag. -->
   <PropertyGroup>
