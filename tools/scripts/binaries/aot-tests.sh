@@ -31,7 +31,7 @@ done
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd "$script_directory/../../.." && pwd)"
-cd "$repository_root"
+cd "$repository_root" || exit 1
 
 app_binary="$repository_root/src/Scripts.App/bin/Release/net10.0/linux-x64/publish/scripts"
 

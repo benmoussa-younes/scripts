@@ -137,6 +137,15 @@ if not any_line_starts_with(workflow_commands, "bash packaging/verify-release.sh
 if not any_line_starts_with(workflow_commands, "uses: actions/attest-build-provenance@") {
     failures.append(".github/workflows/release.yml: has no 'uses: actions/attest-build-provenance@' line")
 }
+if not release_workflow.contains("\n  release:\n    needs: build\n") {
+    failures.append(".github/workflows/release.yml: the release job does not declare 'needs: build'")
+}
+if not any_line_starts_with(workflow_commands, "subject-path: artifacts/*") {
+    failures.append(".github/workflows/release.yml: the attestation has no 'subject-path: artifacts/*'")
+}
+if not any_line_starts_with(workflow_commands, "path: artifacts") {
+    failures.append(".github/workflows/release.yml: no 'path: artifacts' hand-off between build and release")
+}
 for marker in ["SHA256SUMS.asc", "tarballs.sha256.asc", "packaging/*.asc"] {
     if any_line_contains(workflow_commands, marker) {
         failures.append(".github/workflows/release.yml: references {marker}, but no release publishes a signature")

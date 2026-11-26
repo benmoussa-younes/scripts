@@ -168,7 +168,7 @@ info "generating DEBIAN/control…"
 } > "${DOSSIER_TRAVAIL}/racine/DEBIAN/control"
 
 # Installed-Size = sum of 1 KiB blocks rounded up (like dh_installdeb).
-TAILLE_KIO=$(( ( $(du -sk "${DOSSIER_TRAVAIL}/racine/usr" | cut -f1) ) ))
+TAILLE_KIO="$(du -sk "${DOSSIER_TRAVAIL}/racine/usr" | cut -f1)"
 {
     awk -v taille="${TAILLE_KIO}" '
         BEGIN { remplace=0 }

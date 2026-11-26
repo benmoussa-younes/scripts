@@ -2,14 +2,13 @@
 # gate — read-only full verification of this repository.
 #
 #   tools/scripts/binaries/gate [--no-build]
-# It runs check-all.sh (6 steps with the build, 5 with --no-build; tests run
+# It runs check-all.sh (7 steps with the build, 6 with --no-build; tests run
 # only as Native AOT executables), streams its output, and ends with exactly
 # one VERDICT line. It does not change tracked files.
 set -u
 export LC_ALL=C
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-repository_root="$(cd "${script_directory}/../../.." && pwd)"
 
 bash "${script_directory}/check-all.sh" "$@"
 status=$?
