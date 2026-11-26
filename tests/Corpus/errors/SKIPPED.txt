@@ -21,4 +21,5 @@ SCRIPTS-CLI-0012	— CLI cases live in the CLI tests, not in the generated .scs 
 SCRIPTS-CLI-0013	— CLI cases live in the CLI tests, not in the generated .scs cases
 SCRIPTS-CLI-0014	— CLI cases live in the CLI tests, not in the generated .scs cases
 SCRIPTS-CLI-0015	— CLI cases live in the CLI tests, not in the generated .scs cases
+SCRIPTS-CLI-0016	— CLI cases live in the CLI tests, not in the generated .scs cases
 SCRIPTS-PARSE-0050	— retired: a module declaration without `public` is private; `private` is implicit

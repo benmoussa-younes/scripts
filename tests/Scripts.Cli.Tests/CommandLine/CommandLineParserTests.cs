@@ -415,12 +415,13 @@ public sealed class CommandLineParserTests
     }
 
     [Fact]
-    public void Format_requires_check_and_accepts_one_script_or_the_standard_input()
+    public void Format_accepts_one_script_and_check_is_optional()
     {
-        Assert.Equal(new FormatCommand("s.scs", false), Accepted("format", "--check", "s.scs"));
-        Assert.Equal(new FormatCommand("-", true), Accepted("format", "--check", "-"));
-        Assert.Equal(new FormatCommand("s.scs", false), Accepted("format", "s.scs", "--check"));
-        Assert.Equal("SCRIPTS-CLI-0015", Rejected("format", "s.scs").Code);
+        Assert.Equal(new FormatCommand("s.scs", false, false), Accepted("format", "s.scs"));
+        Assert.Equal(new FormatCommand("s.scs", false, true), Accepted("format", "--check", "s.scs"));
+        Assert.Equal(new FormatCommand("-", true, true), Accepted("format", "--check", "-"));
+        Assert.Equal(new FormatCommand("s.scs", false, true), Accepted("format", "s.scs", "--check"));
+        Assert.Equal("SCRIPTS-CLI-0016", Rejected("format", "-").Code);
         Assert.Equal("SCRIPTS-CLI-0005", Rejected("format", "--check").Code);
         Assert.Equal("SCRIPTS-CLI-0008", Rejected("format", "--check", "--check", "s.scs").Code);
         Assert.Equal("SCRIPTS-CLI-0003", Rejected("format", "--json-out", "--check", "s.scs").Code);

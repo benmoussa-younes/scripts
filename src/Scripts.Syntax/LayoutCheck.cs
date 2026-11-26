@@ -7,14 +7,15 @@ namespace Scripts.Syntax;
 public sealed record LayoutIssue(int Line, int Column, string Message);
 
 /// <summary>
-/// <c>scripts format --check</c> (DESIGN §9): the canonical **layout** of a scripts source, checked without rewriting any token.
+/// <c>scripts format [--check]</c> (DESIGN §9): the canonical **layout** of a scripts source. <see cref="Check"/>
+/// reports the violations without touching a token; <see cref="Canonicalize"/> rewrites exactly those violations.
 /// The rules are deliberately local so the formatter never changes meaning: UTF-8 without BOM, LF only, a final
 /// newline, no tab in layout (a tab in string data — a normal, raw or path literal, including a nested string inside an
 /// interpolation — is data; a tab in an interpolation expression or a comment is layout), no trailing whitespace
 /// outside raw-string content (the opening line and the interior lines), empty blank lines (at most one in a row), and
 /// indentation of exactly four spaces per open brace.
 /// A line whose first token is inside an open <c>(</c> or <c>[</c> is a continuation and keeps its author indentation.
-/// Token spacing and line breaks are preserved: this is a layout gate, not a re-printer.
+/// Token spacing and line breaks are preserved: this is a layout formatter, not a re-printer.
 /// </summary>
 public static class LayoutCheck
 {
@@ -27,7 +28,7 @@ public static class LayoutCheck
     public static IReadOnlyList<LayoutIssue> Check(string text)
     {
         var issues = new List<LayoutIssue>();
-        var source = new SourceFile("<fmt>", text);
+        var source = new SourceFile("<layout>", text);
         var tokens = Tokenize(source, issues);
         if (tokens is null)
         {
@@ -153,6 +154,114 @@ public static class LayoutCheck
         }
 
         return issues;
+    }
+
+    /// <summary>
+    /// Returns <paramref name="text"/> rewritten to the canonical layout, or null when the source cannot be tokenized.
+    /// The rewrite applies exactly the rules <see cref="Check"/> reports, and only to layout outside string data, so
+    /// the meaning of the program is preserved.
+    /// </summary>
+    public static string? Canonicalize(string text)
+    {
+        var source = new SourceFile("<layout>", text);
+        var ignoredIssues = new List<LayoutIssue>();
+        var tokens = Tokenize(source, ignoredIssues);
+        if (tokens is null)
+        {
+            return null;
+        }
+
+        var lines = text.Split('\n');
+        var firstTokens = FirstTokensByLine(tokens, source);
+        var stringLines = StringInteriorLines(tokens, source);
+        var rawContentLineEnds = RawStringContentLineEnds(tokens, source);
+        var rawClosingLines = RawStringClosingLines(tokens, source);
+        var stringSpans = StringTextSpansByLine(tokens, source, lines);
+        var endsWithNewline = text.Length == 0 || text.EndsWith('\n');
+        var lastLine = endsWithNewline ? lines.Length - 1 : lines.Length;
+
+        var canonicalLines = new List<string>(lastLine);
+        var previousBlank = false;
+        for (var index = 0; index < lastLine; index++)
+        {
+            var lineNumber = index + 1;
+            var line = lines[index];
+            if (stringLines.Contains(lineNumber))
+            {
+                // A string's interior line is data: every layout rule is skipped.
+                canonicalLines.Add(line);
+                previousBlank = false;
+                continue;
+            }
+
+            var lineEndIsContent = rawContentLineEnds.Contains(lineNumber);
+            if (line.EndsWith('\r') && !lineEndIsContent)
+            {
+                line = line[..^1];
+            }
+
+            if (line.Length == 0)
+            {
+                if (canonicalLines.Count == 0 || previousBlank)
+                {
+                    continue;
+                }
+
+                canonicalLines.Add(line);
+                previousBlank = true;
+                continue;
+            }
+
+            var spans = stringSpans.TryGetValue(lineNumber, out var lineSpans) ? lineSpans : null;
+            var leadingIsContent = IsInsideString(spans, 0) || rawClosingLines.Contains(lineNumber);
+            var indentEnd = 0;
+            while (indentEnd < line.Length && line[indentEnd] is ' ' or '\t')
+            {
+                indentEnd++;
+            }
+
+            if (!leadingIsContent
+                && firstTokens.TryGetValue(lineNumber, out var first)
+                && first.ParenthesisDepth == 0
+                && first.BracketDepth == 0
+                && first.Kind != TokenKind.Dot)
+            {
+                var expectedDepth = first.Kind == TokenKind.RightBrace ? first.BraceDepth - 1 : first.BraceDepth;
+                line = new string(' ', Math.Max(expectedDepth, 0) * IndentWidth) + line[indentEnd..];
+            }
+
+            if (line.Contains('\t'))
+            {
+                line = ExpandLayoutTabs(line, spans);
+            }
+
+            if (!lineEndIsContent)
+            {
+                line = line.TrimEnd(' ', '\t');
+            }
+
+            canonicalLines.Add(line);
+            previousBlank = false;
+        }
+
+        // A trailing blank line is layout whether or not the file ended with a newline.
+        while (canonicalLines.Count > 0 && canonicalLines[^1].Length == 0)
+        {
+            canonicalLines.RemoveAt(canonicalLines.Count - 1);
+        }
+
+        return canonicalLines.Count == 0 ? string.Empty : string.Join('\n', canonicalLines) + '\n';
+    }
+
+    private static string ExpandLayoutTabs(string line, List<(int Start, int End)>? spans)
+    {
+        var builder = new StringBuilder(line.Length);
+        for (var index = 0; index < line.Length; index++)
+        {
+            builder.Append(line[index] == '\t' && !IsInsideString(spans, index) ? ' ' : line[index]);
+        }
+
+        return builder.ToString();
     }
 
     private sealed record LayoutToken(

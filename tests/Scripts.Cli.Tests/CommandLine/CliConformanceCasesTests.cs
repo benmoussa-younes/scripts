@@ -45,7 +45,7 @@ public sealed class CliConformanceCasesTests
     {
         var names = ListCaseNames();
 
-        // CLI-0001..0010: the .cmd corpus. CLI-0011 lives in the json corpus; CLI-0012..0015 are command
+        // CLI-0001..0010: the .cmd corpus. CLI-0011 lives in the json corpus; CLI-0012..0016 are command
         // behaviours covered by the EndToEnd CLI tests, not by this parser corpus.
         Assert.Equal(Enumerable.Range(1, 10).Select(number => $"SCRIPTS-CLI-{number:D4}"), names);
     }

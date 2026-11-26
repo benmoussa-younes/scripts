@@ -28,8 +28,8 @@ public sealed record ExplainCommand(string ScriptPath, bool JsonOut = false) : P
 
 public sealed record DescribeCommand(string? Name = null) : ParsedCommand;
 
-/// <summary><c>scripts format --check script|-</c> (P9c): check the canonical layout of one source file; never rewrites it.</summary>
-public sealed record FormatCommand(string ScriptPath, bool StandardInput) : ParsedCommand;
+/// <summary><c>scripts format [--check] script|-</c> (P9c): rewrite the canonical layout of one source file, or with <c>--check</c> report the violations without writing; the standard input can only be checked.</summary>
+public sealed record FormatCommand(string ScriptPath, bool StandardInput, bool Check) : ParsedCommand;
 
 public sealed record VersionCommand : ParsedCommand;
 

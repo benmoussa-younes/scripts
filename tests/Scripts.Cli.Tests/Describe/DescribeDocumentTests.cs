@@ -405,8 +405,8 @@ public sealed class DescribeDocumentTests
         using var document = Parse();
         var errorCodes = document.RootElement.GetProperty("error_codes").EnumerateArray().ToList();
 
-        Assert.Equal(193, ErrorCatalog.All.Count);
-        Assert.Equal(193, errorCodes.Count);
+        Assert.Equal(194, ErrorCatalog.All.Count);
+        Assert.Equal(194, errorCodes.Count);
         for (var errorIndex = 0; errorIndex < errorCodes.Count; errorIndex++)
         {
             var expected = ErrorCatalog.All[errorIndex];

@@ -1,10 +1,10 @@
 exit: 0
 stream: stdout
-check: len(doc["error_codes"]) == 193
-check: len({e["code"] for e in doc["error_codes"]}) == 193
+check: len(doc["error_codes"]) == 194
+check: len({e["code"] for e in doc["error_codes"]}) == 194
 check: all(list(e.keys()) == ["code", "category", "message", "cause", "suggestion", "position"] or list(e.keys()) == ["code", "category", "message", "cause", "suggestion", "position", "status"] for e in doc["error_codes"])
 check: {e["code"] for e in doc["error_codes"] if e.get("status") == "reserved"} == {"SCRIPTS-PARSE-0036", "SCRIPTS-PARSE-0037", "SCRIPTS-PARSE-0038", "SCRIPTS-TYPE-0060", "SCRIPTS-TYPE-0061"}
-check: {e["code"] for e in doc["error_codes"] if e.get("status") == "retired"} == {"SCRIPTS-LINT-0002", "SCRIPTS-LINT-0008", "SCRIPTS-LINT-0009", "SCRIPTS-PARSE-0050"}
+check: {e["code"] for e in doc["error_codes"] if e.get("status") == "retired"} == {"SCRIPTS-CLI-0015", "SCRIPTS-LINT-0002", "SCRIPTS-LINT-0008", "SCRIPTS-LINT-0009", "SCRIPTS-PARSE-0050"}
 check: all(e["code"].startswith("SCRIPTS-") for e in doc["error_codes"])
 check: {e["category"] for e in doc["error_codes"]} == {"parse", "type", "module", "runtime", "cli", "lint"}
 check: {e["code"] for e in doc["error_codes"]} >= {"SCRIPTS-TYPE-0012", "SCRIPTS-RUNTIME-0018", "SCRIPTS-CLI-0006", "SCRIPTS-PARSE-0001", "SCRIPTS-MODULE-0001", "SCRIPTS-LINT-0002"}

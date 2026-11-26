@@ -205,14 +205,17 @@ public static class CommandLineParser
             }
         }
 
-        if (!checkSeen)
+        if (scriptPath is null)
         {
-            return Reject(ErrorCodes.Cli0015);
+            return Reject(ErrorCodes.Cli0005, ("command", "format"));
         }
 
-        return scriptPath is null
-            ? Reject(ErrorCodes.Cli0005, ("command", "format"))
-            : Accept(new FormatCommand(scriptPath, scriptPath == StandardInputPath));
+        if (!checkSeen && scriptPath == StandardInputPath)
+        {
+            return Reject(ErrorCodes.Cli0016);
+        }
+
+        return Accept(new FormatCommand(scriptPath, scriptPath == StandardInputPath, checkSeen));
     }
 
     /// <summary>

@@ -42,6 +42,7 @@ public sealed class HelpTextTests
     [InlineData("scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]")]
     [InlineData("scripts check [--errors-json] [--deny-warnings] [--fix] [--module] <script.scs>|-")]
     [InlineData("scripts explain [--json-out] <script.scs>")]
+    [InlineData("scripts format [--check] <script.scs>")]
     [InlineData("scripts describe --format json [--name NAME]")]
     [InlineData("scripts --version")]
     [InlineData("scripts --help")]
@@ -63,6 +64,7 @@ public sealed class HelpTextTests
     [InlineData("  --deny-warnings ")]
     [InlineData("  --module ")]
     [InlineData("  -- ")]
+    [InlineData("  --check ")]
     [InlineData("  --format json ")]
     [InlineData("  --version ")]
     [InlineData("  --help ")]
@@ -121,7 +123,8 @@ public sealed class HelpTextTests
     [Fact]
     public void Help_documents_the_script_read_from_the_standard_input()
     {
-        Assert.Contains("\n  -               (run, check) Reads the script from the standard input", HelpText.Full, StringComparison.Ordinal);
+        Assert.Contains("\n  -               (run, check, format --check) Reads the script from the standard input", HelpText.Full, StringComparison.Ordinal);
         Assert.Contains("\n  scripts run - < script.scs ", HelpText.Full, StringComparison.Ordinal);
+        Assert.Contains("\n  scripts format script.scs ", HelpText.Full, StringComparison.Ordinal);
     }
 }

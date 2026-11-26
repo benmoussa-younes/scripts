@@ -171,10 +171,12 @@ public static class ScriptsApplication
         return WriteStandardError(text) ? ExitCodes.ScriptUnreadable : ExitCodes.RuntimeFailure;
     }
 
-    // ----------------------------------------------------------------- check
+    // ----------------------------------------------------------------- format
     /// <summary>
-    /// <c>scripts format --check</c> (P9c): layout only, no code rewriting. Exit 0 when canonical, 251 otherwise, with
-    /// one <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
+    /// <c>scripts format [--check]</c> (P9c): layout only, no token rewriting. Without <c>--check</c> the file is
+    /// rewritten to the canonical layout, and the result is checked again before writing: a rewrite never leaves a
+    /// violation behind. With <c>--check</c> nothing is written, exit 0 when canonical and 251 otherwise, with one
+    /// <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
     /// (SourceReading strips it silently); lexical and source-size errors use the normal 251/252 rendering.
     /// </summary>
     private static int RunFormat(FormatCommand command)
@@ -201,6 +203,17 @@ public static class ScriptsApplication
                 return ReportLoadError(refusal);
             }
 
+            // A rewrite opens the file for writing: the final symbolic link is refused before reading, and the
+            // O_NOFOLLOW open stays the decisive write-time check.
+            if (!command.Check && NoFollowFileWriter.IsFinalSymbolicLink(scriptPath))
+            {
+                return ReportScriptUnreadable(Diagnostics.Create(
+                    ErrorCodes.Cli0014,
+                    null,
+                    new Span(0, 0),
+                    ("reason", NoFollowFileWriter.SymbolicLinkReason)));
+            }
+
             var provider = new FileSystemSourceProvider();
             if (!provider.TryReadBytes(scriptPath, out bytes, out var reason))
             {
@@ -221,17 +234,48 @@ public static class ScriptsApplication
             return ReportLoadError(source.Error);
         }
 
-        var issues = LayoutCheck.Check(source.Source!.Text).ToList();
-        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+        var hasByteOrderMark = bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
+        if (command.Check)
         {
-            issues.Insert(0, new LayoutIssue(1, 1, "UTF-8 byte-order mark is forbidden"));
+            var issues = CheckLayoutIssues(source.Source!.Text, hasByteOrderMark);
+            return issues.Count == 0 ? ExitCodes.Success : ReportLayoutIssues(path, issues);
         }
 
-        if (issues.Count == 0)
+        var canonical = LayoutCheck.Canonicalize(source.Source!.Text);
+        if (canonical is null)
+        {
+            // The lexer refused the source: report its position and write nothing.
+            return ReportLayoutIssues(path, CheckLayoutIssues(source.Source!.Text, hasByteOrderMark));
+        }
+
+        // The rewriter must never write a file that still fails the layout: report instead of claiming success.
+        var remaining = LayoutCheck.Check(canonical);
+        if (remaining.Count > 0)
+        {
+            return ReportLayoutIssues(path, remaining);
+        }
+
+        if (canonical == source.Source!.Text && !hasByteOrderMark)
         {
             return ExitCodes.Success;
         }
 
+        return WriteCanonicalLayout(path, canonical, hasByteOrderMark ? "\uFEFF" + source.Source!.Text : source.Source!.Text);
+    }
+
+    private static List<LayoutIssue> CheckLayoutIssues(string text, bool hasByteOrderMark)
+    {
+        var issues = LayoutCheck.Check(text).ToList();
+        if (hasByteOrderMark)
+        {
+            issues.Insert(0, new LayoutIssue(1, 1, "UTF-8 byte-order mark is forbidden"));
+        }
+
+        return issues;
+    }
+
+    private static int ReportLayoutIssues(string path, IReadOnlyList<LayoutIssue> issues)
+    {
         foreach (var issue in issues)
         {
             if (!WriteStandardError($"{path}:{issue.Line}:{issue.Column}: not canonical: {issue.Message}\n"))
@@ -241,6 +285,35 @@ public static class ScriptsApplication
         }
 
         return ExitCodes.StaticError;
+    }
+
+    private static int WriteCanonicalLayout(string path, string canonical, string originalText)
+    {
+        try
+        {
+            // In-place write (mode and owner preserved). A failed write is rolled back to the original text, so a
+            // disk-full error never leaves a truncated script behind.
+            using var stream = NoFollowFileWriter.OpenAndTruncate(path);
+            try
+            {
+                stream.Write(new UTF8Encoding(false).GetBytes(canonical));
+                stream.Flush(flushToDisk: true);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                TryRestore(stream, originalText);
+                throw;
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            var failure = Diagnostics.Create(ErrorCodes.Cli0014, null, new Span(0, 0), ("reason", exception.Message));
+            return WriteStandardError(DiagnosticReporter.RenderHuman([failure], []))
+                ? ExitCodes.ScriptUnreadable
+                : ExitCodes.RuntimeFailure;
+        }
+
+        return ExitCodes.Success;
     }
 
     private static int RunCheck(CheckCommand command)
@@ -790,7 +863,7 @@ public static class ScriptsApplication
     private static int ReportStaticErrors(IReadOnlyList<Diagnostic> errors, IReadOnlyList<Diagnostic> warnings)
     {
         var text = DiagnosticReporter.RenderHuman(errors, warnings);
-        return WriteStandardError(text) ? ExitCodes.StaticError : ExitCodes.StaticError;
+        return WriteStandardError(text) ? ExitCodes.StaticError : ExitCodes.RuntimeFailure;
     }
 
     private static int InternalError()
