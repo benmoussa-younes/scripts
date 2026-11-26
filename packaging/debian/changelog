@@ -1,3 +1,14 @@
+scripts (0.2.2) unstable; urgency=medium
+
+  * SCRIPTS-LINT-0004 reads a literal basename inside an interpolated
+    program, and no longer warns when the call already has a type or arity
+    error.
+  * The corpus asserts every check warning through tests/Corpus/warnings.txt.
+  * The README documents provenance attestations instead of a detached
+    OpenPGP signature.
+
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Thu, 26 Nov 2026 08:00:00 +0000
+
 scripts (0.2.1) unstable; urgency=medium
 
   * `scripts fmt` is renamed `scripts format`; `fmt` still runs with a
