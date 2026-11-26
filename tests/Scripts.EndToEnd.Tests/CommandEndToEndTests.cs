@@ -1608,6 +1608,50 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Check_module_still_analyzes_the_module_body()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var module = ScriptsProcess.WriteScript(
+                directory,
+                "bad-helper.scs",
+                "public function double(n: integer) -> integer {\n    return \"not an integer\"\n}\n");
+
+            var result = ScriptsProcess.Run("check", "--module", module);
+
+            Assert.Equal(251, result.ExitCode);
+            Assert.Contains("SCRIPTS-TYPE-0012", result.StandardError, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Check_module_refuses_a_top_level_statement()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var program = ScriptsProcess.WriteScript(
+                directory,
+                "program.scs",
+                "io.write_standard_output_line(\"x\")\n");
+
+            var result = ScriptsProcess.Run("check", "--module", program);
+
+            Assert.Equal(251, result.ExitCode);
+            Assert.Contains("SCRIPTS-MODULE-0008", result.StandardError, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_module_accepts_a_module_file_alone()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();

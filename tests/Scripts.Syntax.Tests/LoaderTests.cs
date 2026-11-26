@@ -68,6 +68,23 @@ public sealed class LoaderTests
     }
 
     [Fact]
+    public void A_module_entry_appears_once_in_the_load_order()
+    {
+        var result = ProgramLoader.Load(
+            "/module.scs",
+            Provider(
+                ("/module.scs", "import \"dep.scs\" as dep\npublic function value() -> integer {\n    return dep.answer\n}\n"),
+                ("/dep.scs", "public let answer = 42\n")),
+            isModule: true);
+        Assert.True(result.Error is null, Parsing.Describe(result.Error));
+        var program = result.Program!;
+
+        Assert.True(program.Entry.IsModule);
+        Assert.Equal(["/dep.scs", "/module.scs"], program.AllFilesInLoadOrder().Select(file => file.CanonicalPath));
+        Assert.DoesNotContain(program.Modules, module => module.CanonicalPath == "/module.scs");
+    }
+
+    [Fact]
     public void A_module_imported_twice_is_loaded_once_and_shared()
     {
         var program = LoadOk(
