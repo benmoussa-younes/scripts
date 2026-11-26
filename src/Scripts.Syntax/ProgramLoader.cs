@@ -46,19 +46,19 @@ internal sealed class ModuleLoader
             return new LoadResult(null, unreadable);
         }
 
-        var error = TryLoadFile(entryPath, bytes, isModule, provider.Canonicalize(entryPath), out var entry);
+        var error = TryLoadFile(entryPath, bytes, isModule, provider.Canonicalize(entryPath), out var entry, isEntry: true);
         return error is null ? new LoadResult(new LoadedProgram(entry!, orderedModules), null) : new LoadResult(null, error);
     }
 
     /// <summary>Loads the entry file from bytes already read (standard input): its canonical path is given, not derived.</summary>
     public LoadResult LoadEntryBytes(string entryPath, byte[] bytes, string canonicalPath, bool isModule = false)
     {
-        var error = TryLoadFile(entryPath, bytes, isModule, canonicalPath, out var entry);
+        var error = TryLoadFile(entryPath, bytes, isModule, canonicalPath, out var entry, isEntry: true);
         return error is null ? new LoadResult(new LoadedProgram(entry!, orderedModules), null) : new LoadResult(null, error);
     }
 
     /// <summary>Order per: the import header is parsed, the modules are loaded, then the rest of the file is parsed.</summary>
-    private Diagnostic? TryLoadFile(string path, byte[] bytes, bool isModule, string canonicalPath, out LoadedFile? file)
+    private Diagnostic? TryLoadFile(string path, byte[] bytes, bool isModule, string canonicalPath, out LoadedFile? file, bool isEntry = false)
     {
         file = null;
         var reading = SourceReading.Read(path, bytes);
@@ -102,7 +102,10 @@ internal sealed class ModuleLoader
         if (isModule)
         {
             loadedModules[canonicalPath] = file;
-            orderedModules.Add(file);
+            if (!isEntry)
+            {
+                orderedModules.Add(file);
+            }
         }
 
         return null;
