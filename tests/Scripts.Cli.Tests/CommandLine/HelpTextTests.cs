@@ -40,7 +40,7 @@ public sealed class HelpTextTests
 
     [Theory]
     [InlineData("scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]")]
-    [InlineData("scripts check [--errors-json] [--deny-warnings] [--fix] <script.scs>|-")]
+    [InlineData("scripts check [--errors-json] [--deny-warnings] [--fix] [--module] <script.scs>|-")]
     [InlineData("scripts explain [--json-out] <script.scs>")]
     [InlineData("scripts describe --format json [--name NAME]")]
     [InlineData("scripts --version")]
@@ -59,7 +59,9 @@ public sealed class HelpTextTests
     [InlineData("  help ")]
     [InlineData("  --errors-json ")]
     [InlineData("  --json-out ")]
+    [InlineData("  --no-warnings ")]
     [InlineData("  --deny-warnings ")]
+    [InlineData("  --module ")]
     [InlineData("  -- ")]
     [InlineData("  --format json ")]
     [InlineData("  --version ")]

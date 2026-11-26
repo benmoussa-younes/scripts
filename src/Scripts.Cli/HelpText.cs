@@ -18,7 +18,7 @@ public static class HelpText
         lines.Add(string.Empty);
         lines.Add("USAGE");
         lines.Add("  scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]");
-        lines.Add("  scripts check [--errors-json] [--deny-warnings] [--fix] <script.scs>|-");
+        lines.Add("  scripts check [--errors-json] [--deny-warnings] [--fix] [--module] <script.scs>|-");
         lines.Add("  scripts explain [--json-out] <script.scs>");
         lines.Add("  scripts format --check <script.scs>|-");
         lines.Add("  scripts describe --format json [--name NAME]");
@@ -57,6 +57,8 @@ public static class HelpText
         lines.Add("  --fix           (check) Applies the safe fixes carried by the diagnostics to the script");
         lines.Add("                  file (never to the standard input), then checks it again. A final");
         lines.Add("                  symbolic link is refused.");
+        lines.Add("  --module        (check) Checks the entry as a module: its `public` declarations and");
+        lines.Add("                  imports are allowed; `run`/`explain` still reject a module.");
         lines.Add("  --              (run) End of options; useful if the script is named -x.scs.");
         lines.Add("  -               (run, check) Reads the script from the standard input, up to the end of");
         lines.Add("                  the stream: scripts run - < script.scs.");

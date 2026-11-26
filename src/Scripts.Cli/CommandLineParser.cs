@@ -11,6 +11,7 @@ public static class CommandLineParser
     private const string ErrorsJsonOption = "--errors-json";
     private const string JsonOutOption = "--json-out";
     private const string NoWarningsOption = "--no-warnings";
+    private const string ModuleOption = "--module";
     private const string FixOption = "--fix";
     private const string NameOption = "--name";
     private const string DenyWarningsOption = "--deny-warnings";
@@ -21,7 +22,7 @@ public static class CommandLineParser
     private const string MissingValueText = "<missing>";
 
     private static readonly string[] RunOptions = [ErrorsJsonOption, JsonOutOption, NoWarningsOption];
-    private static readonly string[] CheckOptions = [ErrorsJsonOption, DenyWarningsOption, FixOption];
+    private static readonly string[] CheckOptions = [ErrorsJsonOption, DenyWarningsOption, FixOption, ModuleOption];
     private static readonly string[] ExplainOptions = [JsonOutOption];
 
     public static CommandLineParseResult Parse(IReadOnlyList<string> commandLineArguments)
@@ -38,8 +39,7 @@ public static class CommandLineParser
             "check" => ParseScriptCommand(commandLineArguments, "check", CheckOptions),
             "explain" => ParseScriptCommand(commandLineArguments, "explain", ExplainOptions),
             "describe" => ParseDescribe(commandLineArguments),
-            "format" => ParseFormat(commandLineArguments, legacyAlias: false),
-            "fmt" => ParseFormat(commandLineArguments, legacyAlias: true),
+            "format" => ParseFormat(commandLineArguments),
             "--version" => ParseStandalone(commandLineArguments, new VersionCommand()),
             "--help" or "help" => ParseStandalone(commandLineArguments, new HelpCommand()),
             _ => Reject(ErrorCodes.Cli0002, ("command", commandName)),
@@ -131,7 +131,7 @@ public static class CommandLineParser
         return commandName == "check"
             ? Accept(new CheckCommand(
                 seenOptions.Contains(ErrorsJsonOption), seenOptions.Contains(DenyWarningsOption), scriptPath, standardInput,
-                seenOptions.Contains(FixOption)))
+                seenOptions.Contains(FixOption), seenOptions.Contains(ModuleOption)))
             : Accept(new ExplainCommand(scriptPath, seenOptions.Contains(JsonOutOption)));
     }
 
@@ -169,9 +169,9 @@ public static class CommandLineParser
 
     /// <summary>
     /// <c>scripts format --check script|-</c> (P9c): the layout check takes one script or the standard input and the
-    /// mandatory <c>--check</c>; it never rewrites the file. <c>fmt</c> is the deprecated alias of the same command.
+    /// mandatory <c>--check</c>; it never rewrites the file.
     /// </summary>
-    private static CommandLineParseResult ParseFormat(IReadOnlyList<string> commandLineArguments, bool legacyAlias)
+    private static CommandLineParseResult ParseFormat(IReadOnlyList<string> commandLineArguments)
     {
         var checkSeen = false;
         string? scriptPath = null;
@@ -212,7 +212,7 @@ public static class CommandLineParser
 
         return scriptPath is null
             ? Reject(ErrorCodes.Cli0005, ("command", "format"))
-            : Accept(new FormatCommand(scriptPath, scriptPath == StandardInputPath, legacyAlias));
+            : Accept(new FormatCommand(scriptPath, scriptPath == StandardInputPath));
     }
 
     /// <summary>

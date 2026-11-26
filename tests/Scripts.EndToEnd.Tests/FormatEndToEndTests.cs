@@ -6,7 +6,7 @@ namespace Scripts.EndToEnd.Tests;
 public sealed class FormatEndToEndTests
 {
     [Fact]
-    public void The_fmt_alias_runs_the_check_and_warns_on_the_standard_error()
+    public void The_fmt_alias_is_removed()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();
         try
@@ -18,10 +18,9 @@ public sealed class FormatEndToEndTests
 
             var result = ScriptsProcess.Run("fmt", "--check", script);
 
-            Assert.Equal(0, result.ExitCode);
+            Assert.Equal(250, result.ExitCode);
             Assert.Equal(string.Empty, result.StandardOutput);
-            Assert.Contains("`scripts fmt` is deprecated", result.StandardError, StringComparison.Ordinal);
-            Assert.Contains("use `scripts format`", result.StandardError, StringComparison.Ordinal);
+            Assert.Contains("unknown command: `fmt`", result.StandardError, StringComparison.Ordinal);
         }
         finally
         {

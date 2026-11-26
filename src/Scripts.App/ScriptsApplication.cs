@@ -91,7 +91,7 @@ public static class ScriptsApplication
 
     // ----------------------------------------------------------------- source loading
 
-    private static LoadResult LoadProgram(string scriptPath, bool standardInput)
+    private static LoadResult LoadProgram(string scriptPath, bool standardInput, bool isModule = false)
     {
         if (!standardInput)
         {
@@ -101,14 +101,14 @@ public static class ScriptsApplication
                 return new LoadResult(null, refusal);
             }
 
-            return ProgramLoader.Load(scriptPath, new FileSystemSourceProvider());
+            return ProgramLoader.Load(scriptPath, new FileSystemSourceProvider(), isModule);
         }
 
         // DESIGN §9: `-` reads the entry script from the standard input, up to the source size limit plus one byte so
         // that the loader can report an oversized source; a closed stream is an empty (valid) script.
         var reading = ReadScriptFromStandardInput();
         return reading.Succeeded
-            ? ProgramLoader.LoadStandardInput(reading.Bytes, new FileSystemSourceProvider())
+            ? ProgramLoader.LoadStandardInput(reading.Bytes, new FileSystemSourceProvider(), isModule)
             : new LoadResult(null, Diagnostics.Create(ErrorCodes.Cli0010, null, default, ("reason", reading.FailureReason)));
     }
 
@@ -179,11 +179,6 @@ public static class ScriptsApplication
     /// </summary>
     private static int RunFormat(FormatCommand command)
     {
-        if (command.LegacyAlias)
-        {
-            WriteStandardError("warning: `scripts fmt` is deprecated; use `scripts format`\n");
-        }
-
         byte[] bytes;
         string path;
         if (command.StandardInput)
@@ -289,7 +284,7 @@ public static class ScriptsApplication
                 : ExitCodes.RuntimeFailure;
         }
 
-        var loaded = LoadProgram(command.ScriptPath, command.StandardInput);
+        var loaded = LoadProgram(command.ScriptPath, command.StandardInput, command.Module);
         var applied = 0;
 
         // A syntax error may carry a safe fix too (L6: `{{` in a string). The parser stops at the first error, so the
@@ -313,7 +308,7 @@ public static class ScriptsApplication
             }
 
             applied += appliedToSyntax;
-            loaded = LoadProgram(command.ScriptPath, false);
+            loaded = LoadProgram(command.ScriptPath, false, command.Module);
             // A fix that rewrites the same text would loop forever: stop as soon as the entry did not change.
             if (loaded.Error?.Fix?.File?.Text == textBefore)
             {
@@ -364,7 +359,7 @@ public static class ScriptsApplication
 
             if (appliedToProgram > 0)
             {
-                var reloaded = LoadProgram(command.ScriptPath, false);
+                var reloaded = LoadProgram(command.ScriptPath, false, command.Module);
                 if (reloaded.Error is not null)
                 {
                     if (command.ErrorsJson)

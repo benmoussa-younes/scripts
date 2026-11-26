@@ -10,15 +10,16 @@ public static class ProgramLoader
     /// <summary>Name of the entry file read from standard input: the `file` of its diagnostics (DESIGN §9).</summary>
     public const string StandardInputSourceName = "<stdin>";
 
-    public static LoadResult Load(string entryPath, ISourceProvider provider) => new ModuleLoader(provider).Load(entryPath);
+    public static LoadResult Load(string entryPath, ISourceProvider provider, bool isModule = false) =>
+        new ModuleLoader(provider).Load(entryPath, isModule);
 
     /// <summary>
     /// Loading phase of DESIGN §9 for `scripts run -` / `scripts check -`: the bytes of standard input are the entry file.
     /// The entry is named <see cref="StandardInputSourceName"/> and has no canonical path (the empty string); its
     /// imports resolve against the current working directory at load time.
     /// </summary>
-    public static LoadResult LoadStandardInput(byte[] bytes, ISourceProvider provider) =>
-        new ModuleLoader(provider).LoadEntryBytes(StandardInputSourceName, bytes, canonicalPath: string.Empty);
+    public static LoadResult LoadStandardInput(byte[] bytes, ISourceProvider provider, bool isModule = false) =>
+        new ModuleLoader(provider).LoadEntryBytes(StandardInputSourceName, bytes, canonicalPath: string.Empty, isModule);
 }
 
 internal sealed class ModuleLoader
@@ -37,7 +38,7 @@ internal sealed class ModuleLoader
 
     private sealed record ActiveFile(string CanonicalPath, string Path);
 
-    public LoadResult Load(string entryPath)
+    public LoadResult Load(string entryPath, bool isModule = false)
     {
         if (!provider.TryReadBytes(entryPath, out var bytes, out var reason))
         {
@@ -45,14 +46,14 @@ internal sealed class ModuleLoader
             return new LoadResult(null, unreadable);
         }
 
-        var error = TryLoadFile(entryPath, bytes, isModule: false, provider.Canonicalize(entryPath), out var entry);
+        var error = TryLoadFile(entryPath, bytes, isModule, provider.Canonicalize(entryPath), out var entry);
         return error is null ? new LoadResult(new LoadedProgram(entry!, orderedModules), null) : new LoadResult(null, error);
     }
 
     /// <summary>Loads the entry file from bytes already read (standard input): its canonical path is given, not derived.</summary>
-    public LoadResult LoadEntryBytes(string entryPath, byte[] bytes, string canonicalPath)
+    public LoadResult LoadEntryBytes(string entryPath, byte[] bytes, string canonicalPath, bool isModule = false)
     {
-        var error = TryLoadFile(entryPath, bytes, isModule: false, canonicalPath, out var entry);
+        var error = TryLoadFile(entryPath, bytes, isModule, canonicalPath, out var entry);
         return error is null ? new LoadResult(new LoadedProgram(entry!, orderedModules), null) : new LoadResult(null, error);
     }
 

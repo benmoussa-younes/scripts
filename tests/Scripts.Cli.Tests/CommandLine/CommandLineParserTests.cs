@@ -42,7 +42,7 @@ public sealed class CommandLineParserTests
 
         Assert.Equal("SCRIPTS-CLI-0002", diagnostic.Code);
         Assert.Equal($"unknown command: `{firstArgument}`", diagnostic.Message);
-        Assert.Equal("available commands: run, check, explain, fmt, describe, help", diagnostic.Suggestion);
+        Assert.Equal("available commands: run, check, format, explain, describe, help", diagnostic.Suggestion);
     }
 
     [Fact]
@@ -71,10 +71,10 @@ public sealed class CommandLineParserTests
     }
 
     [Theory]
-    [InlineData("check", "--json-out", "--errors-json, --deny-warnings, --fix")]
+    [InlineData("check", "--json-out", "--errors-json, --deny-warnings, --fix, --module")]
     [InlineData("explain", "--errors-json", "--json-out")]
     [InlineData("run", "-x.scs", "--errors-json, --json-out, --no-warnings")]
-    [InlineData("check", "-x", "--errors-json, --deny-warnings, --fix")]
+    [InlineData("check", "-x", "--errors-json, --deny-warnings, --fix, --module")]
     [InlineData("run", "--deny-warnings", "--errors-json, --json-out, --no-warnings")]
     [InlineData("explain", "--deny-warnings", "--json-out")]
     [InlineData("describe", "--verbose", "--format, --name")]
@@ -428,10 +428,18 @@ public sealed class CommandLineParserTests
     }
 
     [Fact]
-    public void Fmt_is_the_deprecated_alias_of_format()
+    public void Fmt_is_no_longer_a_command()
     {
-        Assert.Equal(new FormatCommand("s.scs", false, LegacyAlias: true), Accepted("fmt", "--check", "s.scs"));
-        Assert.Equal("SCRIPTS-CLI-0015", Rejected("fmt", "s.scs").Code);
+        Assert.Equal("SCRIPTS-CLI-0002", Rejected("fmt", "--check", "s.scs").Code);
+        Assert.Equal("SCRIPTS-CLI-0002", Rejected("fmt", "s.scs").Code);
+    }
+
+    [Fact]
+    public void Check_module_is_accepted_before_the_script_only()
+    {
+        var command = Assert.IsType<CheckCommand>(Accepted("check", "--module", "m.scs"));
+        Assert.True(command.Module);
+        Assert.Equal("SCRIPTS-CLI-0004", Rejected("check", "m.scs", "--module").Code);
     }
 
     [Fact]

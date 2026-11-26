@@ -1608,6 +1608,72 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Check_module_accepts_a_module_file_alone()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var module = ScriptsProcess.WriteScript(
+                directory,
+                "helper.scs",
+                "public function double(n: integer) -> integer {\n    return n * 2\n}\n");
+
+            var program = ScriptsProcess.Run("check", module);
+            Assert.Equal(251, program.ExitCode);
+            Assert.Contains("SCRIPTS-PARSE-0049", program.StandardError, StringComparison.Ordinal);
+            Assert.Contains("scripts check --module", program.StandardError, StringComparison.Ordinal);
+
+            var checkedModule = ScriptsProcess.Run("check", "--module", module);
+            Assert.Equal(0, checkedModule.ExitCode);
+            Assert.Equal(string.Empty, checkedModule.StandardError);
+
+            var json = ScriptsProcess.Run("check", "--module", "--errors-json", module);
+            Assert.Equal(0, json.ExitCode);
+            using var document = JsonDocument.Parse(json.StandardOutput);
+            Assert.True(document.RootElement.GetProperty("success").GetBoolean());
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void Run_no_warnings_keeps_the_errors_and_the_json_warnings()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            // A static error (list<integer> where list<string> is expected) and a warning (bash) on the same call.
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "error-and-warning.scs",
+                "let outcome = process.run(process.request(\"bash\", [42]))?\nio.write_standard_output_line(outcome.standard_output)");
+
+            var noisy = ScriptsProcess.Run("run", script);
+            Assert.Equal(251, noisy.ExitCode);
+            Assert.Contains("error[SCRIPTS-TYPE-0012]", noisy.StandardError, StringComparison.Ordinal);
+            Assert.Contains("warning[SCRIPTS-LINT-0001]", noisy.StandardError, StringComparison.Ordinal);
+
+            var quiet = ScriptsProcess.Run("run", "--no-warnings", script);
+            Assert.Equal(251, quiet.ExitCode);
+            Assert.Contains("error[SCRIPTS-TYPE-0012]", quiet.StandardError, StringComparison.Ordinal);
+            Assert.DoesNotContain("warning[SCRIPTS-LINT-0001]", quiet.StandardError, StringComparison.Ordinal);
+
+            var json = ScriptsProcess.Run("run", "--errors-json", "--no-warnings", script);
+            Assert.Equal(251, json.ExitCode);
+            var lastLine = json.StandardError.Split('\n', StringSplitOptions.RemoveEmptyEntries).Last();
+            using var document = JsonDocument.Parse(lastLine);
+            Assert.NotEmpty(document.RootElement.GetProperty("warnings").EnumerateArray());
+            Assert.NotEmpty(document.RootElement.GetProperty("errors").EnumerateArray());
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_deny_warnings_fails_on_a_warning_and_keeps_it_in_warnings()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();

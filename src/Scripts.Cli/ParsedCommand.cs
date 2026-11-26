@@ -21,18 +21,15 @@ public sealed record RunCommand(
     bool NoWarnings = false) : ParsedCommand;
 
 /// <summary><c>scripts check [--errors-json] [--deny-warnings] [--fix] script|-</c>; a bare <c>-</c> reads the script from the standard input, which <c>--fix</c> cannot rewrite.</summary>
-public sealed record CheckCommand(bool ErrorsJson, bool DenyWarnings, string ScriptPath, bool StandardInput, bool Fix = false) : ParsedCommand;
+public sealed record CheckCommand(bool ErrorsJson, bool DenyWarnings, string ScriptPath, bool StandardInput, bool Fix = false, bool Module = false) : ParsedCommand;
 
 /// <summary><c>scripts explain [--json-out] script</c>; <c>--json-out</c> asks for the machine document (DESIGN §9).</summary>
 public sealed record ExplainCommand(string ScriptPath, bool JsonOut = false) : ParsedCommand;
 
 public sealed record DescribeCommand(string? Name = null) : ParsedCommand;
 
-/// <summary>
-/// <c>scripts format --check script|-</c> (P9c): check the canonical layout of one source file; never rewrites it.
-/// <c>fmt</c> is the deprecated alias, marked so the run can warn.
-/// </summary>
-public sealed record FormatCommand(string ScriptPath, bool StandardInput, bool LegacyAlias = false) : ParsedCommand;
+/// <summary><c>scripts format --check script|-</c> (P9c): check the canonical layout of one source file; never rewrites it.</summary>
+public sealed record FormatCommand(string ScriptPath, bool StandardInput) : ParsedCommand;
 
 public sealed record VersionCommand : ParsedCommand;
 

@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `scripts run --no-warnings` hides the human warning block on stderr; errors
   still print, and `--json-out`/`--errors-json` keep the warnings in their JSON.
   `check` is unchanged.
+- `scripts check --module` checks a module file on its own: `public`
+  declarations and imports are allowed, and the entry is not treated as a
+  program. `check` alone still refuses a module, and `run`/`explain` still
+  reject it.
+
+### Changed
+
+- The deprecated `fmt` alias is removed; use `scripts format --check`.
 
 ## [0.2.2] - 2026-11-26
 
