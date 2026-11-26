@@ -6,16 +6,19 @@ namespace Scripts.Cli;
 public abstract record ParsedCommand;
 
 /// <summary>
-/// <c>scripts run [--errors-json] [--json-out] [--] script|- [arguments…]</c>; <c>ScriptArguments</c> is everything after
-/// the script, verbatim. A bare <c>-</c> (or <c>--</c> followed by <c>-</c>) reads the script from the standard input
-/// (DESIGN §9): <c>StandardInput</c> is then true and <c>ScriptPath</c> stays <c>"-"</c> only as the token that was read.
+/// <c>scripts run [--errors-json] [--json-out] [--no-warnings] [--] script|- [arguments…]</c>; <c>ScriptArguments</c> is
+/// everything after the script, verbatim. A bare <c>-</c> (or <c>--</c> followed by <c>-</c>) reads the script from the
+/// standard input (DESIGN §9): <c>StandardInput</c> is then true and <c>ScriptPath</c> stays <c>"-"</c> only as the token
+/// that was read. <c>NoWarnings</c> hides the human warning block only: errors always print, and the JSON documents keep
+/// the warnings.
 /// </summary>
 public sealed record RunCommand(
     bool ErrorsJson,
     bool JsonOut,
     string ScriptPath,
     bool StandardInput,
-    IReadOnlyList<string> ScriptArguments) : ParsedCommand;
+    IReadOnlyList<string> ScriptArguments,
+    bool NoWarnings = false) : ParsedCommand;
 
 /// <summary><c>scripts check [--errors-json] [--deny-warnings] [--fix] script|-</c>; a bare <c>-</c> reads the script from the standard input, which <c>--fix</c> cannot rewrite.</summary>
 public sealed record CheckCommand(bool ErrorsJson, bool DenyWarnings, string ScriptPath, bool StandardInput, bool Fix = false) : ParsedCommand;

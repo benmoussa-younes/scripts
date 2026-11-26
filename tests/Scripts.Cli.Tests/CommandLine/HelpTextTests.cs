@@ -39,7 +39,7 @@ public sealed class HelpTextTests
     }
 
     [Theory]
-    [InlineData("scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]")]
+    [InlineData("scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]")]
     [InlineData("scripts check [--errors-json] [--deny-warnings] [--fix] <script.scs>|-")]
     [InlineData("scripts explain [--json-out] <script.scs>")]
     [InlineData("scripts describe --format json [--name NAME]")]

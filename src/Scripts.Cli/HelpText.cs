@@ -17,7 +17,7 @@ public static class HelpText
         lines.Add("Statically typed system scripting language for Linux, interpreted by one native binary.");
         lines.Add(string.Empty);
         lines.Add("USAGE");
-        lines.Add("  scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]");
+        lines.Add("  scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]");
         lines.Add("  scripts check [--errors-json] [--deny-warnings] [--fix] <script.scs>|-");
         lines.Add("  scripts explain [--json-out] <script.scs>");
         lines.Add("  scripts format --check <script.scs>|-");
@@ -28,7 +28,7 @@ public static class HelpText
         lines.Add(string.Empty);
         lines.Add("COMMANDS");
         lines.Add("  run       Checks then runs the script; nothing runs if a static error exists (code");
-        lines.Add("            251). Warnings are printed even on success.");
+        lines.Add("            251). Warnings are printed even on success, unless --no-warnings.");
         lines.Add("  check     Analyzes the script without running it: syntax, types, calls, imports,");
         lines.Add("            visibility, mutability, returns, exhaustiveness and warnings. Code 0 if");
         lines.Add("            valid, 251 otherwise.");
@@ -50,6 +50,8 @@ public static class HelpText
         lines.Add("                  stderr, result, errors, warnings.");
         lines.Add("                  explain: schema_version, command, script, steps (depth, kind,");
         lines.Add("                  text, destructive, dangerous, line, column), errors, warnings.");
+        lines.Add("  --no-warnings   (run) No warning block on stderr; errors still print, and the JSON");
+        lines.Add("                  documents keep the warnings. `check` is unchanged.");
         lines.Add("  --deny-warnings (check) Fail with code 251 as soon as the script has a warning, as if");
         lines.Add("                  the warning were a static error; the warning rendering is unchanged.");
         lines.Add("  --fix           (check) Applies the safe fixes carried by the diagnostics to the script");

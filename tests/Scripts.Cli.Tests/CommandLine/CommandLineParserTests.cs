@@ -66,16 +66,16 @@ public sealed class CommandLineParserTests
         Assert.Equal("SCRIPTS-CLI-0003", diagnostic.Code);
         Assert.Equal("option `--verbose` unknown or not accepted by `scripts run`", diagnostic.Message);
         Assert.Equal(
-            "options accepted by `scripts run`: --errors-json, --json-out; for a script starting with `-`, write `./-x.scs`",
+            "options accepted by `scripts run`: --errors-json, --json-out, --no-warnings; for a script starting with `-`, write `./-x.scs`",
             diagnostic.Suggestion);
     }
 
     [Theory]
     [InlineData("check", "--json-out", "--errors-json, --deny-warnings, --fix")]
     [InlineData("explain", "--errors-json", "--json-out")]
-    [InlineData("run", "-x.scs", "--errors-json, --json-out")]
+    [InlineData("run", "-x.scs", "--errors-json, --json-out, --no-warnings")]
     [InlineData("check", "-x", "--errors-json, --deny-warnings, --fix")]
-    [InlineData("run", "--deny-warnings", "--errors-json, --json-out")]
+    [InlineData("run", "--deny-warnings", "--errors-json, --json-out, --no-warnings")]
     [InlineData("explain", "--deny-warnings", "--json-out")]
     [InlineData("describe", "--verbose", "--format, --name")]
     [InlineData("describe", "--json-out", "--format, --name")]
@@ -92,6 +92,7 @@ public sealed class CommandLineParserTests
     [Theory]
     [InlineData("run", "--errors-json")]
     [InlineData("run", "--json-out")]
+    [InlineData("run", "--no-warnings")]
     public void Scripts_option_after_the_script_of_run_is_cli_0004(string command, string option)
     {
         var diagnostic = Rejected(command, "script.scs", option);
@@ -267,7 +268,17 @@ public sealed class CommandLineParserTests
         Assert.Equal(jsonOut, command.JsonOut);
         Assert.Equal(expectedScript, command.ScriptPath);
         Assert.False(command.StandardInput);
+        Assert.False(command.NoWarnings);
         Assert.Empty(command.ScriptArguments);
+    }
+
+    [Fact]
+    public void Run_no_warnings_is_accepted_before_the_script_only()
+    {
+        var command = Assert.IsType<RunCommand>(Accepted("run", "--no-warnings", "script.scs"));
+        Assert.True(command.NoWarnings);
+        Assert.Equal("SCRIPTS-CLI-0004", Rejected("run", "script.scs", "--no-warnings").Code);
+        Assert.Equal("SCRIPTS-CLI-0003", Rejected("check", "--no-warnings", "script.scs").Code);
     }
 
     public static TheoryData<string[]> BothOutputFlagsCases => new()

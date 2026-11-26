@@ -551,7 +551,7 @@ public static class ScriptsApplication
         var check = ProgramChecker.Check(loaded.Program!);
         if (check.Errors.Count > 0)
         {
-            var exitCode = ReportStaticErrors(check.Errors, check.Warnings);
+            var exitCode = ReportStaticErrors(check.Errors, command.NoWarnings ? Array.Empty<Diagnostic>() : check.Warnings);
             if (command.ErrorsJson)
             {
                 WriteErrorsJsonLine(check.Errors, check.Warnings);
@@ -560,7 +560,7 @@ public static class ScriptsApplication
             return exitCode;
         }
 
-        if (check.Warnings.Count > 0)
+        if (!command.NoWarnings && check.Warnings.Count > 0)
         {
             WriteStandardError(DiagnosticReporter.RenderHuman([], check.Warnings));
         }

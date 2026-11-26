@@ -10,6 +10,7 @@ public static class CommandLineParser
 {
     private const string ErrorsJsonOption = "--errors-json";
     private const string JsonOutOption = "--json-out";
+    private const string NoWarningsOption = "--no-warnings";
     private const string FixOption = "--fix";
     private const string NameOption = "--name";
     private const string DenyWarningsOption = "--deny-warnings";
@@ -19,7 +20,7 @@ public static class CommandLineParser
     private const string StandardInputPath = "-";
     private const string MissingValueText = "<missing>";
 
-    private static readonly string[] RunOptions = [ErrorsJsonOption, JsonOutOption];
+    private static readonly string[] RunOptions = [ErrorsJsonOption, JsonOutOption, NoWarningsOption];
     private static readonly string[] CheckOptions = [ErrorsJsonOption, DenyWarningsOption, FixOption];
     private static readonly string[] ExplainOptions = [JsonOutOption];
 
@@ -162,7 +163,8 @@ public static class CommandLineParser
             seenOptions.Contains(JsonOutOption),
             scriptPath,
             standardInput,
-            trailingArguments));
+            trailingArguments,
+            seenOptions.Contains(NoWarningsOption)));
     }
 
     /// <summary>

@@ -1565,6 +1565,49 @@ public sealed class CommandEndToEndTests
     }
 
     [Fact]
+    public void Run_no_warnings_hides_the_human_warning_but_every_json_document_keeps_it()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            // `process.request("bash", …)` triggers SCRIPTS-LINT-0001 and still runs.
+            var script = ScriptsProcess.WriteScript(
+                directory,
+                "warn.scs",
+                "let outcome = process.run(process.request(\"bash\", [\"-c\", \"printf ok\"]))?\nio.write_standard_output_line(outcome.standard_output)");
+
+            var noisy = ScriptsProcess.Run("run", script);
+            Assert.Equal(0, noisy.ExitCode);
+            Assert.Equal("ok\n", noisy.StandardOutput);
+            Assert.Contains("warning[SCRIPTS-LINT-0001]", noisy.StandardError, StringComparison.Ordinal);
+
+            var quiet = ScriptsProcess.Run("run", "--no-warnings", script);
+            Assert.Equal(0, quiet.ExitCode);
+            Assert.Equal("ok\n", quiet.StandardOutput);
+            Assert.DoesNotContain("warning[SCRIPTS-LINT-0001]", quiet.StandardError, StringComparison.Ordinal);
+
+            var jsonOut = ScriptsProcess.Run("run", "--json-out", "--no-warnings", script);
+            Assert.Equal(0, jsonOut.ExitCode);
+            using var jsonDocument = JsonDocument.Parse(jsonOut.StandardOutput);
+            Assert.NotEmpty(jsonDocument.RootElement.GetProperty("warnings").EnumerateArray());
+
+            var errorsJson = ScriptsProcess.Run("run", "--errors-json", "--no-warnings", script);
+            Assert.Equal(0, errorsJson.ExitCode);
+            var lastLine = errorsJson.StandardError.Split('\n', StringSplitOptions.RemoveEmptyEntries).Last();
+            using var errorsDocument = JsonDocument.Parse(lastLine);
+            Assert.NotEmpty(errorsDocument.RootElement.GetProperty("warnings").EnumerateArray());
+
+            var checkedResult = ScriptsProcess.Run("check", script);
+            Assert.Equal(0, checkedResult.ExitCode);
+            Assert.Contains("warning[SCRIPTS-LINT-0001]", checkedResult.StandardError, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Check_deny_warnings_fails_on_a_warning_and_keeps_it_in_warnings()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();
