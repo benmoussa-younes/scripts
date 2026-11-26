@@ -5,21 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-11-26
 
 ### Added
 
 - `scripts run --no-warnings` hides the human warning block on stderr; errors
-  still print, and `--json-out`/`--errors-json` keep the warnings in their JSON.
-  `check` is unchanged.
+  still print, and `--json-out`/`--errors-json` keep the warnings in their
+  JSON. The hidden block includes the launcher lints `SCRIPTS-LINT-0001` and
+  `SCRIPTS-LINT-0004`; `check` is unchanged.
 - `scripts check --module` checks a module file on its own: `public`
   declarations and imports are allowed, and the entry is not treated as a
-  program. `check` alone still refuses a module, and `run`/`explain` still
-  reject it.
+  program. Top-level statements are refused with `SCRIPTS-MODULE-0008`.
+- `scripts format <file>` rewrites the file to the canonical layout (LF, no
+  BOM, final newline, no tab or trailing space, four spaces per open brace);
+  `format --check` reports without writing, and the rewrite is idempotent.
+  A final symbolic link is refused, and the standard input can only be checked.
+
+### Removed
+
+- The deprecated `fmt` alias is removed: `scripts fmt` is an unknown command
+  (`SCRIPTS-CLI-0002`). Use `scripts format`.
 
 ### Changed
 
-- The deprecated `fmt` alias is removed; use `scripts format --check`.
+- `scripts format` without `--check` now rewrites the file; `--check` keeps
+  the reporting behavior. `SCRIPTS-CLI-0015` is retired, and a rewrite of the
+  standard input is `SCRIPTS-CLI-0016`. A file that declares `public` is
+  refused by `check`, `run` and `explain`; `check --module` is the mode that
+  accepts it.
+- NuGet restore is locked: one `packages.lock.json` per project and
+  `RestoreLockedMode`; a stale lock fails the build with `NU1004`, and the CI
+  cache keys on the locks.
+- The gate runs `shellcheck -S warning` on the packaging and tooling scripts.
+
+### Fixed
+
+- `check --module` analyzes the entry module once instead of twice; the
+  duplicate analysis was invisible because identical diagnostics are
+  deduplicated.
+- The `SCRIPTS-PARSE-0049` suggestion only sends a file that is a module to
+  `check --module`, not one with a misplaced `public`.
 
 ## [0.2.2] - 2026-11-26
 
@@ -163,6 +188,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   at Core v0.1.1 (security release) under LGPL-3.0-or-later; the JSON codecs
   are local GPL-3.0-or-later adaptations.
 
+[Unreleased]: https://github.com/benmoussa-younes/scripts/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/benmoussa-younes/scripts/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/benmoussa-younes/scripts/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/benmoussa-younes/scripts/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.2.0
 [0.1.2]: https://github.com/benmoussa-younes/scripts/releases/tag/v0.1.2

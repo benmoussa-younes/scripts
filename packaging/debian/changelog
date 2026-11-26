@@ -1,3 +1,19 @@
+scripts (0.3.0) unstable; urgency=medium
+
+  * `scripts format <file>` rewrites the file to the canonical layout (LF,
+    no BOM, final newline, no tab or trailing space, four spaces per open
+    brace); `--check` reports without writing, and the rewrite is idempotent.
+  * `scripts run --no-warnings` hides the human warning block; errors still
+    print, and the JSON documents keep the warnings.
+  * `scripts check --module` checks a module on its own; without the flag a
+    file that declares `public` is refused, and top-level statements are
+    refused with SCRIPTS-MODULE-0008.
+  * `scripts fmt` is removed: the command is `scripts format`.
+  * NuGet restore is locked (packages.lock.json, RestoreLockedMode), and the
+    gate runs shellcheck on the packaging and tooling scripts.
+
+ -- Younes BENMOUSSA <younes.benmoussa@pm.me>  Thu, 26 Nov 2026 18:00:00 +0000
+
 scripts (0.2.2) unstable; urgency=medium
 
   * SCRIPTS-LINT-0004 reads a literal basename inside an interpolated
