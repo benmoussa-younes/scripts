@@ -9,5 +9,5 @@ warning[SCRIPTS-LINT-0001]: the program `/bin/sh` is an interpreter or a launche
     |
  11 | let noisy = process.run(process.request("/bin/sh", ["-c", "echo boom >&2; exit 3"]))?
     |                                         ^^^^^^^^^
-    = cause: `process.request` or `process.spawn` receives a literal program whose basename ∈ {`sh bash dash zsh csh scripts ksh tcsh env xargs busybox python python3 perl ruby node`}
+    = cause: `process.request` or `process.spawn` receives a program whose basename ∈ {`sh bash dash zsh csh scripts ksh tcsh env xargs busybox python python3 perl ruby node`}; the basename is a literal string, or the literal tail of an interpolated string after its last `/`
     = suggestion: call the program you meant directly, with its arguments: `process.run(process.request(program, […]))`

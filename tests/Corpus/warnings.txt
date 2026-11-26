@@ -1,0 +1,41 @@
+# Every `scripts check` warning of tests/Corpus, one per line:
+#   entry|file|line|code
+# A new or removed warning updates this file; Every_corpus_warning_is_in_the_expected_set fails otherwise.
+base/environment/child.scs|child.scs|2|SCRIPTS-LINT-0001
+base/modules/std_filesystem.scs|std_filesystem.scs|19|SCRIPTS-LINT-0011
+base/modules/std_parallel.scs|std_parallel.scs|42|SCRIPTS-LINT-0001
+base/modules/std_parallel.scs|std_parallel.scs|43|SCRIPTS-LINT-0001
+base/strings/strings_literal_dollar.scs|strings_literal_dollar.scs|2|SCRIPTS-LINT-0003
+differential/05-dollar-var.scs|05-dollar-var.scs|5|SCRIPTS-LINT-0003
+errors/SCRIPTS-LINT-0001.scs|SCRIPTS-LINT-0001.scs|2|SCRIPTS-LINT-0001
+errors/SCRIPTS-LINT-0003.scs|SCRIPTS-LINT-0003.scs|2|SCRIPTS-LINT-0003
+errors/SCRIPTS-LINT-0004.scs|SCRIPTS-LINT-0004.scs|3|SCRIPTS-LINT-0004
+errors/SCRIPTS-LINT-0005.scs|SCRIPTS-LINT-0005.scs|2|SCRIPTS-LINT-0005
+errors/SCRIPTS-LINT-0006.scs|SCRIPTS-LINT-0006.scs|2|SCRIPTS-LINT-0006
+errors/SCRIPTS-LINT-0007.scs|SCRIPTS-LINT-0007.scs|2|SCRIPTS-LINT-0007
+errors/SCRIPTS-LINT-0010.scs|SCRIPTS-LINT-0010.scs|2|SCRIPTS-LINT-0010
+errors/SCRIPTS-LINT-0011.scs|SCRIPTS-LINT-0011.scs|2|SCRIPTS-LINT-0011
+errors/SCRIPTS-LINT-0012.scs|SCRIPTS-LINT-0012.scs|4|SCRIPTS-LINT-0012
+errors/SCRIPTS-LINT-0013.scs|SCRIPTS-LINT-0013.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-LINT-0014.scs|SCRIPTS-LINT-0014.scs|3|SCRIPTS-LINT-0014
+errors/SCRIPTS-RUNTIME-0001.scs|SCRIPTS-RUNTIME-0001.scs|3|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0002.scs|SCRIPTS-RUNTIME-0002.scs|3|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0003.scs|SCRIPTS-RUNTIME-0003.scs|3|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0004.scs|SCRIPTS-RUNTIME-0004.scs|3|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0005.scs|SCRIPTS-RUNTIME-0005.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0006.scs|SCRIPTS-RUNTIME-0006.scs|3|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0007.scs|SCRIPTS-RUNTIME-0007.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0009.scs|SCRIPTS-RUNTIME-0009.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0010.scs|SCRIPTS-RUNTIME-0010.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0011.scs|SCRIPTS-RUNTIME-0011.scs|5|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0013.scs|SCRIPTS-RUNTIME-0013.scs|4|SCRIPTS-LINT-0012
+errors/SCRIPTS-RUNTIME-0017.scs|SCRIPTS-RUNTIME-0017.scs|2|SCRIPTS-LINT-0013
+errors/SCRIPTS-RUNTIME-0018.scs|SCRIPTS-RUNTIME-0018.scs|3|SCRIPTS-LINT-0006
+json/check-errors-json-warning.scs|check-errors-json-warning.scs|2|SCRIPTS-LINT-0001
+json/run-json-out-warning.scs|run-json-out-warning.scs|2|SCRIPTS-LINT-0001
+migration/03-exit-status.scs|03-exit-status.scs|5|SCRIPTS-LINT-0004
+stdlib/filesystem/walk_directory.scs|walk_directory.scs|12|SCRIPTS-LINT-0011
+stdlib/filesystem/walk_directory.scs|walk_directory.scs|5|SCRIPTS-LINT-0011
+stdlib/json/builders.scs|builders.scs|27|SCRIPTS-LINT-0012
+stdlib/json/builders.scs|builders.scs|32|SCRIPTS-LINT-0012
+stdlib/process/require_success.scs|require_success.scs|11|SCRIPTS-LINT-0001

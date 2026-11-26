@@ -128,14 +128,15 @@ internal sealed partial class FileAnalyzer
                 return ErrorType.Instance;
             }
 
-            ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count);
-            return CheckSignatureCall(
+            var callType = CheckSignatureCall(
                 signature,
                 new TypeBindings(),
                 bound,
                 ClosingParenthesisOf(call),
                 identifier.Span,
                 call.Span);
+            ApplyLint(entry, bound);
+            return callType;
         }
 
         if (StdlibCatalog.IsModuleName(identifier.Name))
@@ -266,8 +267,7 @@ internal sealed partial class FileAnalyzer
             return ErrorType.Instance;
         }
 
-        ApplyLint(entry, ExpressionsOf(bound), signature.Parameters.Count);
-        return CheckSignatureCall(
+        var callType = CheckSignatureCall(
             signature,
             new TypeBindings(),
             bound,
@@ -275,6 +275,8 @@ internal sealed partial class FileAnalyzer
             member.MemberSpan,
             call.Span,
             lintHost: entry);
+        ApplyLint(entry, bound);
+        return callType;
     }
 
     private (ScriptType Type, CallTarget? Target) ResolveMethodCall(MethodCallSite site)
@@ -795,25 +797,32 @@ internal sealed partial class FileAnalyzer
             ("signature", signature.SignatureText));
     }
 
-    private void ApplyLint(StdlibEntry entry, IReadOnlyList<Expression> arguments, int parameterCount)
+    private void ApplyLint(StdlibEntry entry, IReadOnlyList<CallArgument> arguments)
     {
-        if (arguments.Count == 0)
+        if (arguments.Count == 0 || !LintRules.LaunchesProgram(entry))
         {
             return;
         }
 
-        var firstArgument = arguments[0];
-        if (LintRules.LaunchesProgram(entry))
+        var first = arguments[0];
+        var firstType = first.PreTypedType ?? first.Expression.ResolvedType;
+        if (firstType is null or ErrorType || (firstType is not TypeVariable && firstType != ScriptTypes.String))
         {
-            if (LintRules.FindLauncherProgram(firstArgument) is { } program)
-            {
-                Report(ErrorCodes.Lint0001, firstArgument.Span, ("program", program), ("target", LauncherTargetPlaceholder));
-            }
-            else if (LintRules.IsComputedProgram(firstArgument))
-            {
-                Report(ErrorCodes.Lint0004, firstArgument.Span, ("program", TextOf(firstArgument.Span)));
-            }
+            return;
         }
 
+        var firstArgument = first.Expression;
+        if (LintRules.StaticProgramBaseName(firstArgument) is { } baseName)
+        {
+            if (LintRules.IsLauncherBaseName(baseName))
+            {
+                var display = firstArgument is StringLiteral literal ? literal.Value : baseName;
+                Report(ErrorCodes.Lint0001, firstArgument.Span, ("program", display), ("target", LauncherTargetPlaceholder));
+            }
+        }
+        else
+        {
+            Report(ErrorCodes.Lint0004, firstArgument.Span, ("program", TextOf(firstArgument.Span)));
+        }
     }
 }

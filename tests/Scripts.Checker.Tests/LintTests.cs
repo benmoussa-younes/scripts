@@ -59,6 +59,63 @@ public sealed class LintTests
         Assert.Contains("computed", result.Warnings[0].Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void An_interpolated_program_with_a_literal_basename_is_not_flagged()
+    {
+        var result = Checking.AssertClean(
+            "let dir = \"/tmp\"\nlet outcome = process.run(process.request(\"{dir}/sextant-vault\", []))?\nio.write_standard_output_line(outcome.standard_output)");
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void An_interpolated_program_with_a_literal_launcher_basename_is_flagged()
+    {
+        var result = Checking.AssertMarkedWarnings(
+            "let dir = \"/tmp\"\nlet outcome = process.run(process.request(‸\"{dir}/bash\", [\"-c\", \"true\"]))?\nio.write_standard_output_line(outcome.standard_output)",
+            "SCRIPTS-LINT-0001");
+        Assert.Contains("`bash`", result.Warnings[0].Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("let prefix = \"b\"\nlet outcome = process.run(process.request(‸\"{prefix}ash\", [\"-c\", \"true\"]))?\nio.write_standard_output_line(outcome.standard_output)")]
+    [InlineData("let dir = \"/tmp\"\nlet outcome = process.run(process.request(‸\"{dir}/\", []))?\nio.write_standard_output_line(outcome.standard_output)")]
+    [InlineData("let dir = \"/tmp\"\nlet name = \"tool\"\nlet outcome = process.run(process.request(‸\"{dir}/{name}\", []))?\nio.write_standard_output_line(outcome.standard_output)")]
+    [InlineData("let dir = \"/tmp\"\nlet name = \"sh\"\nlet outcome = process.run(process.request(‸\"{dir}/ba{name}\", []))?\nio.write_standard_output_line(outcome.standard_output)")]
+    [InlineData("let dir = \"/tmp\"\nlet name = \"tool\"\nlet outcome = process.run(process.request(‸\"{dir}/\" + name, []))?\nio.write_standard_output_line(outcome.standard_output)")]
+    public void An_interpolated_program_without_a_decidable_basename_is_flagged(string source)
+    {
+        var result = Checking.AssertMarkedWarnings(source, "SCRIPTS-LINT-0004");
+        Assert.Contains("computed", result.Warnings[0].Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_raw_launcher_program_is_flagged()
+    {
+        Checking.AssertMarkedWarnings(
+            "let outcome = process.run(process.request(‸r\"/bin/bash\", [\"-c\", \"true\"]))?\nio.write_standard_output_line(outcome.standard_output)",
+            "SCRIPTS-LINT-0001");
+    }
+
+    [Theory]
+    [InlineData("let _request = process.request(‸p\"/bin/bash\", [])")]
+    [InlineData("let _request = process.request(‸42, [])")]
+    [InlineData("let path_value = p\"/bin/bash\"\nlet _request = process.request(‸path_value, [])")]
+    [InlineData("let handle = process.spawn(‸p\"/bin/bash\", [])?\nmatch process.wait_for_process(handle, 1000) {\n    ok(_) => {}\n    error(_) => {}\n}")]
+    [InlineData("let value = json.from_string(\"bash\")\nlet _request = process.request(‸value, [])")]
+    public void A_program_argument_that_is_not_a_string_is_not_linted_again(string source)
+    {
+        var result = Checking.AssertMarked(source, "SCRIPTS-TYPE-0012");
+        Assert.Empty(result.Warnings);
+    }
+
+    [Fact]
+    public void A_mixed_file_flags_only_the_undecidable_program()
+    {
+        Checking.AssertMarkedWarnings(
+            "let dir = \"/tmp\"\nlet _known = process.request(\"{dir}/sextant-vault\", [])\nlet program = \"ls\"\nlet _unknown = process.request(‸program, [])",
+            "SCRIPTS-LINT-0004");
+    }
+
     [Theory]
     [InlineData("let outcome = process.run(process.request(\"ls\", []))?\nio.write_standard_output_line(outcome.standard_output)")]
     [InlineData("let outcome = process.run(process.request(\"bashful\", []))?\nio.write_standard_output_line(outcome.standard_output)")]

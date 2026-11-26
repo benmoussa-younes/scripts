@@ -53,19 +53,47 @@ internal static class LintRules
     public static bool IsParallelLambdaHost(StdlibEntry entry) =>
         entry.Kind == StdlibKind.ModuleFunction && ParallelLambdaHosts.Contains(entry.QualifiedName);
 
-    /// <summary>The literal program name when its basename is an interpreter or launcher.</summary>
-    public static string? FindLauncherProgram(Expression programArgument)
+    /// <summary>
+    /// The basename of a program argument when it is written literally: a string literal, or an interpolated string
+    /// whose literal tail contains a <c>/</c> and a non-empty basename after it. Null when the basename is not
+    /// statically known (SCRIPTS-LINT-0004).
+    /// </summary>
+    public static string? StaticProgramBaseName(Expression programArgument)
     {
-        if (programArgument is not StringLiteral literal)
+        if (programArgument is StringLiteral literal)
+        {
+            var lastSeparator = literal.Value.LastIndexOf('/');
+            return lastSeparator < 0 ? literal.Value : literal.Value[(lastSeparator + 1)..];
+        }
+
+        if (programArgument is not InterpolatedString interpolated || interpolated.Parts.Count == 0)
         {
             return null;
         }
 
-        var lastSeparator = literal.Value.LastIndexOf('/');
-        var baseName = lastSeparator < 0 ? literal.Value : literal.Value[(lastSeparator + 1)..];
-        return LauncherPrograms.Contains(baseName) ? literal.Value : null;
+        // The basename is decidable only when the last '/' is itself literal: an interpolation before it could
+        // change the basename ("{prefix}ash" with prefix "b" is "bash", not "ash").
+        var tail = string.Empty;
+        for (var index = interpolated.Parts.Count - 1; index >= 0; index--)
+        {
+            if (interpolated.Parts[index] is not TextPart text)
+            {
+                return null;
+            }
+
+            var separator = text.Text.LastIndexOf('/');
+            if (separator >= 0)
+            {
+                var baseName = text.Text[(separator + 1)..] + tail;
+                return baseName.Length == 0 ? null : baseName;
+            }
+
+            tail = text.Text + tail;
+        }
+
+        return null;
     }
 
-    /// <summary>True when a program argument is not a literal string (SCRIPTS-LINT-0004).</summary>
-    public static bool IsComputedProgram(Expression programArgument) => programArgument is not StringLiteral;
+    /// <summary>True when a statically known basename is an interpreter or a launcher (SCRIPTS-LINT-0001).</summary>
+    public static bool IsLauncherBaseName(string baseName) => LauncherPrograms.Contains(baseName);
 }
