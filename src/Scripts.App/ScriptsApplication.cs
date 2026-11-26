@@ -91,7 +91,7 @@ public static class ScriptsApplication
 
     // ----------------------------------------------------------------- source loading
 
-    private static LoadResult LoadProgram(string scriptPath, bool standardInput)
+    private static LoadResult LoadProgram(string scriptPath, bool standardInput, bool isModule = false)
     {
         if (!standardInput)
         {
@@ -101,14 +101,14 @@ public static class ScriptsApplication
                 return new LoadResult(null, refusal);
             }
 
-            return ProgramLoader.Load(scriptPath, new FileSystemSourceProvider());
+            return ProgramLoader.Load(scriptPath, new FileSystemSourceProvider(), isModule);
         }
 
         // DESIGN §9: `-` reads the entry script from the standard input, up to the source size limit plus one byte so
         // that the loader can report an oversized source; a closed stream is an empty (valid) script.
         var reading = ReadScriptFromStandardInput();
         return reading.Succeeded
-            ? ProgramLoader.LoadStandardInput(reading.Bytes, new FileSystemSourceProvider())
+            ? ProgramLoader.LoadStandardInput(reading.Bytes, new FileSystemSourceProvider(), isModule)
             : new LoadResult(null, Diagnostics.Create(ErrorCodes.Cli0010, null, default, ("reason", reading.FailureReason)));
     }
 
@@ -171,19 +171,16 @@ public static class ScriptsApplication
         return WriteStandardError(text) ? ExitCodes.ScriptUnreadable : ExitCodes.RuntimeFailure;
     }
 
-    // ----------------------------------------------------------------- check
+    // ----------------------------------------------------------------- format
     /// <summary>
-    /// <c>scripts format --check</c> (P9c): layout only, no code rewriting. Exit 0 when canonical, 251 otherwise, with
-    /// one <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
+    /// <c>scripts format [--check]</c> (P9c): layout only, no token rewriting. Without <c>--check</c> the file is
+    /// rewritten to the canonical layout, and the result is checked again before writing: a rewrite never leaves a
+    /// violation behind. With <c>--check</c> nothing is written, exit 0 when canonical and 251 otherwise, with one
+    /// <c>path:line:column: not canonical: …</c> line per violation on stderr. A BOM is refused before decoding
     /// (SourceReading strips it silently); lexical and source-size errors use the normal 251/252 rendering.
     /// </summary>
     private static int RunFormat(FormatCommand command)
     {
-        if (command.LegacyAlias)
-        {
-            WriteStandardError("warning: `scripts fmt` is deprecated; use `scripts format`\n");
-        }
-
         byte[] bytes;
         string path;
         if (command.StandardInput)
@@ -206,6 +203,17 @@ public static class ScriptsApplication
                 return ReportLoadError(refusal);
             }
 
+            // A rewrite opens the file for writing: the final symbolic link is refused before reading, and the
+            // O_NOFOLLOW open stays the decisive write-time check.
+            if (!command.Check && NoFollowFileWriter.IsFinalSymbolicLink(scriptPath))
+            {
+                return ReportScriptUnreadable(Diagnostics.Create(
+                    ErrorCodes.Cli0014,
+                    null,
+                    new Span(0, 0),
+                    ("reason", NoFollowFileWriter.SymbolicLinkReason)));
+            }
+
             var provider = new FileSystemSourceProvider();
             if (!provider.TryReadBytes(scriptPath, out bytes, out var reason))
             {
@@ -226,17 +234,48 @@ public static class ScriptsApplication
             return ReportLoadError(source.Error);
         }
 
-        var issues = LayoutCheck.Check(source.Source!.Text).ToList();
-        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+        var hasByteOrderMark = bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF;
+        if (command.Check)
         {
-            issues.Insert(0, new LayoutIssue(1, 1, "UTF-8 byte-order mark is forbidden"));
+            var issues = CheckLayoutIssues(source.Source!.Text, hasByteOrderMark);
+            return issues.Count == 0 ? ExitCodes.Success : ReportLayoutIssues(path, issues);
         }
 
-        if (issues.Count == 0)
+        var canonical = LayoutCheck.Canonicalize(source.Source!.Text);
+        if (canonical is null)
+        {
+            // The lexer refused the source: report its position and write nothing.
+            return ReportLayoutIssues(path, CheckLayoutIssues(source.Source!.Text, hasByteOrderMark));
+        }
+
+        // The rewriter must never write a file that still fails the layout: report instead of claiming success.
+        var remaining = LayoutCheck.Check(canonical);
+        if (remaining.Count > 0)
+        {
+            return ReportLayoutIssues(path, remaining);
+        }
+
+        if (canonical == source.Source!.Text && !hasByteOrderMark)
         {
             return ExitCodes.Success;
         }
 
+        return WriteCanonicalLayout(path, canonical, hasByteOrderMark ? "\uFEFF" + source.Source!.Text : source.Source!.Text);
+    }
+
+    private static List<LayoutIssue> CheckLayoutIssues(string text, bool hasByteOrderMark)
+    {
+        var issues = LayoutCheck.Check(text).ToList();
+        if (hasByteOrderMark)
+        {
+            issues.Insert(0, new LayoutIssue(1, 1, "UTF-8 byte-order mark is forbidden"));
+        }
+
+        return issues;
+    }
+
+    private static int ReportLayoutIssues(string path, IReadOnlyList<LayoutIssue> issues)
+    {
         foreach (var issue in issues)
         {
             if (!WriteStandardError($"{path}:{issue.Line}:{issue.Column}: not canonical: {issue.Message}\n"))
@@ -246,6 +285,35 @@ public static class ScriptsApplication
         }
 
         return ExitCodes.StaticError;
+    }
+
+    private static int WriteCanonicalLayout(string path, string canonical, string originalText)
+    {
+        try
+        {
+            // In-place write (mode and owner preserved). A failed write is rolled back to the original text, so a
+            // disk-full error never leaves a truncated script behind.
+            using var stream = NoFollowFileWriter.OpenAndTruncate(path);
+            try
+            {
+                stream.Write(new UTF8Encoding(false).GetBytes(canonical));
+                stream.Flush(flushToDisk: true);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                TryRestore(stream, originalText);
+                throw;
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            var failure = Diagnostics.Create(ErrorCodes.Cli0014, null, new Span(0, 0), ("reason", exception.Message));
+            return WriteStandardError(DiagnosticReporter.RenderHuman([failure], []))
+                ? ExitCodes.ScriptUnreadable
+                : ExitCodes.RuntimeFailure;
+        }
+
+        return ExitCodes.Success;
     }
 
     private static int RunCheck(CheckCommand command)
@@ -289,7 +357,7 @@ public static class ScriptsApplication
                 : ExitCodes.RuntimeFailure;
         }
 
-        var loaded = LoadProgram(command.ScriptPath, command.StandardInput);
+        var loaded = LoadProgram(command.ScriptPath, command.StandardInput, command.Module);
         var applied = 0;
 
         // A syntax error may carry a safe fix too (L6: `{{` in a string). The parser stops at the first error, so the
@@ -313,7 +381,7 @@ public static class ScriptsApplication
             }
 
             applied += appliedToSyntax;
-            loaded = LoadProgram(command.ScriptPath, false);
+            loaded = LoadProgram(command.ScriptPath, false, command.Module);
             // A fix that rewrites the same text would loop forever: stop as soon as the entry did not change.
             if (loaded.Error?.Fix?.File?.Text == textBefore)
             {
@@ -364,7 +432,7 @@ public static class ScriptsApplication
 
             if (appliedToProgram > 0)
             {
-                var reloaded = LoadProgram(command.ScriptPath, false);
+                var reloaded = LoadProgram(command.ScriptPath, false, command.Module);
                 if (reloaded.Error is not null)
                 {
                     if (command.ErrorsJson)
@@ -551,7 +619,7 @@ public static class ScriptsApplication
         var check = ProgramChecker.Check(loaded.Program!);
         if (check.Errors.Count > 0)
         {
-            var exitCode = ReportStaticErrors(check.Errors, check.Warnings);
+            var exitCode = ReportStaticErrors(check.Errors, command.NoWarnings ? Array.Empty<Diagnostic>() : check.Warnings);
             if (command.ErrorsJson)
             {
                 WriteErrorsJsonLine(check.Errors, check.Warnings);
@@ -560,7 +628,7 @@ public static class ScriptsApplication
             return exitCode;
         }
 
-        if (check.Warnings.Count > 0)
+        if (!command.NoWarnings && check.Warnings.Count > 0)
         {
             WriteStandardError(DiagnosticReporter.RenderHuman([], check.Warnings));
         }
@@ -795,7 +863,7 @@ public static class ScriptsApplication
     private static int ReportStaticErrors(IReadOnlyList<Diagnostic> errors, IReadOnlyList<Diagnostic> warnings)
     {
         var text = DiagnosticReporter.RenderHuman(errors, warnings);
-        return WriteStandardError(text) ? ExitCodes.StaticError : ExitCodes.StaticError;
+        return WriteStandardError(text) ? ExitCodes.StaticError : ExitCodes.RuntimeFailure;
     }
 
     private static int InternalError()

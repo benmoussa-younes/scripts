@@ -1,6 +1,6 @@
-.\" Man page for scripts(1); every statement comes from `scripts --help` and
-.\" `scripts describe --format json`, which are generated from the same tables.
-.TH SCRIPTS 1 "2026-11-22" "scripts" "User Commands"
+.\" Man page for scripts(1); the commands, options and exit codes match
+.\" `scripts --help` and `scripts describe --format json`, generated from the same tables.
+.TH SCRIPTS 1 "2026-11-26" "scripts" "User Commands"
 .SH NAME
 scripts \- statically typed system scripting language
 .SH SYNOPSIS
@@ -22,7 +22,7 @@ scripts \- statically typed system scripting language
 .br
 .B scripts
 .B format
-.B \-\-check
+.RI [ options ]
 .I script
 .br
 .B scripts
@@ -50,10 +50,11 @@ an explicit request, never through a shell string.
 .BR run ,
 .B check
 and
-.B format
+.B format --check
 accept
 .B \-
-as the script name to read the script from the standard input.
+as the script name to read the script from the standard input; a rewrite
+needs a file.
 .SH COMMANDS
 .TP
 .B run
@@ -66,10 +67,11 @@ Reports syntax, type, call, import, visibility, mutability, return and
 exhaustiveness diagnostics, plus warnings, without running the script.
 .TP
 .B format
-With
+Rewrites the script to the canonical layout (LF, no BOM, final newline, no tab
+or trailing space, four spaces per open brace), then checks the result; the
+rewrite is idempotent. With
 .BR \-\-check ,
-reports whether the layout is canonical (LF, final newline, no BOM, tab or
-trailing space, four spaces per open brace) and rewrites nothing.
+reports the violations and rewrites nothing.
 .TP
 .B explain
 Checks the script, then describes it in English, one sentence per statement,
@@ -83,6 +85,19 @@ types, functions, groups, error codes, exit codes, limits and grammar.
 Prints the usage text, like
 .BR \-\-help .
 .SH OPTIONS
+.TP
+.B \-\-no\-warnings
+(
+.BR run )
+No warning block on standard error; errors still print, and
+.B \-\-json\-out
+and
+.B \-\-errors\-json
+keep the warnings. The launcher lints
+.B SCRIPTS\-LINT\-0001
+and
+.B SCRIPTS\-LINT\-0004
+are hidden too.
 .TP
 .B \-\-errors\-json
 (
@@ -110,10 +125,26 @@ Exit 251 as soon as the script has a warning.
 Applies the safe fixes carried by the diagnostics to the script; a fix that
 cannot be applied safely is not offered.
 .TP
+.B \-\-module
+(
+.BR check )
+Checks the entry as a module: its
+.B public
+declarations and imports are allowed. Without the flag, a file that declares
+.B public
+is refused by
+.BR check ,
+.B run
+and
+.BR explain .
+.TP
 .B \-\-check
 (
 .B format )
-Reports whether the layout is canonical; it never rewrites the script.
+Reports the layout violations and exits 251 without rewriting the script.
+Without it
+.B format
+rewrites the file.
 .TP
 .B \-\-format json
 (
@@ -156,7 +187,7 @@ Static error (syntax, types, modules), or a warning under
 .BR \-\-deny\-warnings .
 .TP
 .B 252
-Unreadable or missing script.
+Unreadable or missing script, or a rewrite refused or failed.
 .TP
 .B 253
 Fatal runtime error, or an unhandled error at the top level.

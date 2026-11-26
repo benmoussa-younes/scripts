@@ -350,7 +350,7 @@ public sealed class DiagnosticReporterTests
         var expected = Lines(
             "error[SCRIPTS-CLI-0002]: unknown command: `frobnicate`",
             "   = cause: " + diagnostic.Cause,
-            "   = suggestion: available commands: run, check, explain, fmt, describe, help");
+            "   = suggestion: available commands: run, check, format, explain, describe, help");
         Assert.Equal(expected, DiagnosticReporter.RenderHuman(diagnostic));
     }
 

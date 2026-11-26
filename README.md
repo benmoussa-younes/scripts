@@ -40,7 +40,7 @@ no build step for the script.
 
 ## Status
 
-Scripts 0.2.2 is the current release. The language is usable; as a
+Scripts 0.3.0 is the current release. The language is usable; as a
 `0.y.z` release its API may still change. Supported platform: Linux x86-64,
 glibc 2.34 or newer.
 
@@ -53,7 +53,7 @@ Download the assets from the
 [latest release](https://github.com/benmoussa-younes/scripts/releases/latest)
 and verify them with `sha256sum -c SHA256SUMS`. The checksum proves integrity,
 not origin. Releases carry no detached OpenPGP signature of it: 0.1.2 had one,
-0.2.0, 0.2.1 and 0.2.2 have none, and the release workflow produces none.
+0.2.0, 0.2.1, 0.2.2 and 0.3.0 have none, and the release workflow produces none.
 
 Origin rests on two facts. The `vX.Y.Z` tag is signed by the maintainer key,
 whose public half is `packaging/maintainer-key.asc`, with the fingerprint
@@ -76,15 +76,15 @@ gh attestation verify scripts_<version>_amd64.deb \
 ### Debian/Ubuntu package
 
 ```sh
-sudo apt install ./scripts_0.2.2_amd64.deb
+sudo apt install ./scripts_0.3.0_amd64.deb
 scripts --version
 ```
 
 ### Binary tarball
 
 ```sh
-tar -xzf scripts_0.2.2_linux-x64.tar.gz
-sudo install -m 755 scripts-0.2.2/scripts /usr/local/bin/scripts
+tar -xzf scripts_0.3.0_linux-x64.tar.gz
+sudo install -m 755 scripts-0.3.0/scripts /usr/local/bin/scripts
 ```
 
 ### From source
@@ -148,10 +148,10 @@ io.write_standard_output_line(outcome.standard_output)
 
 | Command | What it does |
 |---|---|
-| `scripts run <file> [argument…]` | check, then run; arguments are exposed as `process.arguments` |
-| `scripts check <file>` | static analysis without running; `--fix` applies the safe fixes |
+| `scripts run [--no-warnings] <file> [argument…]` | check, then run; `--no-warnings` hides the human warning block only |
+| `scripts check [--module] <file>` | static analysis without running; `--fix` applies the safe fixes; `--module` checks a module on its own |
 | `scripts explain <file>` | check, then explain each statement in English |
-| `scripts format --check <file>` | report whether the layout is canonical |
+| `scripts format [--check] <file>` | rewrite the canonical layout, or with `--check` report whether it is canonical |
 | `scripts describe --format json` | the machine-readable language reference |
 | `scripts --version`, `scripts --help` | version and usage |
 
@@ -176,11 +176,11 @@ bash tools/scripts/binaries/gate
 
 Tests run only as Native AOT executables, published by
 `tools/scripts/binaries/aot-tests.sh`; there is no `dotnet test` path. The gate
-runs `check-all` with the build (6 steps: build, AOT app, helpers, packaging
-metadata, AOT tests, licences); `check-all --no-build` runs the 5 remaining
-steps (the AOT publishes still compile). It prints one `VERDICT` line and does
-not change tracked files. `gate-static` is the lighter gate. `reuse` 5.0.2 is
-needed for the licence step.
+runs `check-all` with the build (7 steps: build, AOT app, helpers, packaging
+metadata, shellcheck, AOT tests, licences); `check-all --no-build` runs the 6
+remaining steps (the AOT publishes still compile). It prints one `VERDICT` line
+and does not change tracked files. `gate-static` is the lighter gate. `reuse`
+5.0.2 is needed for the licence step, and `shellcheck` for the shell step.
 
 `reuse lint` scans the whole tree; the undecodable-name fixture used by the
 filesystem corpus is generated at test time.

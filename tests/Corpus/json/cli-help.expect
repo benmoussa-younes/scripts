@@ -2,7 +2,7 @@ exit: 0
 stream: stdout
 text-contains: scripts @VERSION@
 text-contains: USAGE
-text-contains: scripts run [--errors-json] [--json-out] [--] <script.scs>|- [argument…]
+text-contains: scripts run [--errors-json] [--json-out] [--no-warnings] [--] <script.scs>|- [argument…]
 text-contains: --json-out
 text-contains: --errors-json
 text-contains: scripts describe --format json

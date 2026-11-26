@@ -12,8 +12,8 @@ internal sealed record CallSignature(
     ScriptType Return,
     string SignatureText);
 
-/// <summary>An argument; the data operand of a pipeline stage arrives already typed.</summary>
-internal readonly record struct CallArgument(Expression Expression, ScriptType? PreTypedType);
+/// <summary>An argument of a call.</summary>
+internal readonly record struct CallArgument(Expression Expression);
 
 internal readonly record struct MethodCallSite(
     string MethodName,
@@ -34,10 +34,10 @@ internal sealed partial class FileAnalyzer
     private static ScriptType? HintFor(ScriptType expectedType) => expectedType is TypeVariable ? null : expectedType;
 
     private static List<CallArgument> Wrap(IReadOnlyList<Expression> arguments) =>
-        [.. arguments.Select(argument => new CallArgument(argument, null))];
+        [.. arguments.Select(argument => new CallArgument(argument))];
 
     private static List<CallArgument> Wrap(IReadOnlyList<CoreCallArgument> arguments) =>
-        [.. arguments.Select(argument => new CallArgument(argument.Expression, null))];
+        [.. arguments.Select(argument => new CallArgument(argument.Expression))];
 
     private static IReadOnlyList<Expression> ExpressionsOf(IReadOnlyList<CallArgument> arguments) =>
         [.. arguments.Select(argument => argument.Expression)];
@@ -66,10 +66,7 @@ internal sealed partial class FileAnalyzer
     {
         foreach (var argument in arguments)
         {
-            if (argument.PreTypedType is null)
-            {
-                TypeOf(argument.Expression, ErrorType.Instance);
-            }
+            TypeOf(argument.Expression, ErrorType.Instance);
         }
     }
 
@@ -103,7 +100,6 @@ internal sealed partial class FileAnalyzer
                         new TypeBindings(),
                         userArguments,
                         ClosingParenthesisOf(call),
-                        identifier.Span,
                         call.Span)
                     : ErrorType.Instance;
             case VariableSymbol variable:
@@ -133,7 +129,6 @@ internal sealed partial class FileAnalyzer
                 new TypeBindings(),
                 bound,
                 ClosingParenthesisOf(call),
-                identifier.Span,
                 call.Span);
             ApplyLint(entry, bound);
             return callType;
@@ -160,7 +155,7 @@ internal sealed partial class FileAnalyzer
             // A function type carries parameter types only: a named call has no published names to bind to.
             var signature = new CallSignature(displayName, function.Parameters, [], function.Return, function.ToString());
             return TryBindCallArguments(call.Arguments, signature, call.Span, out var bound)
-                ? CheckSignatureCall(signature, new TypeBindings(), bound, ClosingParenthesisOf(call), calleeSpan, call.Span)
+                ? CheckSignatureCall(signature, new TypeBindings(), bound, ClosingParenthesisOf(call), call.Span)
                 : ErrorType.Instance;
         }
 
@@ -224,7 +219,6 @@ internal sealed partial class FileAnalyzer
                     new TypeBindings(),
                     bound,
                     ClosingParenthesisOf(call),
-                    member.MemberSpan,
                     call.Span)
                 : ErrorType.Instance;
         }
@@ -272,7 +266,6 @@ internal sealed partial class FileAnalyzer
             new TypeBindings(),
             bound,
             ClosingParenthesisOf(call),
-            member.MemberSpan,
             call.Span,
             lintHost: entry);
         ApplyLint(entry, bound);
@@ -351,7 +344,7 @@ internal sealed partial class FileAnalyzer
         {
             Report(ErrorCodes.Type0064, templateReceiver.Span);
         }
-        var type = CheckSignatureCall(callSignature, bindings, bound, site.ClosingParenthesis, site.NameSpan, site.CallSpan);
+        var type = CheckSignatureCall(callSignature, bindings, bound, site.ClosingParenthesis, site.CallSpan);
         if (entry.Name == "group_by")
         {
             var keyType = bindings.Apply(new TypeVariable("K"));
@@ -596,7 +589,7 @@ internal sealed partial class FileAnalyzer
             }
 
             seen[position] = true;
-            ordered[position] = new CallArgument(argument.Expression, null);
+            ordered[position] = new CallArgument(argument.Expression);
         }
 
         // Report missing parameters only when every supplied name is valid: otherwise the unknown name already
@@ -643,13 +636,12 @@ internal sealed partial class FileAnalyzer
         TypeBindings bindings,
         IReadOnlyList<CallArgument> arguments,
         Span closingParenthesis,
-        Span anchorSpan,
         Span callSpan,
         StdlibEntry? lintHost = null)
     {
         if (arguments.Count != signature.Parameters.Count)
         {
-            ReportArity(signature, arguments, closingParenthesis, anchorSpan);
+            ReportArity(signature, arguments, closingParenthesis);
             SilenceArguments(arguments);
             return ErrorType.Instance;
         }
@@ -663,7 +655,7 @@ internal sealed partial class FileAnalyzer
             }
 
             var expectedType = bindings.Apply(signature.Parameters[position]);
-            var actualType = argument.PreTypedType ?? TypeOf(argument.Expression, HintFor(expectedType));
+            var actualType = TypeOf(argument.Expression, HintFor(expectedType));
             if (!bindings.TryUnify(expectedType, actualType))
             {
                 Report(
@@ -778,14 +770,13 @@ internal sealed partial class FileAnalyzer
         _ => type,
     };
 
-    private void ReportArity(CallSignature signature, IReadOnlyList<CallArgument> arguments, Span closingParenthesis, Span anchorSpan)
+    private void ReportArity(CallSignature signature, IReadOnlyList<CallArgument> arguments, Span closingParenthesis)
     {
         var parameterCount = signature.Parameters.Count;
         var span = closingParenthesis;
         if (arguments.Count > parameterCount)
         {
-            var firstExtra = arguments[parameterCount];
-            span = firstExtra.PreTypedType is null ? firstExtra.Expression.Span : anchorSpan;
+            span = arguments[parameterCount].Expression.Span;
         }
 
         Report(
@@ -805,7 +796,7 @@ internal sealed partial class FileAnalyzer
         }
 
         var first = arguments[0];
-        var firstType = first.PreTypedType ?? first.Expression.ResolvedType;
+        var firstType = first.Expression.ResolvedType;
         if (firstType is null or ErrorType || (firstType is not TypeVariable && firstType != ScriptTypes.String))
         {
             return;

@@ -45,7 +45,6 @@ fi
 
 # Description without the `-dirty` suffix (we compute dirtiness ourselves, cf. note).
 describe="$(git -C "$repository_root" describe --tags --always --long 2>/dev/null || true)"
-describe="${describe%$'\n'}"
 
 if [ -z "$describe" ]; then
     printf '%s\n' "$fallback"

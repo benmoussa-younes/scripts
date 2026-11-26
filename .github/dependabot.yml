@@ -1,0 +1,13 @@
+# Dependabot keeps the SHA-pinned GitHub Actions current. The only direct NuGet
+# reference (xunit.v3.aot) is declared in tests/Directory.Build.props, which the
+# NuGet ecosystem does not parse; update it by hand and regenerate the locks.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "benmoussa-younes"
+    commit-message:
+      prefix: "ci"

@@ -10,7 +10,7 @@ never re-parsed as code.
 ```sh
 dotnet build Scripts.slnx -c Release
 reuse lint
-tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, packaging, AOT tests, licences
+tools/scripts/binaries/gate            # check-all: build, AOT app, helpers, packaging, shellcheck, AOT tests, licences
 tools/scripts/binaries/gate-static     # the lighter gate: build, fast AOT tests, tree hygiene
 ```
 
@@ -41,7 +41,8 @@ generated at test time.
 - The prose documents (README, AGENTS, CHANGELOG, THIRD-PARTY) are
   `CC-BY-SA-4.0`; see `THIRD-PARTY` and `LICENSES/`.
 - Scripts is consumed as source; no NuGet package is produced.
-- Root markdown is limited to `README.md`, `AGENTS.md` and `CHANGELOG.md`.
+- Root markdown is limited to `README.md`, `AGENTS.md`, `CHANGELOG.md` and
+  `SECURITY.md`.
 
 ## Commits and releases
 

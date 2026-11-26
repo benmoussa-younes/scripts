@@ -14,7 +14,7 @@ public sealed class PackagingMetadataEndToEndTests
         "Scripts 0.2.0 is the current release.\n\nsudo apt install ./scripts_0.2.0_amd64.deb\ntar -xzf scripts_0.2.0_linux-x64.tar.gz\nsudo install -m 755 scripts-0.2.0/scripts /usr/local/bin/scripts\ngit verify-tag v0.2.0\ngh attestation verify scripts_0.2.0_amd64.deb --repo example/scripts\n";
 
     private const string ReleaseWorkflow =
-        "jobs:\n  build:\n    steps:\n      - name: Verify\n        run: |\n          gpg --batch --import packaging/maintainer-key.asc\n          bash packaging/verify-release.sh --require-tag\n      - name: Attest\n        uses: actions/attest-build-provenance@4d101475d8b2 # v4\n";
+        "jobs:\n  build:\n    steps:\n      - name: Verify\n        run: |\n          gpg --batch --import packaging/maintainer-key.asc\n          bash packaging/verify-release.sh --require-tag\n      - name: Attest\n        uses: actions/attest-build-provenance@4d101475d8b2 # v4\n        with:\n          subject-path: artifacts/*\n      - name: Upload\n        uses: actions/upload-artifact@v6\n        with:\n          path: artifacts/*\n  release:\n    needs: build\n    steps:\n      - name: Create\n        run: gh release create v0.2.0 artifacts/*\n";
 
     private const string ReleaseChecker = "usage: verify-release.sh [--write] [--require-tag] [--directory DIR]\n";
 
@@ -98,6 +98,18 @@ public sealed class PackagingMetadataEndToEndTests
                         "",
                         StringComparison.Ordinal),
                     ".github/workflows/release.yml: has no 'uses: actions/attest-build-provenance@' line"
+                ),
+                (
+                    ReleaseWorkflow.Replace("    needs: build\n", "", StringComparison.Ordinal),
+                    ".github/workflows/release.yml: the release job does not declare 'needs: build'"
+                ),
+                (
+                    ReleaseWorkflow.Replace("subject-path: artifacts/*", "subject-path: out/*", StringComparison.Ordinal),
+                    ".github/workflows/release.yml: the attestation has no 'subject-path: artifacts/*'"
+                ),
+                (
+                    ReleaseWorkflow.Replace("          path: artifacts/*\n", "", StringComparison.Ordinal),
+                    ".github/workflows/release.yml: no 'path: artifacts' hand-off between build and release"
                 ),
                 (
                     ReleaseWorkflow + "        run: cp packaging/SHA256SUMS.asc artifacts/\n",

@@ -11,7 +11,7 @@ export LC_ALL=C
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd "${script_directory}/../../.." && pwd)"
-cd "${repository_root}"
+cd "${repository_root}" || exit 1
 
 failure=0
 step() {

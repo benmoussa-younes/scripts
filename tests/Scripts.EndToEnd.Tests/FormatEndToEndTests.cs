@@ -6,7 +6,7 @@ namespace Scripts.EndToEnd.Tests;
 public sealed class FormatEndToEndTests
 {
     [Fact]
-    public void The_fmt_alias_runs_the_check_and_warns_on_the_standard_error()
+    public void The_fmt_alias_is_removed()
     {
         var directory = ScriptsProcess.NewTemporaryDirectory();
         try
@@ -18,10 +18,9 @@ public sealed class FormatEndToEndTests
 
             var result = ScriptsProcess.Run("fmt", "--check", script);
 
-            Assert.Equal(0, result.ExitCode);
+            Assert.Equal(250, result.ExitCode);
             Assert.Equal(string.Empty, result.StandardOutput);
-            Assert.Contains("`scripts fmt` is deprecated", result.StandardError, StringComparison.Ordinal);
-            Assert.Contains("use `scripts format`", result.StandardError, StringComparison.Ordinal);
+            Assert.Contains("unknown command: `fmt`", result.StandardError, StringComparison.Ordinal);
         }
         finally
         {
@@ -195,11 +194,142 @@ public sealed class FormatEndToEndTests
     }
 
     [Fact]
-    public void Without_check_the_command_is_a_usage_error()
+    public void A_layout_violation_is_rewritten_to_the_canonical_layout()
     {
-        var result = ScriptsProcess.Run("format", "script.scs");
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var path = Path.Combine(directory, "messy.scs");
+            File.WriteAllBytes(
+                path,
+                [0xEF, 0xBB, 0xBF, .. Encoding.UTF8.GetBytes("function f() -> unit {\r\n   io.write_standard_output_line(\"x\")  \r\n}\r\nf()\r\n\r\n")]);
+
+            var format = ScriptsProcess.Run("format", path);
+
+            Assert.Equal(0, format.ExitCode);
+            Assert.Equal(string.Empty, format.StandardOutput);
+            Assert.Equal(string.Empty, format.StandardError);
+            var expected = "function f() -> unit {\n    io.write_standard_output_line(\"x\")\n}\nf()\n";
+            Assert.Equal(expected, File.ReadAllText(path));
+            Assert.Equal(0, ScriptsProcess.Run("format", "--check", path).ExitCode);
+            var run = ScriptsProcess.Run("run", path);
+            Assert.Equal(0, run.ExitCode);
+            Assert.Equal("x\n", run.StandardOutput);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void A_second_rewrite_leaves_the_bytes_unchanged()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var path = ScriptsProcess.WriteScript(directory, "bad.scs", "function f() -> unit {\n   let x = 1  \n}\n");
+            Assert.Equal(0, ScriptsProcess.Run("format", path).ExitCode);
+            var once = File.ReadAllBytes(path);
+
+            Assert.Equal(0, ScriptsProcess.Run("format", path).ExitCode);
+            Assert.Equal(once, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void A_rewrite_keeps_raw_string_content()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var path = Path.Combine(directory, "raw.scs");
+            File.WriteAllText(
+                path,
+                "let text = r\"\"\"\r\nline with spaces  \r\n\"\"\"\r\n   io.write_standard_output_line(\"{text.length()}\")\r\n",
+                new UTF8Encoding(false));
+
+            Assert.Equal(0, ScriptsProcess.Run("format", path).ExitCode);
+            var rewritten = File.ReadAllText(path);
+            Assert.Contains("r\"\"\"\r\nline with spaces  \r\n\"\"\"\n", rewritten, StringComparison.Ordinal);
+            Assert.Equal(0, ScriptsProcess.Run("format", "--check", path).ExitCode);
+            Assert.Equal(0, ScriptsProcess.Run("check", path).ExitCode);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void The_standard_input_cannot_be_rewritten()
+    {
+        var result = ScriptsProcess.RunWithStandardInput("let x = 1\n", "format", "-");
 
         Assert.Equal(250, result.ExitCode);
-        Assert.Contains("SCRIPTS-CLI-0015", result.StandardError, StringComparison.Ordinal);
+        Assert.Contains("SCRIPTS-CLI-0016", result.StandardError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_final_symbolic_link_is_refused_and_the_target_is_unchanged()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var target = ScriptsProcess.WriteScript(directory, "target.scs", "let x = 1\n");
+            var link = Path.Combine(directory, "link.scs");
+            File.CreateSymbolicLink(link, target);
+
+            var result = ScriptsProcess.Run("format", link);
+
+            Assert.Equal(252, result.ExitCode);
+            Assert.Contains("SCRIPTS-CLI-0014", result.StandardError, StringComparison.Ordinal);
+            Assert.Equal("let x = 1\n", File.ReadAllText(target));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void A_source_that_cannot_be_tokenized_is_not_rewritten()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var path = ScriptsProcess.WriteScript(directory, "unterminated.scs", "let text = \"unterminated\n");
+
+            var result = ScriptsProcess.Run("format", path);
+
+            Assert.Equal(251, result.ExitCode);
+            Assert.Contains("not canonical: the source cannot be tokenized", result.StandardError, StringComparison.Ordinal);
+            Assert.Equal("let text = \"unterminated\n", File.ReadAllText(path));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void A_missing_script_is_252_for_a_rewrite_too()
+    {
+        var directory = ScriptsProcess.NewTemporaryDirectory();
+        try
+        {
+            var result = ScriptsProcess.Run("format", Path.Combine(directory, "absent.scs"));
+
+            Assert.Equal(252, result.ExitCode);
+            Assert.Contains("SCRIPTS-CLI-0009", result.StandardError, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
     }
 }

@@ -280,4 +280,61 @@ public sealed class LayoutCheckTests
         var issue = Assert.Single(issues);
         Assert.Equal("the source cannot be tokenized", issue.Message);
     }
+
+    [Fact]
+    public void Canonicalize_returns_a_canonical_source_unchanged()
+    {
+        Assert.Equal(Canonical + "\n", LayoutCheck.Canonicalize(Canonical + "\n"));
+    }
+
+    [Fact]
+    public void Canonicalize_rewrites_indentation_crlf_tabs_and_trailing_whitespace()
+    {
+        var canonical = LayoutCheck.Canonicalize("function f() -> unit {\r\n   let x =\t1  \r\n}\r\n\r\n\r\n");
+
+        Assert.Equal("function f() -> unit {\n    let x = 1\n}\n", canonical);
+        Assert.Empty(LayoutCheck.Check(canonical!));
+    }
+
+    [Fact]
+    public void Canonicalize_drops_leading_and_trailing_blank_lines_and_adds_the_final_newline()
+    {
+        Assert.Equal("let x = 1\n", LayoutCheck.Canonicalize("\n\nlet x = 1\n\n\n"));
+        Assert.Equal("let x = 1\n", LayoutCheck.Canonicalize("let x = 1"));
+        Assert.Equal(string.Empty, LayoutCheck.Canonicalize("\n\n"));
+    }
+
+    [Fact]
+    public void Canonicalize_keeps_a_continuation_indentation_and_a_method_chain()
+    {
+        const string source = "let sum = [1, 2]\n      .transform(n => n * 2)\n      .sum()\n";
+
+        Assert.Equal(source, LayoutCheck.Canonicalize(source));
+        Assert.Empty(LayoutCheck.Check(source));
+    }
+
+    [Fact]
+    public void Canonicalize_keeps_raw_string_content_and_its_crlf()
+    {
+        const string source = "let text = r\"\"\"\r\nline with spaces  \r\n\"\"\"\nio.write_standard_output_line(\"{text.length()}\")\n";
+
+        Assert.Equal(source, LayoutCheck.Canonicalize(source));
+        Assert.Empty(LayoutCheck.Check(source));
+    }
+
+    [Fact]
+    public void Canonicalize_refuses_a_source_that_cannot_be_tokenized()
+    {
+        Assert.Null(LayoutCheck.Canonicalize("let text = \"unterminated\n"));
+    }
+
+    [Fact]
+    public void Canonicalize_is_idempotent()
+    {
+        const string source = "function f() -> unit {\n   let x =\t1  \r\n}\n\n\n";
+
+        var once = LayoutCheck.Canonicalize(source);
+        Assert.NotNull(once);
+        Assert.Equal(once, LayoutCheck.Canonicalize(once));
+    }
 }

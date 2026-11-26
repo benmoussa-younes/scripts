@@ -10,8 +10,9 @@
 #   2. AOT app              dotnet publish src/Scripts.App -r linux-x64
 #   3. script helpers       scripts run tools/scripts/binaries/test-scripts.scs
 #   4. packaging metadata   scripts run tools/scripts/binaries/check-packaging.scs
-#   5. AOT tests            publish + run the six Native AOT xUnit executables
-#   6. licences             reuse lint on the tree
+#   5. shell scripts        shellcheck -S warning on packaging/ and tools/scripts/binaries/
+#   6. AOT tests            publish + run the six Native AOT xUnit executables
+#   7. licences             reuse lint on the tree
 #
 # Tests only run as Native AOT executables: there is no `dotnet test` step and
 # no VSTest host. The step count is asserted below: a silently skipped corpus
@@ -34,15 +35,15 @@ for argument in "$@"; do
   esac
 done
 
-# Six steps with the build, five without it (the AOT app publish always runs).
-expected_steps=6
+# Seven steps with the build, six without it (the AOT app publish always runs).
+expected_steps=7
 if [ "$do_build" -eq 0 ]; then
-  expected_steps=5
+  expected_steps=6
 fi
 
 script_directory="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repository_root="$(cd "$script_directory/../../.." && pwd)"
-cd "$repository_root"
+cd "$repository_root" || exit 1
 
 # The product binary the tests exercise: the Native AOT deliverable, never the
 # JIT apphost under bin/Release/net10.0/.
@@ -142,12 +143,31 @@ run_step "script helpers (version fallback)" \
 run_step "packaging metadata (Debian, CHANGELOG, README)" \
   "$scripts_binary" run tools/scripts/binaries/check-packaging.scs || fail_fast "packaging metadata"
 
-# 5. AOT tests: each xUnit project is published as a Native AOT executable and
+# 5. Shell scripts: shellcheck on the repository's own tooling. The .sh files
+#    under tests/Corpus are language fixtures, not shipped programs, and the
+#    .scs files are not shell scripts; both stay out of the scan.
+run_shellcheck() {
+  local files=(
+    packaging/build-deb.sh
+    packaging/build-tarballs.sh
+    packaging/smoke-test.sh
+    packaging/verify-release.sh
+    tools/scripts/binaries/aot-tests.sh
+    tools/scripts/binaries/check-all.sh
+    tools/scripts/binaries/gate
+    tools/scripts/binaries/gate-static
+    tools/scripts/binaries/version.sh
+  )
+  shellcheck -S warning "${files[@]}"
+}
+run_step "shell scripts (shellcheck)" run_shellcheck || fail_fast "shell scripts"
+
+# 6. AOT tests: each xUnit project is published as a Native AOT executable and
 #    run directly by aot-tests.sh (E2E and corpus receive the AOT app binary).
 run_step "AOT tests (xUnit Native AOT)" \
   bash tools/scripts/binaries/aot-tests.sh --all || fail_fast "AOT tests"
 
-# 6. Licences: `reuse lint` on the tracked tree.
+# 7. Licences: `reuse lint` on the tracked tree.
 run_licences() {
   local work list status
   work="$(mktemp -d)" || return 1
@@ -168,7 +188,7 @@ run_licences() {
   ( cd "$work" && reuse lint )
   status=$?
   rm -rf "$work"
-  return $status
+  return "$status"
 }
 run_step "licences (reuse lint)" run_licences || fail_fast "licences"
 

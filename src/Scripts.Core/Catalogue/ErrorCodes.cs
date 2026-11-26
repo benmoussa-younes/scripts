@@ -184,6 +184,7 @@ public static class ErrorCodes
     public const string Cli0013 = "SCRIPTS-CLI-0013";
     public const string Cli0014 = "SCRIPTS-CLI-0014";
     public const string Cli0015 = "SCRIPTS-CLI-0015";
+    public const string Cli0016 = "SCRIPTS-CLI-0016";
     public const string Lint0001 = "SCRIPTS-LINT-0001";
     public const string Lint0002 = "SCRIPTS-LINT-0002";
     public const string Lint0003 = "SCRIPTS-LINT-0003";
